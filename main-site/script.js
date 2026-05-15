@@ -56,6 +56,7 @@ const DOCS = {
         contentEl:   'join-content',
         breadcrumbEl:'join-breadcrumb',
         navFooterEl: 'join-nav-footer',
+        defaultSlug: 'index',
     },
 };
 
@@ -135,7 +136,11 @@ function handleRoute(fullPath) {
             switchDoc(docKey);
             showPage(docKey === 'charter' ? 'charter' : docKey);
             updateActiveNav(doc.navPage);
-            renderDocIndex();
+            if (doc.defaultSlug) {
+                loadPage(doc.defaultSlug, null);
+            } else {
+                renderDocIndex();
+            }
             ensureSidebarOpen();
             return;
         }
