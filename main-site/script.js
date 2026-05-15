@@ -179,7 +179,7 @@ function showPage(name) {
     if (el) el.classList.add('active');
     if (name !== 'charter') window.scrollTo(0, 0);
 
-    if (name === 'home' || name === 'about') {
+    if (name === 'home' || name === 'about' || name === 'admin') {
         const nav = document.getElementById('sidebar-nav');
         if (name === 'home' && nav) nav.innerHTML = '';
         const titleEl = document.querySelector('.sidebar-title');
