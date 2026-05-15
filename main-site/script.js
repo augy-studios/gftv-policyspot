@@ -179,17 +179,11 @@ function showPage(name) {
     if (el) el.classList.add('active');
     if (name !== 'charter') window.scrollTo(0, 0);
 
-    if (name === 'home') {
+    if (name === 'home' || name === 'join' || name === 'about' || name === 'admin') {
         buildHomeSidebar();
         if (window.innerWidth >= 900) {
             document.getElementById('sidebar')?.classList.remove('collapsed');
             document.getElementById('main-content')?.classList.remove('sidebar-hidden');
-        }
-    } else if (name === 'about' || name === 'admin') {
-        closeSidebar();
-        if (window.innerWidth >= 900) {
-            document.getElementById('sidebar')?.classList.add('collapsed');
-            document.getElementById('main-content')?.classList.add('sidebar-hidden');
         }
     } else {
         if (window.innerWidth >= 900) {
