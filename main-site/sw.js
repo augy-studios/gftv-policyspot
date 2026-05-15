@@ -1,4 +1,4 @@
-const CACHE = "gftv-policyspot-offline-v1";
+const CACHE = "gftv-policyspot-offline-v2";
 
 const ASSETS = [
   "/",
