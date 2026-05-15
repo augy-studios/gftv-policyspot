@@ -17,17 +17,25 @@ module.exports = async (req, res) => {
     const user = await validateSession(req);
     if (!user) return err(res, 'Unauthorized', 401);
     if (!user.is_admin) return err(res, 'Forbidden', 403);
-    const { id, table, title, content, anchor, number } = req.body || {};
+    const { id, table, title, content, anchor, number, slug } = req.body || {};
     if (!id || !table) return err(res, 'id and table required');
     const tableName = TABLE_MAP[table];
     if (!tableName) return err(res, 'Invalid table');
     if (title !== undefined && !String(title).trim()) return err(res, 'Title cannot be empty');
+    if (slug !== undefined && !String(slug).trim()) return err(res, 'Slug cannot be empty');
+    if (slug !== undefined && !/^[a-z0-9-]+$/.test(String(slug).trim())) return err(res, 'Slug must be lowercase alphanumeric with hyphens only');
     const updates = { updated_at: new Date().toISOString() };
     if (title   !== undefined) updates.title   = String(title).trim();
     if (content !== undefined) updates.content = content;
     if (anchor  !== undefined) updates.anchor  = anchor || null;
     if (number  !== undefined) updates.number  = number || null;
+    if (slug    !== undefined) updates.slug    = String(slug).trim();
     const supabase = getSupabaseClient();
+    if (slug !== undefined) {
+        const { data: existing } = await supabase
+            .from(tableName).select('id').eq('slug', String(slug).trim()).neq('id', id).maybeSingle();
+        if (existing) return err(res, 'Slug already in use', 409);
+    }
     const { data, error } = await supabase
         .from(tableName)
         .update(updates)

@@ -179,15 +179,21 @@ function showPage(name) {
     if (el) el.classList.add('active');
     if (name !== 'charter') window.scrollTo(0, 0);
 
-    if (name === 'home') {
+    if (name === 'home' || name === 'about') {
         const nav = document.getElementById('sidebar-nav');
-        if (nav) nav.innerHTML = '';
+        if (name === 'home' && nav) nav.innerHTML = '';
         const titleEl = document.querySelector('.sidebar-title');
-        if (titleEl) titleEl.textContent = '';
+        if (name === 'home' && titleEl) titleEl.textContent = '';
         closeSidebar();
         if (window.innerWidth >= 900) {
             document.getElementById('sidebar')?.classList.add('collapsed');
             document.getElementById('main-content')?.classList.add('sidebar-hidden');
+        }
+    } else if (name === 'join') {
+        closeSidebar();
+        if (window.innerWidth >= 900) {
+            document.getElementById('sidebar')?.classList.remove('collapsed');
+            document.getElementById('main-content')?.classList.remove('sidebar-hidden');
         }
     } else {
         if (window.innerWidth >= 900) {
@@ -306,6 +312,14 @@ function buildSidebar() {
         }
         nav.appendChild(div);
     });
+
+    if (currentUser?.is_admin) {
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn btn-sm btn-ghost sidebar-add-btn';
+        addBtn.textContent = '+ Add Section';
+        addBtn.addEventListener('click', () => openAddSectionModal(null));
+        nav.appendChild(addBtn);
+    }
 }
 
 function buildArticleCards() {
@@ -497,6 +511,10 @@ function renderArticlePage(article, activeAnchor) {
       </div>`;
     });
 
+    if (canEditContent) {
+        html += `<button class="btn btn-sm btn-ghost add-subsection-btn" data-parent-id="${article.id}">+ Add Subsection</button>`;
+    }
+
     html += `</div>`;
     contentEl.innerHTML = html;
 
@@ -512,6 +530,7 @@ function renderArticlePage(article, activeAnchor) {
             const sec = sections.find(s => s.id === btn.dataset.id) || article;
             btn.addEventListener('click', () => openContentModal(sec));
         });
+        contentEl.querySelector('.add-subsection-btn')?.addEventListener('click', () => openAddSectionModal(article));
     }
 
     contentEl.querySelectorAll('.anchor-link').forEach(a => {
@@ -1027,45 +1046,182 @@ function openContentModal(section) {
     document.getElementById('content-edit-id').value = section.id;
     document.getElementById('content-edit-table').value = currentDoc;
     document.getElementById('content-edit-title').value = section.title || '';
+    document.getElementById('content-edit-slug').value = section.slug || '';
     document.getElementById('content-edit-number').value = section.number || '';
     document.getElementById('content-edit-anchor').value = section.anchor || '';
     document.getElementById('content-edit-content').value = section.content || '';
+    document.getElementById('content-edit-mode').value = 'edit';
+    document.getElementById('content-edit-parent-id').value = section.parent_id || '';
+
     const anchorGroup = document.getElementById('content-edit-anchor-group');
     if (anchorGroup) anchorGroup.style.display = section.type === 'subsection' ? '' : 'none';
+    document.getElementById('content-edit-type-group').style.display = 'none';
+
+    document.getElementById('content-modal-title').textContent = 'Edit Section';
+
+    const siblings = section.type === 'subsection'
+        ? subsectionsOf(section.parent_id)
+        : topLevelPages();
+    const idx = siblings.findIndex(s => s.id === section.id);
+    document.getElementById('content-edit-move-up').style.display = idx > 0 ? '' : 'none';
+    document.getElementById('content-edit-move-down').style.display = (idx >= 0 && idx < siblings.length - 1) ? '' : 'none';
+    document.getElementById('content-edit-delete').style.display = '';
+
+    document.getElementById('content-edit-error').classList.add('hidden');
+    openModal('content-modal');
+}
+
+function openAddSectionModal(parentSection) {
+    document.getElementById('content-edit-id').value = '';
+    document.getElementById('content-edit-table').value = currentDoc;
+    document.getElementById('content-edit-title').value = '';
+    document.getElementById('content-edit-slug').value = '';
+    document.getElementById('content-edit-number').value = '';
+    document.getElementById('content-edit-anchor').value = '';
+    document.getElementById('content-edit-content').value = '';
+    document.getElementById('content-edit-mode').value = 'add';
+    document.getElementById('content-edit-parent-id').value = parentSection ? parentSection.id : '';
+
+    const isSubsection = !!parentSection;
+    document.getElementById('content-edit-anchor-group').style.display = isSubsection ? '' : 'none';
+    document.getElementById('content-edit-type-group').style.display = isSubsection ? 'none' : '';
+
+    document.getElementById('content-modal-title').textContent = isSubsection ? 'Add Subsection' : 'Add Section';
+    document.getElementById('content-edit-move-up').style.display = 'none';
+    document.getElementById('content-edit-move-down').style.display = 'none';
+    document.getElementById('content-edit-delete').style.display = 'none';
+
     document.getElementById('content-edit-error').classList.add('hidden');
     openModal('content-modal');
 }
 
 document.getElementById('content-edit-save')?.addEventListener('click', async () => {
-    const id      = document.getElementById('content-edit-id').value;
-    const table   = document.getElementById('content-edit-table').value;
-    const title   = document.getElementById('content-edit-title').value.trim();
-    const number  = document.getElementById('content-edit-number').value.trim();
-    const anchor  = document.getElementById('content-edit-anchor').value.trim();
-    const content = document.getElementById('content-edit-content').value;
-    const errEl   = document.getElementById('content-edit-error');
+    const id       = document.getElementById('content-edit-id').value;
+    const table    = document.getElementById('content-edit-table').value;
+    const title    = document.getElementById('content-edit-title').value.trim();
+    const slug     = document.getElementById('content-edit-slug').value.trim();
+    const number   = document.getElementById('content-edit-number').value.trim();
+    const anchor   = document.getElementById('content-edit-anchor').value.trim();
+    const content  = document.getElementById('content-edit-content').value;
+    const mode     = document.getElementById('content-edit-mode').value;
+    const parentId = document.getElementById('content-edit-parent-id').value;
+    const errEl    = document.getElementById('content-edit-error');
     errEl.classList.add('hidden');
-    if (!title) {
-        errEl.textContent = 'Title cannot be empty';
-        errEl.classList.remove('hidden');
-        return;
-    }
+
+    if (!title) { errEl.textContent = 'Title cannot be empty'; errEl.classList.remove('hidden'); return; }
+    if (!slug)  { errEl.textContent = 'Slug cannot be empty';  errEl.classList.remove('hidden'); return; }
+
     const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch('/api/policy/update-section', {
+
+    if (mode === 'add') {
+        const type = parentId
+            ? 'subsection'
+            : (document.getElementById('content-edit-type')?.value || 'article');
+        const res = await apiFetch('/api/policy/add-section', {
+            method: 'POST',
+            body: JSON.stringify({ table, title, slug, content, type, parent_id: parentId || null, number: number || null, anchor: anchor || null }),
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+            closeModal('content-modal');
+            showToast('Section created', 'success');
+            docSectionsCache[currentDoc] = null;
+            await loadSections(currentDoc, { force: true });
+            navigate(`${DOCS[currentDoc].urlBase}/${res.section.slug}`);
+        } else {
+            errEl.textContent = res.error || 'Create failed';
+            errEl.classList.remove('hidden');
+        }
+    } else {
+        const res = await apiFetch('/api/policy/update-section', {
+            method: 'PUT',
+            body: JSON.stringify({ id, table, title, slug, content, anchor: anchor || null, number: number || null }),
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+            closeModal('content-modal');
+            showToast('Section updated', 'success');
+            const sec = sections.find(s => s.id === id);
+            if (sec) Object.assign(sec, res.section);
+            buildSidebar();
+            navigate(`${DOCS[currentDoc].urlBase}/${res.section?.slug || slug}${location.hash}`, { replace: true });
+        } else {
+            errEl.textContent = res.error || 'Update failed';
+            errEl.classList.remove('hidden');
+        }
+    }
+});
+
+/* ─── Move Up / Down ─── */
+async function moveSection(direction) {
+    const id    = document.getElementById('content-edit-id').value;
+    const table = document.getElementById('content-edit-table').value;
+    const errEl = document.getElementById('content-edit-error');
+    const token = localStorage.getItem('gftv-token');
+    const res = await apiFetch('/api/policy/reorder-section', {
         method: 'PUT',
-        body: JSON.stringify({ id, table, title, content, anchor: anchor || null, number: number || null }),
+        body: JSON.stringify({ id, table, direction }),
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     });
     if (res.ok) {
         closeModal('content-modal');
-        showToast('Section updated', 'success');
-        const sec = sections.find(s => s.id === id);
-        if (sec) Object.assign(sec, res.section);
+        showToast('Reordered', 'success');
+        docSectionsCache[currentDoc] = null;
+        await loadSections(currentDoc, { force: true });
         navigate(location.pathname + location.hash, { replace: true });
-        buildSidebar();
     } else {
-        errEl.textContent = res.error || 'Update failed';
+        errEl.textContent = res.error || 'Reorder failed';
         errEl.classList.remove('hidden');
+    }
+}
+
+document.getElementById('content-edit-move-up')?.addEventListener('click', () => moveSection('up'));
+document.getElementById('content-edit-move-down')?.addEventListener('click', () => moveSection('down'));
+
+/* ─── Delete Section ─── */
+let _pendingDeleteId = null;
+let _pendingDeleteTable = null;
+let _pendingDeleteParent = null;
+
+document.getElementById('content-edit-delete')?.addEventListener('click', () => {
+    _pendingDeleteId = document.getElementById('content-edit-id').value;
+    _pendingDeleteTable = document.getElementById('content-edit-table').value;
+    _pendingDeleteParent = document.getElementById('content-edit-parent-id').value || null;
+    const title = document.getElementById('content-edit-title').value;
+    document.getElementById('delete-confirm-message').textContent =
+        `Are you sure you want to delete "${title}"? This cannot be undone.`;
+    document.getElementById('delete-confirm-error').classList.add('hidden');
+    closeModal('content-modal');
+    openModal('delete-confirm-modal');
+});
+
+document.getElementById('delete-confirm-btn')?.addEventListener('click', async () => {
+    if (!_pendingDeleteId || !_pendingDeleteTable) return;
+    const token = localStorage.getItem('gftv-token');
+    const res = await apiFetch('/api/policy/delete-section', {
+        method: 'DELETE',
+        body: JSON.stringify({ id: _pendingDeleteId, table: _pendingDeleteTable }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) {
+        closeModal('delete-confirm-modal');
+        showToast('Section deleted', 'success');
+        docSectionsCache[currentDoc] = null;
+        await loadSections(currentDoc, { force: true });
+        if (_pendingDeleteParent) {
+            // Navigate back to the parent article
+            const parent = sections.find(s => s.id === _pendingDeleteParent);
+            if (parent) navigate(`${DOCS[currentDoc].urlBase}/${parent.slug}`);
+            else navigate(DOCS[currentDoc].urlBase);
+        } else {
+            navigate(DOCS[currentDoc].urlBase);
+        }
+        _pendingDeleteId = null;
+        _pendingDeleteTable = null;
+        _pendingDeleteParent = null;
+    } else {
+        document.getElementById('delete-confirm-error').textContent = res.error || 'Delete failed';
+        document.getElementById('delete-confirm-error').classList.remove('hidden');
     }
 });
 
