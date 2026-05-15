@@ -161,6 +161,24 @@
   --shadow: rgba(100, 130, 100, 0.15);
 }
 
+[data-theme="hello"] {
+  --brand: #fedc00;
+  --brand-mid: #f5d000;
+  --brand-dark: #9e8800;
+  --brand-text: #3a3000;
+  --bg: #fffde0;
+  --bg-alt: #fff9c4;
+  --surface: rgba(254, 220, 0, 0.35);
+  --surface-hover: rgba(254, 220, 0, 0.55);
+  --surface-active: rgba(254, 220, 0, 0.7);
+  --border: rgba(200, 170, 0, 0.3);
+  --border-strong: rgba(160, 130, 0, 0.5);
+  --text: #2e2800;
+  --text-muted: #5a4e00;
+  --text-light: #7a6c00;
+  --shadow: rgba(160, 130, 0, 0.15);
+}
+
 /* ─── Reset & Base ─── */
 *,
 *::before,
