@@ -1,10 +1,47 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
     "version": 2,
-    "cleanUrls": true,
     "regions": ["sin1"],
     "rewrites": [{
-        "source": "/",
-        "destination": "/"
+            "source": "/api/(.*)",
+            "destination": "/api/$1"
+        },
+        {
+            "source": "/the-charter",
+            "destination": "/"
+        },
+        {
+            "source": "/the-charter/(.*)",
+            "destination": "/"
+        },
+        {
+            "source": "/about",
+            "destination": "/"
+        },
+        {
+            "source": "/admin",
+            "destination": "/"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/$1"
+        }
+    ],
+    "headers": [{
+        "source": "/api/(.*)",
+        "headers": [{
+                "key": "Access-Control-Allow-Origin",
+                "value": "*"
+            },
+            {
+                "key": "Access-Control-Allow-Methods",
+                "value": "GET, POST, PUT, DELETE, OPTIONS"
+            },
+            {
+                "key": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+            }
+        ]
     }]
+
 }

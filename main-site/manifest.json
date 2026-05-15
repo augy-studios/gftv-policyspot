@@ -1,7 +1,7 @@
 {
-    "name": "Template by UwU Apps",
-    "short_name": "UwU Template",
-    "description": "A simple template app; view live template at a glance!",
+    "name": "GFTV PolicySpot by Global Furry Television",
+    "short_name": "GFTV PolicySpot",
+    "description": "The official policy documentation site for Global Furry Television (GFTV).",
     "icons": [{
         "src": "templateicon1.png",
         "type": "image/png",
@@ -26,7 +26,7 @@
     "display": "standalone",
     "display_override": ["fullscreen", "minimal-ui", "window-controls-overlay"],
     "orientation": "portrait-primary",
-    "id": "template",
+    "id": "gftv-policyspot",
     "dir": "ltr",
     "scope": "/",
     "lang": "en",

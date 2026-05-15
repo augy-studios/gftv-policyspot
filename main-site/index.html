@@ -20,14 +20,15 @@
     <link rel="manifest" href="/manifest.json" />
 
     <meta charset="utf-8">
-    <title>Template | UwU Apps</title>
+    <title>GFTV PolicySpot | Global Furry Television</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A simple template app; view live template at a glance!">
+    <meta name="description" content="The official policy documentation site for Global Furry Television (GFTV).">
 
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Template | UwU Apps" />
-    <meta property="og:site_name" content="UwU Apps" />
-    <meta property="og:description" content="A simple template app; view live template at a glance!" />
+    <meta property="og:title" content="GFTV PolicySpot | Global Furry Television" />
+    <meta property="og:site_name" content="Global Furry Television" />
+    <meta property="og:description"
+        content="The official policy documentation site for Global Furry Television (GFTV)." />
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jua">
     <link rel="stylesheet" href="/style.css">
@@ -45,17 +46,448 @@
     <script defer="" src="https://use.fontawesome.com/releases/v6.5.2/js/all.js"></script>
 </head>
 
-<body>
-    Template
+<body data-theme="classic">
+    <!-- Header -->
+    <header class="site-header" id="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-link">
+                <span class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="28" height="28" rx="8" fill="var(--brand)" />
+                        <path d="M7 8h14M7 14h10M7 20h12" stroke="white" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </span>
+                <span class="logo-text">PolicySpot</span>
+                <span class="logo-sub">GFTV</span>
+            </a>
+            <nav class="header-nav" id="header-nav">
+                <a href="/" class="nav-link" data-page="home">Home</a>
+                <a href="/the-charter" class="nav-link" data-page="charter">Charter</a>
+                <a href="/about" class="nav-link" data-page="about">About</a>
+            </nav>
+            <div class="header-actions">
+                <button class="icon-btn coffee-btn" id="coffee-btn" title="Buy Augy a Coffee"
+                    onclick="window.open('https://donate.stripe.com/28o2akeAr3hv0DK6oo','_blank')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 8h1a4 4 0 0 1 0 8h-1" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                        <line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                    </svg>
+                </button>
+                <button class="icon-btn theme-btn" id="theme-btn" title="Change Theme">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                        <path d="M12 2a10 10 0 0 1 0 20" fill="currentColor" />
+                    </svg>
+                </button>
+                <button class="icon-btn menu-btn" id="menu-btn" title="Menu" aria-label="Toggle navigation">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                    </svg>
+                </button>
+                <div class="user-area" id="user-area">
+                    <button class="btn btn-ghost btn-sm" id="login-btn">Sign In</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">Contents</span>
+            <button class="icon-btn sidebar-close" id="sidebar-close" aria-label="Close sidebar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </button>
+        </div>
+        <nav class="sidebar-nav" id="sidebar-nav">
+            <div class="sidebar-loading">
+                <span class="spinner"></span> Loading...
+            </div>
+        </nav>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <div id="page-home" class="page active">
+            <!-- Hero -->
+            <section class="hero glass-card">
+                <div class="hero-body">
+                    <div class="hero-badge">Edition 2024</div>
+                    <h1 class="hero-title">Charter of Global Furry Television</h1>
+                    <p class="hero-sub">The supreme governing framework of GFTV — establishing its ethical and
+                        operational principles.</p>
+                    <div class="hero-actions">
+                        <a href="/the-charter" class="btn btn-primary" data-navlink>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+                                    stroke="currentColor" stroke-width="2" />
+                                <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" /></svg>
+                            Read the Charter
+                        </a>
+                        <a href="/the-charter/citation" class="btn btn-ghost" data-navlink>Start Reading</a>
+                    </div>
+                </div>
+                <div class="hero-graphic">
+                    <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="10" width="100" height="100" rx="16" fill="var(--brand)" opacity="0.15" />
+                        <rect x="24" y="24" width="72" height="72" rx="10" fill="var(--brand)" opacity="0.25" />
+                        <path d="M35 46h50M35 60h36M35 74h44" stroke="var(--brand-dark)" stroke-width="3"
+                            stroke-linecap="round" />
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Quick links -->
+            <section class="section-grid" id="quick-links">
+                <h2 class="section-title">Articles at a Glance</h2>
+                <div class="card-grid" id="article-cards">
+                    <div class="glass-card article-card skeleton"></div>
+                    <div class="glass-card article-card skeleton"></div>
+                    <div class="glass-card article-card skeleton"></div>
+                    <div class="glass-card article-card skeleton"></div>
+                </div>
+            </section>
+
+            <!-- Values -->
+            <section class="values-section">
+                <h2 class="section-title">Core Values</h2>
+                <div class="values-grid">
+                    <div class="glass-card value-card">
+                        <div class="value-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="var(--brand-dark)"
+                                    stroke-width="2" stroke-linejoin="round" /></svg>
+                        </div>
+                        <div class="value-zh">诚</div>
+                        <div class="value-en">Genuine</div>
+                        <p>To serve the community with true dedication, rather than for social status.</p>
+                    </div>
+                    <div class="glass-card value-card">
+                        <div class="value-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"
+                                    stroke="var(--brand-dark)" stroke-width="2" stroke-linejoin="round" /></svg>
+                        </div>
+                        <div class="value-zh">正</div>
+                        <div class="value-en">Fairness</div>
+                        <p>To ensure that all individuals are treated fairly and given equal opportunity.</p>
+                    </div>
+                    <div class="glass-card value-card">
+                        <div class="value-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                                    stroke="var(--brand-dark)" stroke-width="2" />
+                                <path d="M8 12l2 2 4-4" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" /></svg>
+                        </div>
+                        <div class="value-zh">信</div>
+                        <div class="value-en">Trust</div>
+                        <p>To act with sincerity, reliability, and integrity, so as to earn and maintain the trust of
+                            the community.</p>
+                    </div>
+                    <div class="glass-card value-card">
+                        <div class="value-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="var(--brand-dark)" stroke-width="2" />
+                                <path d="M12 8v4l3 3" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" /></svg>
+                        </div>
+                        <div class="value-zh">前</div>
+                        <div class="value-en">Visionary</div>
+                        <p>To explore new ways of bringing communities together and advancing GFTV's purpose.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Charter Page -->
+        <div id="page-charter" class="page">
+            <div class="charter-layout">
+                <div class="charter-main">
+                    <div class="doc-toolbar">
+                        <div class="doc-breadcrumb" id="doc-breadcrumb">
+                            <a href="/" data-navlink>Home</a>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                            <span>Charter</span>
+                        </div>
+                        <div class="doc-actions">
+                            <button class="btn btn-ghost btn-sm copy-dropdown-btn" id="copy-dropdown-btn"
+                                title="Copy / Export options">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor"
+                                        stroke-width="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                                        stroke="currentColor" stroke-width="2" /></svg>
+                                Copy
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" /></svg>
+                            </button>
+                            <div class="copy-dropdown" id="copy-dropdown" hidden>
+                                <button class="dropdown-item" id="action-copy-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor"
+                                            stroke-width="2" />
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                                            stroke="currentColor" stroke-width="2" /></svg>
+                                    Copy Page (Markdown for LLMs)
+                                </button>
+                                <button class="dropdown-item" id="action-view-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+                                            stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+                                        </svg>
+                                    View as Markdown
+                                </button>
+                                <button class="dropdown-item" id="action-export-pdf">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+                                            stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" />
+                                        </svg>
+                                    Export as PDF
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" id="action-chatgpt">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                        <path d="M8 12s1.5-3 4-3 4 3 4 3-1.5 3-4 3-4-3-4-3z" stroke="currentColor"
+                                            stroke-width="2" /></svg>
+                                    Open in ChatGPT
+                                </button>
+                                <button class="dropdown-item" id="action-claude">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"
+                                            fill="currentColor" /></svg>
+                                    Open in Claude
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="section-content" class="section-content">
+                        <div class="section-loading">
+                            <span class="spinner large"></span>
+                            <p>Loading content...</p>
+                        </div>
+                    </div>
+
+                    <div class="doc-nav-footer" id="doc-nav-footer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="page-about" class="page">
+            <section class="glass-card about-card">
+                <h1>About PolicySpot</h1>
+                <p>PolicySpot is the official policy documentation portal for <strong>Global Furry Television
+                        (GFTV)</strong>. This site hosts the Charter of Global Furry Television and related policy
+                    documents in a structured, accessible format.</p>
+                <h2>About GFTV</h2>
+                <p>Global Furry Television (国际兽圈电视) is a Singapore-based furry fandom media channel dedicated to
+                    producing and distributing furry fandom entertainment and news content, and facilitating cultural
+                    and community activity and exchange among participants of the furry fandom.</p>
+                <h2>Document</h2>
+                <p>The Charter of Global Furry Television (Edition 2024) is the supreme governing framework of GFTV,
+                    establishing its ethical and operational principles across nine articles and one schedule.</p>
+                <div class="about-links">
+                    <a href="https://gftv.asia" target="_blank" rel="noopener" class="btn btn-ghost">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor"
+                                stroke-width="2" />
+                            <polyline points="15,3 21,3 21,9" stroke="currentColor" stroke-width="2" />
+                            <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" /></svg>
+                        Visit GFTV
+                    </a>
+                </div>
+            </section>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="page-admin" class="page">
+            <div class="admin-layout">
+                <h1>Admin Panel</h1>
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-tab="users">Users</button>
+                    <button class="tab-btn" data-tab="seed">Seed Data</button>
+                </div>
+                <div class="tab-content" id="tab-users">
+                    <h2>User Management</h2>
+                    <div id="admin-users-list">Loading...</div>
+                </div>
+                <div class="tab-content hidden" id="tab-seed">
+                    <h2>Seed Policy Sections</h2>
+                    <p>This will populate the database with all sections from the Charter. Safe to run multiple times
+                        (upserts on slug).</p>
+                    <button class="btn btn-primary" id="seed-btn">Run Seed</button>
+                    <pre id="seed-output" class="seed-output hidden"></pre>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modals -->
+    <!-- Theme Picker Modal -->
+    <div class="modal-overlay" id="theme-modal" hidden>
+        <div class="modal glass-card">
+            <div class="modal-header">
+                <h2 class="modal-title">Choose Theme</h2>
+                <button class="icon-btn modal-close" data-close="theme-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                </button>
+            </div>
+            <div class="theme-grid">
+                <button class="theme-swatch active" data-theme="classic" style="--swatch:#ccffcc">
+                    <span class="swatch-dot" style="background:#ccffcc"></span>
+                    <span>Classic</span>
+                    <span class="swatch-hex">#ccffcc</span>
+                </button>
+                <button class="theme-swatch" data-theme="ng1" style="--swatch:#ffcccc">
+                    <span class="swatch-dot" style="background:#ffcccc"></span>
+                    <span>Not green 1</span>
+                    <span class="swatch-hex">#ffcccc</span>
+                </button>
+                <button class="theme-swatch" data-theme="ng2" style="--swatch:#ccccff">
+                    <span class="swatch-dot" style="background:#ccccff"></span>
+                    <span>Not green 2</span>
+                    <span class="swatch-hex">#ccccff</span>
+                </button>
+                <button class="theme-swatch" data-theme="ng3" style="--swatch:#ffffcc">
+                    <span class="swatch-dot" style="background:#ffffcc"></span>
+                    <span>Not green 3</span>
+                    <span class="swatch-hex">#ffffcc</span>
+                </button>
+                <button class="theme-swatch" data-theme="ng4" style="--swatch:#ffccff">
+                    <span class="swatch-dot" style="background:#ffccff"></span>
+                    <span>Not green 4</span>
+                    <span class="swatch-hex">#ffccff</span>
+                </button>
+                <button class="theme-swatch" data-theme="ng5" style="--swatch:#ccffff">
+                    <span class="swatch-dot" style="background:#ccffff"></span>
+                    <span>Not green 5</span>
+                    <span class="swatch-hex">#ccffff</span>
+                </button>
+                <button class="theme-swatch" data-theme="white" style="--swatch:#ffffff">
+                    <span class="swatch-dot" style="background:#ffffff;border:1px solid #ccc"></span>
+                    <span>Really really light green</span>
+                    <span class="swatch-hex">#ffffff</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="auth-modal" hidden>
+        <div class="modal glass-card auth-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="auth-modal-title">Sign In</h2>
+                <button class="icon-btn modal-close" data-close="auth-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                </button>
+            </div>
+            <div id="auth-error" class="auth-error hidden"></div>
+            <div id="auth-form-login">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" class="form-input" placeholder="you@example.com"
+                        autocomplete="email" />
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-input" placeholder="Password"
+                        autocomplete="current-password" />
+                </div>
+                <button class="btn btn-primary w-full" id="login-submit">Sign In</button>
+                <p class="auth-switch">No account? <button class="link-btn" id="show-register">Create one</button></p>
+            </div>
+            <div id="auth-form-register" class="hidden">
+                <div class="form-group">
+                    <label for="reg-display">Display Name</label>
+                    <input type="text" id="reg-display" class="form-input" placeholder="Your Name" />
+                </div>
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" class="form-input" placeholder="lowercase username" />
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" class="form-input" placeholder="you@example.com"
+                        autocomplete="email" />
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" class="form-input" placeholder="Min 8 characters"
+                        autocomplete="new-password" />
+                </div>
+                <button class="btn btn-primary w-full" id="reg-submit">Create Account</button>
+                <p class="auth-note">Accounts require admin approval before login is possible.</p>
+                <p class="auth-switch">Already have an account? <button class="link-btn" id="show-login">Sign
+                        in</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slug Edit Modal -->
+    <div class="modal-overlay" id="slug-modal" hidden>
+        <div class="modal glass-card">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Slug</h2>
+                <button class="icon-btn modal-close" data-close="slug-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                </button>
+            </div>
+            <div class="form-group">
+                <label for="slug-input">New Slug</label>
+                <input type="text" id="slug-input" class="form-input" placeholder="lowercase-with-hyphens" />
+                <p class="form-hint">URL: <code id="slug-preview">policy.globalfurry.tv/charter/</code></p>
+            </div>
+            <input type="hidden" id="slug-section-id" />
+            <div id="slug-error" class="auth-error hidden"></div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" data-close="slug-modal">Cancel</button>
+                <button class="btn btn-primary" id="slug-save">Save Slug</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
 
     <script src="/script.js"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/sw.js');
+            navigator.serviceWorker.register('/sw.js');
         }
     </script>
-    
+
 </body>
 
 </html>
