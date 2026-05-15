@@ -1544,7 +1544,7 @@ svg {
 /* ─── Responsive ─── */
 @media (min-width: 900px) {
   .sidebar {
-    position: sticky;
+    position: fixed;
     top: 60px;
     transform: none;
     height: calc(100vh - 60px);
