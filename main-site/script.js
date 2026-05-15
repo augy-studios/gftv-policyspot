@@ -935,58 +935,52 @@ function clearAuthError() {
 
 /* ─── Copy Toolbar ─── */
 function setupCopyDropdown() {
-    const btn = document.getElementById('copy-dropdown-btn');
-    const dd = document.getElementById('copy-dropdown');
-    if (!btn || !dd) return;
-    btn.addEventListener('click', e => {
-        e.stopPropagation();
-        dd.hidden = !dd.hidden;
+    document.addEventListener('click', e => {
+        const btn = e.target.closest('.copy-dropdown-btn');
+        if (btn) {
+            e.stopPropagation();
+            const dd = btn.closest('.doc-actions').querySelector('.copy-dropdown');
+            const isOpen = !dd.hidden;
+            document.querySelectorAll('.copy-dropdown').forEach(d => { d.hidden = true; });
+            dd.hidden = isOpen;
+            return;
+        }
+        if (!e.target.closest('.copy-dropdown')) {
+            document.querySelectorAll('.copy-dropdown').forEach(d => { d.hidden = true; });
+        }
     });
-    document.addEventListener('click', () => {
+
+    document.addEventListener('click', e => {
+        const item = e.target.closest('[data-action]');
+        if (!item) return;
+        const action = item.dataset.action;
+        const dd = item.closest('.copy-dropdown');
         if (dd) dd.hidden = true;
-    });
 
-    document.getElementById('action-copy-md')?.addEventListener('click', () => {
-        dd.hidden = true;
-        if (!currentSection) return showToast('No page loaded', 'error');
-        const urlBase = DOCS[currentDoc].urlBase;
-        const subs = currentSection.type === 'article' ? subsectionsOf(currentSection.id) : [];
-        let md = `# ${currentSection.title}\n\nSource: https://policy.globalfurry.tv${urlBase}/${currentSection.slug}\n\n${currentSection.content || ''}`;
-        subs.forEach(s => { md += `\n\n## ${s.title}\n\n${s.content || ''}`; });
-        navigator.clipboard.writeText(md).then(() => showToast('Copied as Markdown', 'success'));
-    });
-
-    document.getElementById('action-view-md')?.addEventListener('click', () => {
-        dd.hidden = true;
-        if (!currentSection) return showToast('No page loaded', 'error');
-        const urlBase = DOCS[currentDoc].urlBase;
-        const subs = currentSection.type === 'article' ? subsectionsOf(currentSection.id) : [];
-        let md = `# ${currentSection.title}\n\nSource: https://policy.globalfurry.tv${urlBase}/${currentSection.slug}\n\n${currentSection.content || ''}`;
-        subs.forEach(s => { md += `\n\n## ${s.title}\n\n${s.content || ''}`; });
-        window.open(URL.createObjectURL(new Blob([md], { type: 'text/plain' })), '_blank');
-    });
-
-    document.getElementById('action-export-pdf')?.addEventListener('click', () => {
-        dd.hidden = true;
-        window.print();
-    });
-
-    document.getElementById('action-chatgpt')?.addEventListener('click', () => {
-        dd.hidden = true;
-        const urlBase = DOCS[currentDoc].urlBase;
-        const pageUrl = currentSection ?
-            encodeURIComponent(`https://policy.globalfurry.tv${urlBase}/${currentSection.slug}`) :
-            'https%3A%2F%2Fpolicy.globalfurry.tv';
-        window.open(`https://chat.openai.com/?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
-    });
-
-    document.getElementById('action-claude')?.addEventListener('click', () => {
-        dd.hidden = true;
-        const urlBase = DOCS[currentDoc].urlBase;
-        const pageUrl = currentSection ?
-            encodeURIComponent(`https://policy.globalfurry.tv${urlBase}/${currentSection.slug}`) :
-            'https%3A%2F%2Fpolicy.globalfurry.tv';
-        window.open(`https://claude.ai/new?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
+        if (action === 'copy-md' || action === 'view-md') {
+            if (!currentSection) return showToast('No page loaded', 'error');
+            const urlBase = DOCS[currentDoc].urlBase;
+            const subs = currentSection.type === 'article' ? subsectionsOf(currentSection.id) : [];
+            let md = `# ${currentSection.title}\n\nSource: https://policy.globalfurry.tv${urlBase}/${currentSection.slug}\n\n${currentSection.content || ''}`;
+            subs.forEach(s => { md += `\n\n## ${s.title}\n\n${s.content || ''}`; });
+            if (action === 'copy-md') {
+                navigator.clipboard.writeText(md).then(() => showToast('Copied as Markdown', 'success'));
+            } else {
+                window.open(URL.createObjectURL(new Blob([md], { type: 'text/plain' })), '_blank');
+            }
+        } else if (action === 'export-pdf') {
+            window.print();
+        } else if (action === 'chatgpt' || action === 'claude') {
+            const urlBase = DOCS[currentDoc].urlBase;
+            const pageUrl = currentSection ?
+                encodeURIComponent(`https://policy.globalfurry.tv${urlBase}/${currentSection.slug}`) :
+                'https%3A%2F%2Fpolicy.globalfurry.tv';
+            if (action === 'chatgpt') {
+                window.open(`https://chat.openai.com/?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
+            } else {
+                window.open(`https://claude.ai/new?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
+            }
+        }
     });
 }
 

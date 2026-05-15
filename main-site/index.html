@@ -350,7 +350,7 @@
                             <span>Charter</span>
                         </div>
                         <div class="doc-actions">
-                            <button class="btn btn-ghost btn-sm copy-dropdown-btn" id="copy-dropdown-btn"
+                            <button class="btn btn-ghost btn-sm copy-dropdown-btn"
                                 title="Copy / Export options">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                     <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor"
@@ -362,8 +362,8 @@
                                     <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" /></svg>
                             </button>
-                            <div class="copy-dropdown" id="copy-dropdown" hidden>
-                                <button class="dropdown-item" id="action-copy-md">
+                            <div class="copy-dropdown" hidden>
+                                <button class="dropdown-item" data-action="copy-md">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                         <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor"
                                             stroke-width="2" />
@@ -371,7 +371,7 @@
                                             stroke="currentColor" stroke-width="2" /></svg>
                                     Copy Page (Markdown for LLMs)
                                 </button>
-                                <button class="dropdown-item" id="action-view-md">
+                                <button class="dropdown-item" data-action="view-md">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
                                             stroke="currentColor" stroke-width="2" />
@@ -379,7 +379,7 @@
                                         </svg>
                                     View as Markdown
                                 </button>
-                                <button class="dropdown-item" id="action-export-pdf">
+                                <button class="dropdown-item" data-action="export-pdf">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
                                             stroke="currentColor" stroke-width="2" />
@@ -390,14 +390,14 @@
                                     Export as PDF
                                 </button>
                                 <div class="dropdown-divider"></div>
-                                <button class="dropdown-item" id="action-chatgpt">
+                                <button class="dropdown-item" data-action="chatgpt">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                         <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
                                         <path d="M8 12s1.5-3 4-3 4 3 4 3-1.5 3-4 3-4-3-4-3z" stroke="currentColor"
                                             stroke-width="2" /></svg>
                                     Open in ChatGPT
                                 </button>
-                                <button class="dropdown-item" id="action-claude">
+                                <button class="dropdown-item" data-action="claude">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                         <path
                                             d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"
@@ -432,6 +432,51 @@
                             </svg>
                             <span>News Standards</span>
                         </div>
+                        <div class="doc-actions">
+                            <button class="btn btn-ghost btn-sm copy-dropdown-btn"
+                                title="Copy / Export options">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" /></svg>
+                                Copy
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                            </button>
+                            <div class="copy-dropdown" hidden>
+                                <button class="dropdown-item" data-action="copy-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" /></svg>
+                                    Copy Page (Markdown for LLMs)
+                                </button>
+                                <button class="dropdown-item" data-action="view-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" /></svg>
+                                    View as Markdown
+                                </button>
+                                <button class="dropdown-item" data-action="export-pdf">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" /></svg>
+                                    Export as PDF
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" data-action="chatgpt">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                        <path d="M8 12s1.5-3 4-3 4 3 4 3-1.5 3-4 3-4-3-4-3z" stroke="currentColor" stroke-width="2" /></svg>
+                                    Open in ChatGPT
+                                </button>
+                                <button class="dropdown-item" data-action="claude">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor" /></svg>
+                                    Open in Claude
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div id="news-content" class="section-content">
                         <div class="section-loading"><span class="spinner large"></span><p>Loading...</p></div>
@@ -452,6 +497,51 @@
                                 <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                             </svg>
                             <span>Programme Rating System</span>
+                        </div>
+                        <div class="doc-actions">
+                            <button class="btn btn-ghost btn-sm copy-dropdown-btn"
+                                title="Copy / Export options">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" /></svg>
+                                Copy
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                            </button>
+                            <div class="copy-dropdown" hidden>
+                                <button class="dropdown-item" data-action="copy-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" /></svg>
+                                    Copy Page (Markdown for LLMs)
+                                </button>
+                                <button class="dropdown-item" data-action="view-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" /></svg>
+                                    View as Markdown
+                                </button>
+                                <button class="dropdown-item" data-action="export-pdf">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" /></svg>
+                                    Export as PDF
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" data-action="chatgpt">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                        <path d="M8 12s1.5-3 4-3 4 3 4 3-1.5 3-4 3-4-3-4-3z" stroke="currentColor" stroke-width="2" /></svg>
+                                    Open in ChatGPT
+                                </button>
+                                <button class="dropdown-item" data-action="claude">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor" /></svg>
+                                    Open in Claude
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div id="prs-content" class="section-content">
@@ -474,6 +564,51 @@
                             </svg>
                             <span>Community Rules</span>
                         </div>
+                        <div class="doc-actions">
+                            <button class="btn btn-ghost btn-sm copy-dropdown-btn"
+                                title="Copy / Export options">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" /></svg>
+                                Copy
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                            </button>
+                            <div class="copy-dropdown" hidden>
+                                <button class="dropdown-item" data-action="copy-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" /></svg>
+                                    Copy Page (Markdown for LLMs)
+                                </button>
+                                <button class="dropdown-item" data-action="view-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" /></svg>
+                                    View as Markdown
+                                </button>
+                                <button class="dropdown-item" data-action="export-pdf">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" /></svg>
+                                    Export as PDF
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" data-action="chatgpt">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                        <path d="M8 12s1.5-3 4-3 4 3 4 3-1.5 3-4 3-4-3-4-3z" stroke="currentColor" stroke-width="2" /></svg>
+                                    Open in ChatGPT
+                                </button>
+                                <button class="dropdown-item" data-action="claude">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor" /></svg>
+                                    Open in Claude
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div id="rules-content" class="section-content">
                         <div class="section-loading"><span class="spinner large"></span><p>Loading...</p></div>
@@ -494,6 +629,51 @@
                                 <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                             </svg>
                             <span>Join Us</span>
+                        </div>
+                        <div class="doc-actions">
+                            <button class="btn btn-ghost btn-sm copy-dropdown-btn"
+                                title="Copy / Export options">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" /></svg>
+                                Copy
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                            </button>
+                            <div class="copy-dropdown" hidden>
+                                <button class="dropdown-item" data-action="copy-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" /></svg>
+                                    Copy Page (Markdown for LLMs)
+                                </button>
+                                <button class="dropdown-item" data-action="view-md">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" /></svg>
+                                    View as Markdown
+                                </button>
+                                <button class="dropdown-item" data-action="export-pdf">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2" />
+                                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" />
+                                        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" /></svg>
+                                    Export as PDF
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" data-action="chatgpt">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                                        <path d="M8 12s1.5-3 4-3 4 3 4 3-1.5 3-4 3-4-3-4-3z" stroke="currentColor" stroke-width="2" /></svg>
+                                    Open in ChatGPT
+                                </button>
+                                <button class="dropdown-item" data-action="claude">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor" /></svg>
+                                    Open in Claude
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div id="join-content" class="section-content">
