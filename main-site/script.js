@@ -179,11 +179,13 @@ function showPage(name) {
     if (el) el.classList.add('active');
     if (name !== 'charter') window.scrollTo(0, 0);
 
-    if (name === 'home' || name === 'about' || name === 'admin' || name === 'join') {
-        const nav = document.getElementById('sidebar-nav');
-        if (name === 'home' && nav) nav.innerHTML = '';
-        const titleEl = document.querySelector('.sidebar-title');
-        if (name === 'home' && titleEl) titleEl.textContent = '';
+    if (name === 'home') {
+        buildHomeSidebar();
+        if (window.innerWidth >= 900) {
+            document.getElementById('sidebar')?.classList.remove('collapsed');
+            document.getElementById('main-content')?.classList.remove('sidebar-hidden');
+        }
+    } else if (name === 'about' || name === 'admin') {
         closeSidebar();
         if (window.innerWidth >= 900) {
             document.getElementById('sidebar')?.classList.add('collapsed');
@@ -195,6 +197,39 @@ function showPage(name) {
             document.getElementById('main-content')?.classList.remove('sidebar-hidden');
         }
     }
+}
+
+function buildHomeSidebar() {
+    const nav = document.getElementById('sidebar-nav');
+    const titleEl = document.querySelector('.sidebar-title');
+    if (titleEl) titleEl.textContent = 'Site Navigation';
+    if (!nav) return;
+
+    const pages = [
+        { label: 'Charter', href: '/the-charter', page: 'charter', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>` },
+        { label: 'News Standards', href: '/news', page: 'news', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
+        { label: 'Programme Rating System', href: '/prs', page: 'prs', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="23 7 16 12 23 17 23 7" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>` },
+        { label: 'Community Rules', href: '/rules', page: 'rules', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>` },
+        { label: 'Join Us', href: '/join-us', page: 'join', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` },
+        { label: 'About PolicySpot', href: '/about', page: 'about', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` },
+    ];
+
+    nav.innerHTML = pages.map(p => `
+        <div class="nav-article">
+            <div class="nav-article-row">
+                <a href="${p.href}" class="nav-article-btn home-sidebar-link" data-navlink data-page="${p.page}" style="text-decoration:none">
+                    ${p.icon}${p.label}
+                </a>
+            </div>
+        </div>`).join('');
+
+    nav.querySelectorAll('.home-sidebar-link').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            navigate(a.getAttribute('href'));
+            if (window.innerWidth < 900) closeSidebar();
+        });
+    });
 }
 
 function updateActiveNav(page) {
