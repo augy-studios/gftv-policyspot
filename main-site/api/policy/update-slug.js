@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
     const {
         data: existing
     } = await supabase
-        .from('gftvpolicy_sections')
+        .from('gftvpolicy_charter')
         .select('id')
         .eq('slug', slug)
         .neq('id', id)
@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
         data,
         error
     } = await supabase
-        .from('gftvpolicy_sections')
+        .from('gftvpolicy_charter')
         .update({
             slug,
             updated_at: new Date().toISOString()

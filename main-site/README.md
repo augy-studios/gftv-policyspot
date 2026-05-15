@@ -63,7 +63,7 @@ gftv-policyspot/
 
 - Sessions are stored in `gftvhello_sessions` and persist across page refreshes via `localStorage` token.
 - No Supabase Auth is used — custom session management only.
-- The `gftvpolicy_sections` table uses the `gftvpolicy_` prefix per your convention.
+- Policy tables use the `gftvpolicy_` prefix: `gftvpolicy_charter`, `gftvpolicy_news`, `gftvpolicy_prs`, `gftvpolicy_rules`, `gftvpolicy_join`.
 - The table includes an `anchor` column (text, nullable) — this stores the `#fragment` id for subsection rows so they can be deep-linked within their parent article page (e.g. `anchor = 'name'` → `/the-charter/article-i#name`).
 - Article-type rows render all their subsections inline on one page; subsection rows have no standalone URL of their own.
 - PDF export uses the browser's native `window.print()` — no server-side PDF generation needed.

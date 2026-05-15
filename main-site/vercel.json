@@ -15,6 +15,38 @@
             "destination": "/index.html"
         },
         {
+            "source": "/news",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/news/(.*)",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/prs",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/prs/(.*)",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/rules",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/rules/(.*)",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/join-us",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/join-us/(.*)",
+            "destination": "/index.html"
+        },
+        {
             "source": "/about",
             "destination": "/index.html"
         },

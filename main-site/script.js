@@ -1,8 +1,69 @@
 const API = '';
 
+/* ─── Doc config ─── */
+const DOCS = {
+    charter: {
+        apiSections: '/api/policy/sections',
+        apiSection:  '/api/policy/section',
+        urlBase:     '/the-charter',
+        label:       'Charter of Global Furry Television',
+        navPage:     'charter',
+        sidebarTitle:'Charter',
+        contentEl:   'section-content',
+        breadcrumbEl:'doc-breadcrumb',
+        navFooterEl: 'doc-nav-footer',
+    },
+    news: {
+        apiSections: '/api/policy/news/sections',
+        apiSection:  '/api/policy/news/section',
+        urlBase:     '/news',
+        label:       'News Standards',
+        navPage:     'news',
+        sidebarTitle:'News Standards',
+        contentEl:   'news-content',
+        breadcrumbEl:'news-breadcrumb',
+        navFooterEl: 'news-nav-footer',
+    },
+    prs: {
+        apiSections: '/api/policy/prs/sections',
+        apiSection:  '/api/policy/prs/section',
+        urlBase:     '/prs',
+        label:       'Programme Rating System',
+        navPage:     'prs',
+        sidebarTitle:'Programme Rating System',
+        contentEl:   'prs-content',
+        breadcrumbEl:'prs-breadcrumb',
+        navFooterEl: 'prs-nav-footer',
+    },
+    rules: {
+        apiSections: '/api/policy/rules/sections',
+        apiSection:  '/api/policy/rules/section',
+        urlBase:     '/rules',
+        label:       'Community Rules',
+        navPage:     'rules',
+        sidebarTitle:'Community Rules',
+        contentEl:   'rules-content',
+        breadcrumbEl:'rules-breadcrumb',
+        navFooterEl: 'rules-nav-footer',
+    },
+    join: {
+        apiSections: '/api/policy/join/sections',
+        apiSection:  '/api/policy/join/section',
+        urlBase:     '/join-us',
+        label:       'Join GFTV',
+        navPage:     'join',
+        sidebarTitle:'Join GFTV',
+        contentEl:   'join-content',
+        breadcrumbEl:'join-breadcrumb',
+        navFooterEl: 'join-nav-footer',
+    },
+};
+
 /* ─── State ─── */
 let currentUser = null;
-let sections = []; // all rows from DB
+let currentDoc = 'charter'; // active document key
+const docSectionsCache = {}; // { charter: [], news: [], ... }
+let sections = []; // alias for docSectionsCache[currentDoc]
 let currentSection = null; // currently displayed top-level page/article row
 let currentSlug = null;
 
@@ -11,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initTheme();
     initRouter();
     await restoreSession();
-    await loadSections();
+    await loadSections('charter');
     setupEventListeners();
     handleRoute(location.pathname + location.hash);
 });
@@ -67,23 +128,44 @@ function handleRoute(fullPath) {
         return;
     }
 
-    if (cleanPath === '/the-charter') {
-        showPage('charter');
-        updateActiveNav('charter');
-        renderCharterIndex();
-        ensureSidebarOpen();
-        return;
+    // Check each doc's urlBase for a match
+    for (const [docKey, doc] of Object.entries(DOCS)) {
+        const base = doc.urlBase; // e.g. '/the-charter', '/news'
+        if (cleanPath === base) {
+            switchDoc(docKey);
+            showPage(docKey === 'charter' ? 'charter' : docKey);
+            updateActiveNav(doc.navPage);
+            renderDocIndex();
+            ensureSidebarOpen();
+            return;
+        }
+        if (cleanPath.startsWith(base + '/')) {
+            const slug = cleanPath.slice(base.length + 1);
+            switchDoc(docKey);
+            showPage(docKey === 'charter' ? 'charter' : docKey);
+            updateActiveNav(doc.navPage);
+            loadPage(slug, hash || null);
+            ensureSidebarOpen();
+            return;
+        }
     }
-    if (cleanPath.startsWith('/the-charter/')) {
-        const slug = cleanPath.slice('/the-charter/'.length);
-        showPage('charter');
-        updateActiveNav('charter');
-        loadPage(slug, hash || null);
-        ensureSidebarOpen();
-        return;
-    }
+
     showPage('home');
     updateActiveNav('home');
+}
+
+/* Switch active doc context, loading sections if needed */
+async function switchDoc(docKey) {
+    if (currentDoc !== docKey) {
+        currentDoc = docKey;
+        sections = docSectionsCache[docKey] || [];
+    }
+    if (!docSectionsCache[docKey]) {
+        await loadSections(docKey);
+    } else {
+        sections = docSectionsCache[docKey];
+        buildSidebar();
+    }
 }
 
 function showPage(name) {
@@ -99,16 +181,24 @@ function updateActiveNav(page) {
 }
 
 /* ─── Sections Data ─── */
-async function loadSections() {
+async function loadSections(docKey = 'charter', { force = false } = {}) {
+    if (!force && docSectionsCache[docKey]) {
+        sections = docSectionsCache[docKey];
+        buildSidebar();
+        if (docKey === 'charter') buildArticleCards();
+        return;
+    }
     try {
-        const res = await apiFetch('/api/policy/sections');
+        const doc = DOCS[docKey];
+        const res = await apiFetch(doc.apiSections);
         if (res.ok) {
-            sections = res.sections || [];
+            docSectionsCache[docKey] = res.sections || [];
+            sections = docSectionsCache[docKey];
             buildSidebar();
-            buildArticleCards();
+            if (docKey === 'charter') buildArticleCards();
         }
     } catch (e) {
-        console.error('Failed to load sections', e);
+        console.error('Failed to load sections for', docKey, e);
     }
 }
 
@@ -125,12 +215,16 @@ function subsectionsOf(articleId) {
 /* ─── Sidebar ─── */
 function buildSidebar() {
     const nav = document.getElementById('sidebar-nav');
+    const titleEl = document.querySelector('.sidebar-title');
+    if (titleEl) titleEl.textContent = DOCS[currentDoc].sidebarTitle;
+
     if (!sections.length) {
         nav.innerHTML = '<div class="sidebar-loading">No sections found.</div>';
         return;
     }
     nav.innerHTML = '';
 
+    const urlBase = DOCS[currentDoc].urlBase;
     const pages = topLevelPages();
     pages.forEach(page => {
         const children = subsectionsOf(page.id);
@@ -140,8 +234,6 @@ function buildSidebar() {
         div.dataset.slug = page.slug;
 
         if (children.length) {
-            // Article with sub-sections: clicking the article title navigates to the page,
-            // chevron toggles the sub-list
             div.innerHTML = `
         <div class="nav-article-row">
           <button class="nav-article-btn" data-slug="${page.slug}">
@@ -161,7 +253,7 @@ function buildSidebar() {
         </div>`;
 
             div.querySelector('.nav-article-btn').addEventListener('click', () => {
-                navigate(`/the-charter/${page.slug}`);
+                navigate(`${urlBase}/${page.slug}`);
                 if (window.innerWidth < 900) closeSidebar();
             });
             div.querySelector('.nav-chevron-btn').addEventListener('click', () => {
@@ -174,7 +266,7 @@ function buildSidebar() {
                 btn.addEventListener('click', () => {
                     const slug = btn.dataset.slug;
                     const anchor = btn.dataset.anchor;
-                    navigate(`/the-charter/${slug}${anchor ? '#' + anchor : ''}`);
+                    navigate(`${urlBase}/${slug}${anchor ? '#' + anchor : ''}`);
                     if (window.innerWidth < 900) closeSidebar();
                 });
             });
@@ -186,7 +278,7 @@ function buildSidebar() {
           </button>
         </div>`;
             div.querySelector('.nav-article-btn').addEventListener('click', () => {
-                navigate(`/the-charter/${page.slug}`);
+                navigate(`${urlBase}/${page.slug}`);
                 if (window.innerWidth < 900) closeSidebar();
             });
         }
@@ -199,48 +291,50 @@ function buildArticleCards() {
     if (!grid) return;
     const pages = topLevelPages();
     if (!pages.length) return;
+    const urlBase = DOCS['charter'].urlBase;
     grid.innerHTML = pages.map(p => `
     <div class="glass-card article-card" data-slug="${p.slug}" tabindex="0" role="button">
       ${p.number ? `<div class="card-num">${p.number}</div>` : ''}
       <div class="card-title">${p.title}</div>
     </div>`).join('');
     grid.querySelectorAll('.article-card').forEach(card => {
-        const fn = () => navigate(`/the-charter/${card.dataset.slug}`);
+        const fn = () => navigate(`${urlBase}/${card.dataset.slug}`);
         card.addEventListener('click', fn);
         card.addEventListener('keydown', e => e.key === 'Enter' && fn());
     });
 }
 
-/* ─── Charter Index ─── */
-function renderCharterIndex() {
-    const contentEl = document.getElementById('section-content');
+/* ─── Doc Index (charter index generalised for all docs) ─── */
+function renderDocIndex() {
+    const doc = DOCS[currentDoc];
+    const contentEl = document.getElementById(doc.contentEl);
+    if (!contentEl) return;
     updateBreadcrumb(null);
     updateDocNavFooter(null);
+    const urlBase = doc.urlBase;
     contentEl.innerHTML = `
     <div class="section-content-inner">
       <div class="section-header">
         <div class="section-type-badge">Document</div>
-        <h1 class="section-heading">Charter of Global Furry Television</h1>
-        <p style="color:var(--text-muted);margin-top:0.5rem">Edition 2024 — Policy, Action and Leadership (PAL) Division</p>
+        <h1 class="section-heading">${doc.label}</h1>
       </div>
       <div class="section-body">
-        <p>The Charter of Global Furry Television is the supreme governing framework of GFTV, establishing its ethical and operational principles. Select a section from the sidebar, or use the table of contents below.</p>
+        <p>Select a section from the sidebar, or use the table of contents below.</p>
         <h2>Table of Contents</h2>
         ${topLevelPages().map(p => {
           const children = subsectionsOf(p.id);
           return `<div style="margin-bottom:1rem">
-            <a href="/the-charter/${p.slug}" class="toc-link" style="font-size:1rem;color:var(--brand-dark);display:block;margin-bottom:0.3rem">
+            <a href="${urlBase}/${p.slug}" class="toc-link" style="font-size:1rem;color:var(--brand-dark);display:block;margin-bottom:0.3rem">
               ${p.number ? `${p.number} — ` : ''}${p.title}
             </a>
             ${children.length ? `<ul style="margin:0 0 0 1.2rem;list-style:none;padding:0">
-              ${children.map(c => `<li><a href="/the-charter/${p.slug}#${c.anchor}" class="toc-link" style="font-size:0.85rem;color:var(--text-muted)">${c.title}</a></li>`).join('')}
+              ${children.map(c => `<li><a href="${urlBase}/${p.slug}#${c.anchor}" class="toc-link" style="font-size:0.85rem;color:var(--text-muted)">${c.title}</a></li>`).join('')}
             </ul>` : ''}
           </div>`;
         }).join('')}
       </div>
     </div>`;
 
-    // Wire up ToC links
     contentEl.querySelectorAll('.toc-link').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
@@ -253,30 +347,32 @@ function renderCharterIndex() {
 
 /* ─── Page Loading ─── */
 async function loadPage(slug, anchor) {
-    const contentEl = document.getElementById('section-content');
+    const doc = DOCS[currentDoc];
+    const contentEl = document.getElementById(doc.contentEl);
+    if (!contentEl) return;
     contentEl.innerHTML = '<div class="section-loading"><span class="spinner large"></span><p>Loading...</p></div>';
     updateBreadcrumb(null);
     updateDocNavFooter(null);
 
-    // Look up in local cache first for instant feel
     let section = sections.find(s => s.slug === slug && s.type !== 'subsection');
 
     if (!section) {
-        // Try fetching from API (handles custom slugs)
         try {
-            const res = await apiFetch(`/api/policy/section?slug=${encodeURIComponent(slug)}`);
+            const res = await apiFetch(`${doc.apiSection}?slug=${encodeURIComponent(slug)}`);
             if (!res.ok) throw new Error(res.error || 'Not found');
             section = res.section;
-            // Also pull subsections if this is an article
             if (section.type === 'article' || section.type === 'page') {
-                const allRes = await apiFetch('/api/policy/sections');
-                if (allRes.ok) sections = allRes.sections;
+                const allRes = await apiFetch(doc.apiSections);
+                if (allRes.ok) {
+                    docSectionsCache[currentDoc] = allRes.sections;
+                    sections = docSectionsCache[currentDoc];
+                }
             }
         } catch (e) {
             contentEl.innerHTML = `<div class="section-content-inner">
         <h1 class="section-heading">Not Found</h1>
         <p>The section <code>${slug}</code> could not be loaded.</p>
-        <a href="/the-charter" style="color:var(--brand-dark)">Back to Charter</a>
+        <a href="${doc.urlBase}" style="color:var(--brand-dark)">Back to ${doc.label}</a>
       </div>`;
             return;
         }
@@ -295,14 +391,10 @@ async function loadPage(slug, anchor) {
     updateDocNavFooter(section);
     updateSidebarActive(slug, anchor);
 
-    // Scroll to anchor after render
     if (anchor) {
         setTimeout(() => {
             const el = document.getElementById(anchor);
-            if (el) el.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 80);
     } else {
         window.scrollTo(0, 0);
@@ -311,15 +403,18 @@ async function loadPage(slug, anchor) {
 
 /* Renders an article page: intro block + all subsections inline with anchor ids */
 function renderArticlePage(article, activeAnchor) {
-    const contentEl = document.getElementById('section-content');
+    const doc = DOCS[currentDoc];
+    const contentEl = document.getElementById(doc.contentEl);
+    if (!contentEl) return;
     const subs = subsectionsOf(article.id);
-    const canEdit = currentUser && (currentUser.is_admin || currentUser.is_editor);
+    const canEdit = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
+    const urlBase = doc.urlBase;
 
     let html = `<div class="section-content-inner">
     <div class="section-header">
       <div class="section-type-badge">Article</div>
       <div class="section-meta">
-        <span class="section-slug-display">/the-charter/${article.slug}</span>
+        <span class="section-slug-display">${urlBase}/${article.slug}</span>
         ${canEdit ? `<button class="edit-slug-btn" data-id="${article.id}" data-slug="${article.slug}">Edit slug</button>` : ''}
       </div>
       <h1 class="section-heading">${article.number ? `${article.number} — ` : ''}${article.title}</h1>
@@ -329,13 +424,12 @@ function renderArticlePage(article, activeAnchor) {
         html += `<div class="section-body article-intro">${renderMarkdown(article.content)}</div>`;
     }
 
-    // Render subsections inline
     subs.forEach(sub => {
         html += `
       <div class="subsection-block" id="${sub.anchor || sub.slug}">
         <div class="subsection-header">
           <h2 class="subsection-heading">
-            <a class="anchor-link" href="/the-charter/${article.slug}#${sub.anchor || sub.slug}" aria-label="Link to section">
+            <a class="anchor-link" href="${urlBase}/${article.slug}#${sub.anchor || sub.slug}" aria-label="Link to section">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </a>
             ${sub.title}
@@ -349,7 +443,6 @@ function renderArticlePage(article, activeAnchor) {
     html += `</div>`;
     contentEl.innerHTML = html;
 
-    // Wire edit-slug buttons
     if (canEdit) {
         contentEl.querySelectorAll('.edit-slug-btn').forEach(btn => {
             const sec = sections.find(s => s.id === btn.dataset.id) || article;
@@ -357,31 +450,29 @@ function renderArticlePage(article, activeAnchor) {
         });
     }
 
-    // Wire anchor links — update URL without full reload
     contentEl.querySelectorAll('.anchor-link').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
-            const href = a.getAttribute('href');
-            history.replaceState({}, '', href);
+            history.replaceState({}, '', a.getAttribute('href'));
         });
     });
 }
 
-/* Renders a standalone page (Citation, Definitions, First Schedule) */
+/* Renders a standalone page (Citation, Definitions, First Schedule, etc.) */
 function renderStandalonePage(section) {
-    const contentEl = document.getElementById('section-content');
-    const canEdit = currentUser && (currentUser.is_admin || currentUser.is_editor);
-    const typeLabel = {
-        page: 'Section',
-        schedule: 'Schedule'
-    } [section.type] || 'Section';
+    const doc = DOCS[currentDoc];
+    const contentEl = document.getElementById(doc.contentEl);
+    if (!contentEl) return;
+    const canEdit = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
+    const typeLabel = { page: 'Section', schedule: 'Schedule' }[section.type] || 'Section';
+    const urlBase = doc.urlBase;
 
     contentEl.innerHTML = `
     <div class="section-content-inner">
       <div class="section-header">
         <div class="section-type-badge">${typeLabel}</div>
         <div class="section-meta">
-          <span class="section-slug-display">/the-charter/${section.slug}</span>
+          <span class="section-slug-display">${urlBase}/${section.slug}</span>
           ${canEdit ? `<button class="edit-slug-btn" data-id="${section.id}" data-slug="${section.slug}">Edit slug</button>` : ''}
         </div>
         <h1 class="section-heading">${section.number ? `${section.number} — ` : ''}${section.title}</h1>
@@ -446,13 +537,14 @@ function renderMarkdown(md) {
 
 /* ─── Breadcrumb ─── */
 function updateBreadcrumb(section) {
-    const bc = document.getElementById('doc-breadcrumb');
+    const doc = DOCS[currentDoc];
+    const bc = document.getElementById(doc.breadcrumbEl);
     if (!bc) return;
     const sep = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
     if (!section) {
-        bc.innerHTML = `<a href="/" class="bc-link">Home</a>${sep}<a href="/the-charter" class="bc-link">Charter</a>`;
+        bc.innerHTML = `<a href="/" class="bc-link">Home</a>${sep}<a href="${doc.urlBase}" class="bc-link">${doc.sidebarTitle}</a>`;
     } else {
-        bc.innerHTML = `<a href="/" class="bc-link">Home</a>${sep}<a href="/the-charter" class="bc-link">Charter</a>${sep}<span>${section.title}</span>`;
+        bc.innerHTML = `<a href="/" class="bc-link">Home</a>${sep}<a href="${doc.urlBase}" class="bc-link">${doc.sidebarTitle}</a>${sep}<span>${section.title}</span>`;
     }
     bc.querySelectorAll('.bc-link').forEach(a => {
         a.addEventListener('click', e => {
@@ -464,12 +556,14 @@ function updateBreadcrumb(section) {
 
 /* ─── Prev/Next Footer ─── */
 function updateDocNavFooter(section) {
-    const footer = document.getElementById('doc-nav-footer');
+    const doc = DOCS[currentDoc];
+    const footer = document.getElementById(doc.navFooterEl);
     if (!footer) return;
     if (!section) {
         footer.innerHTML = '';
         return;
     }
+    const urlBase = doc.urlBase;
     const pages = topLevelPages();
     const idx = pages.findIndex(s => s.id === section.id);
     const prev = idx > 0 ? pages[idx - 1] : null;
@@ -484,7 +578,7 @@ function updateDocNavFooter(section) {
       <span class="doc-nav-title">${next.number ? next.number + ' — ' : ''}${next.title}</span>
     </button>` : ''}`;
     footer.querySelectorAll('.doc-nav-btn').forEach(btn =>
-        btn.addEventListener('click', () => navigate(`/the-charter/${btn.dataset.slug}`)));
+        btn.addEventListener('click', () => navigate(`${urlBase}/${btn.dataset.slug}`)));
 }
 
 /* ─── Sidebar Active State ─── */
@@ -759,26 +853,21 @@ function setupCopyDropdown() {
     document.getElementById('action-copy-md')?.addEventListener('click', () => {
         dd.hidden = true;
         if (!currentSection) return showToast('No page loaded', 'error');
+        const urlBase = DOCS[currentDoc].urlBase;
         const subs = currentSection.type === 'article' ? subsectionsOf(currentSection.id) : [];
-        let md = `# ${currentSection.title}\n\nSource: https://policy.globalfurry.tv/the-charter/${currentSection.slug}\n\n${currentSection.content || ''}`;
-        subs.forEach(s => {
-            md += `\n\n## ${s.title}\n\n${s.content || ''}`;
-        });
+        let md = `# ${currentSection.title}\n\nSource: https://policy.globalfurry.tv${urlBase}/${currentSection.slug}\n\n${currentSection.content || ''}`;
+        subs.forEach(s => { md += `\n\n## ${s.title}\n\n${s.content || ''}`; });
         navigator.clipboard.writeText(md).then(() => showToast('Copied as Markdown', 'success'));
     });
 
     document.getElementById('action-view-md')?.addEventListener('click', () => {
         dd.hidden = true;
         if (!currentSection) return showToast('No page loaded', 'error');
+        const urlBase = DOCS[currentDoc].urlBase;
         const subs = currentSection.type === 'article' ? subsectionsOf(currentSection.id) : [];
-        let md = `# ${currentSection.title}\n\nSource: https://policy.globalfurry.tv/the-charter/${currentSection.slug}\n\n${currentSection.content || ''}`;
-        subs.forEach(s => {
-            md += `\n\n## ${s.title}\n\n${s.content || ''}`;
-        });
-        const blob = new Blob([md], {
-            type: 'text/plain'
-        });
-        window.open(URL.createObjectURL(blob), '_blank');
+        let md = `# ${currentSection.title}\n\nSource: https://policy.globalfurry.tv${urlBase}/${currentSection.slug}\n\n${currentSection.content || ''}`;
+        subs.forEach(s => { md += `\n\n## ${s.title}\n\n${s.content || ''}`; });
+        window.open(URL.createObjectURL(new Blob([md], { type: 'text/plain' })), '_blank');
     });
 
     document.getElementById('action-export-pdf')?.addEventListener('click', () => {
@@ -788,17 +877,19 @@ function setupCopyDropdown() {
 
     document.getElementById('action-chatgpt')?.addEventListener('click', () => {
         dd.hidden = true;
+        const urlBase = DOCS[currentDoc].urlBase;
         const pageUrl = currentSection ?
-            `https%3A%2F%2Fpolicy.globalfurry.tv%2Fthe-charter%2F${currentSection.slug}` :
-            `https%3A%2F%2Fpolicy.globalfurry.tv`;
+            encodeURIComponent(`https://policy.globalfurry.tv${urlBase}/${currentSection.slug}`) :
+            'https%3A%2F%2Fpolicy.globalfurry.tv';
         window.open(`https://chat.openai.com/?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
     });
 
     document.getElementById('action-claude')?.addEventListener('click', () => {
         dd.hidden = true;
+        const urlBase = DOCS[currentDoc].urlBase;
         const pageUrl = currentSection ?
-            `https%3A%2F%2Fpolicy.globalfurry.tv%2Fthe-charter%2F${currentSection.slug}` :
-            `https%3A%2F%2Fpolicy.globalfurry.tv`;
+            encodeURIComponent(`https://policy.globalfurry.tv${urlBase}/${currentSection.slug}`) :
+            'https%3A%2F%2Fpolicy.globalfurry.tv';
         window.open(`https://claude.ai/new?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
     });
 }
@@ -807,13 +898,13 @@ function setupCopyDropdown() {
 function openSlugModal(section) {
     document.getElementById('slug-input').value = section.slug;
     document.getElementById('slug-section-id').value = section.id;
-    document.getElementById('slug-preview').textContent = `policy.globalfurry.tv/the-charter/${section.slug}`;
+    document.getElementById('slug-preview').textContent = `policy.globalfurry.tv${DOCS[currentDoc].urlBase}/${section.slug}`;
     document.getElementById('slug-error').classList.add('hidden');
     openModal('slug-modal');
 }
 document.getElementById('slug-input')?.addEventListener('input', e => {
     const preview = document.getElementById('slug-preview');
-    if (preview) preview.textContent = `policy.globalfurry.tv/the-charter/${e.target.value}`;
+    if (preview) preview.textContent = `policy.globalfurry.tv${DOCS[currentDoc].urlBase}/${e.target.value}`;
 });
 document.getElementById('slug-save')?.addEventListener('click', async () => {
     const id = document.getElementById('slug-section-id').value;
@@ -842,7 +933,7 @@ document.getElementById('slug-save')?.addEventListener('click', async () => {
         showToast('Slug updated', 'success');
         const sec = sections.find(s => s.id === id);
         if (sec) sec.slug = slug;
-        navigate(`/the-charter/${slug}`);
+        navigate(`${DOCS[currentDoc].urlBase}/${slug}`);
         buildSidebar();
     } else {
         errEl.textContent = res.error || 'Update failed';
@@ -1024,6 +1115,10 @@ function setupEventListeners() {
             const p = l.dataset.page;
             if (p === 'home') navigate('/');
             else if (p === 'charter') navigate('/the-charter');
+            else if (p === 'news') navigate('/news');
+            else if (p === 'prs') navigate('/prs');
+            else if (p === 'rules') navigate('/rules');
+            else if (p === 'join') navigate('/join-us');
             else if (p === 'about') navigate('/about');
         });
     });
