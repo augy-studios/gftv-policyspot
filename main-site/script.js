@@ -957,6 +957,7 @@ function setupCopyDropdown() {
         const dd = item.closest('.copy-dropdown');
         if (dd) dd.hidden = true;
 
+        setTimeout(() => {
         if (action === 'copy-md' || action === 'view-md') {
             if (!currentSection) return showToast('No page loaded', 'error');
             const urlBase = DOCS[currentDoc].urlBase;
@@ -1006,6 +1007,7 @@ function setupCopyDropdown() {
                 window.open(`https://claude.ai/new?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
             }
         }
+        }, 0);
     });
 }
 
