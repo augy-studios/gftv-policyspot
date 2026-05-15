@@ -598,29 +598,98 @@ async function logout() {
 }
 
 /* ─── Auth Form ─── */
+let _totpChallengeToken = null;
+
+function showTotpStep() {
+    document.getElementById('auth-form-login').classList.add('hidden');
+    document.getElementById('auth-form-totp').classList.remove('hidden');
+    document.getElementById('auth-modal-title').textContent = 'Two-Factor Auth';
+    document.getElementById('totp-code').value = '';
+    document.getElementById('totp-trust-device').checked = false;
+    clearAuthError();
+    document.getElementById('totp-code').focus();
+}
+
+function showLoginStep() {
+    document.getElementById('auth-form-totp').classList.add('hidden');
+    document.getElementById('auth-form-login').classList.remove('hidden');
+    document.getElementById('auth-modal-title').textContent = 'Sign In';
+    _totpChallengeToken = null;
+    clearAuthError();
+}
+
+function completeLogin(res) {
+    localStorage.setItem('gftv-token', res.token);
+    if (res.device_token) localStorage.setItem('gftv-device-token', res.device_token);
+    currentUser = res.user;
+    updateUserUI();
+    closeModal('auth-modal');
+    showToast('Welcome back, ' + res.user.display_name, 'success');
+}
+
 document.getElementById('login-form')?.addEventListener('submit', async () => {
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
     clearAuthError();
     if (!username || !password) return showAuthError('Please fill in all fields.');
+    const device_token = localStorage.getItem('gftv-device-token') || undefined;
     const res = await apiFetch('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({
-            username,
-            password
-        }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        body: JSON.stringify({ username, password, device_token }),
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (!res.ok) return showAuthError(res.error || 'Login failed');
+    if (res.totp_required) {
+        _totpChallengeToken = res.challenge_token;
+        showTotpStep();
+    } else {
+        completeLogin(res);
+    }
+});
+
+document.getElementById('totp-submit')?.addEventListener('click', async () => {
+    const code = document.getElementById('totp-code').value.trim();
+    const trust_device = document.getElementById('totp-trust-device').checked;
+    clearAuthError();
+    if (!code) return showAuthError('Please enter your authentication code.');
+    if (!_totpChallengeToken) return showAuthError('Session expired, please log in again.');
+    const res = await apiFetch('/api/auth/totp-verify', {
+        method: 'POST',
+        body: JSON.stringify({ challenge_token: _totpChallengeToken, code, trust_device }),
+        headers: { 'Content-Type': 'application/json' }
     });
     if (res.ok) {
-        localStorage.setItem('gftv-token', res.token);
-        currentUser = res.user;
-        updateUserUI();
-        closeModal('auth-modal');
-        showToast('Welcome back, ' + res.user.display_name, 'success');
-    } else showAuthError(res.error || 'Login failed');
+        completeLogin(res);
+    } else {
+        showAuthError(res.error || 'Invalid code');
+    }
 });
+
+document.getElementById('totp-use-backup')?.addEventListener('click', () => {
+    const label = document.getElementById('totp-code-label');
+    const input = document.getElementById('totp-code');
+    const btn = document.getElementById('totp-use-backup');
+    const isBackup = input.getAttribute('data-mode') === 'backup';
+    if (isBackup) {
+        label.textContent = 'Authentication Code';
+        input.placeholder = '000000';
+        input.inputMode = 'numeric';
+        input.maxLength = 20;
+        input.removeAttribute('data-mode');
+        btn.textContent = 'Use a backup code instead';
+    } else {
+        label.textContent = 'Backup Code';
+        input.placeholder = 'xxxx-xxxx-xxxx';
+        input.inputMode = 'text';
+        input.maxLength = 50;
+        input.setAttribute('data-mode', 'backup');
+        btn.textContent = 'Use authenticator app instead';
+    }
+    input.value = '';
+    clearAuthError();
+});
+
+document.getElementById('totp-back')?.addEventListener('click', showLoginStep);
 document.getElementById('reg-submit')?.addEventListener('click', async () => {
     const display_name = document.getElementById('reg-display').value.trim();
     const username = document.getElementById('reg-username').value.trim();
@@ -890,6 +959,7 @@ function openModal(id) {
 function closeModal(id) {
     const el = document.getElementById(id);
     if (el) el.hidden = true;
+    if (id === 'auth-modal') showLoginStep();
 }
 document.querySelectorAll('.modal-close, [data-close]').forEach(btn => {
     btn.addEventListener('click', () => {
