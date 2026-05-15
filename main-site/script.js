@@ -993,7 +993,7 @@ function setupCopyDropdown() {
             });
             loadHtml2pdf()
                 .then(h2p => h2p().set(opt).from(contentEl).output('bloburl'))
-                .then(url => window.open(url, '_blank'))
+                .then(url => { window.open(url, '_blank'); showToast('PDF opened in new tab', 'success'); })
                 .catch(() => showToast('Failed to load PDF library', 'error'));
         } else if (action === 'chatgpt' || action === 'claude') {
             const urlBase = DOCS[currentDoc].urlBase;
