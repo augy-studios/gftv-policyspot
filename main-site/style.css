@@ -846,6 +846,38 @@ svg {
   background: var(--surface-hover);
 }
 
+.edit-content-btn {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--brand-dark);
+  background: var(--brand);
+  color: var(--brand-dark);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.15s;
+}
+
+.edit-content-btn:hover {
+  background: var(--brand-dark);
+  color: #fff;
+}
+
+.content-edit-modal {
+  max-width: 680px;
+  width: 95vw;
+}
+
+.content-edit-textarea {
+  width: 100%;
+  min-height: 240px;
+  resize: vertical;
+  font-family: monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
 .section-heading {
   font-family: var(--font);
   font-size: 1.75rem;

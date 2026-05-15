@@ -412,15 +412,17 @@ function renderArticlePage(article, activeAnchor) {
     const contentEl = document.getElementById(doc.contentEl);
     if (!contentEl) return;
     const subs = subsectionsOf(article.id);
-    const canEdit = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
+    const canEditSlug = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
+    const canEditContent = currentUser && currentUser.is_admin;
     const urlBase = doc.urlBase;
 
     let html = `<div class="section-content-inner">
     <div class="section-header">
       <div class="section-type-badge">Article</div>
       <div class="section-meta">
-        <span class="section-slug-display">${urlBase}/${article.slug}</span>
-        ${canEdit ? `<button class="edit-slug-btn" data-id="${article.id}" data-slug="${article.slug}">Edit slug</button>` : ''}
+        ${currentUser ? `<span class="section-slug-display">${urlBase}/${article.slug}</span>` : ''}
+        ${canEditSlug ? `<button class="edit-slug-btn" data-id="${article.id}" data-slug="${article.slug}">Edit slug</button>` : ''}
+        ${canEditContent ? `<button class="edit-content-btn" data-id="${article.id}">Edit</button>` : ''}
       </div>
       <h1 class="section-heading">${article.number ? `${article.number} — ` : ''}${article.title}</h1>
     </div>`;
@@ -440,6 +442,7 @@ function renderArticlePage(article, activeAnchor) {
             ${sub.title}
           </h2>
           ${sub.number ? `<span class="subsection-num">${sub.number}</span>` : ''}
+          ${canEditContent ? `<button class="edit-content-btn" data-id="${sub.id}">Edit</button>` : ''}
         </div>
         <div class="section-body subsection-body">${renderMarkdown(sub.content || '')}</div>
       </div>`;
@@ -448,10 +451,17 @@ function renderArticlePage(article, activeAnchor) {
     html += `</div>`;
     contentEl.innerHTML = html;
 
-    if (canEdit) {
+    if (canEditSlug) {
         contentEl.querySelectorAll('.edit-slug-btn').forEach(btn => {
             const sec = sections.find(s => s.id === btn.dataset.id) || article;
             btn.addEventListener('click', () => openSlugModal(sec));
+        });
+    }
+
+    if (canEditContent) {
+        contentEl.querySelectorAll('.edit-content-btn').forEach(btn => {
+            const sec = sections.find(s => s.id === btn.dataset.id) || article;
+            btn.addEventListener('click', () => openContentModal(sec));
         });
     }
 
@@ -468,7 +478,8 @@ function renderStandalonePage(section) {
     const doc = DOCS[currentDoc];
     const contentEl = document.getElementById(doc.contentEl);
     if (!contentEl) return;
-    const canEdit = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
+    const canEditSlug = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
+    const canEditContent = currentUser && currentUser.is_admin;
     const typeLabel = { page: 'Section', schedule: 'Schedule' }[section.type] || 'Section';
     const urlBase = doc.urlBase;
 
@@ -477,16 +488,20 @@ function renderStandalonePage(section) {
       <div class="section-header">
         <div class="section-type-badge">${typeLabel}</div>
         <div class="section-meta">
-          <span class="section-slug-display">${urlBase}/${section.slug}</span>
-          ${canEdit ? `<button class="edit-slug-btn" data-id="${section.id}" data-slug="${section.slug}">Edit slug</button>` : ''}
+          ${currentUser ? `<span class="section-slug-display">${urlBase}/${section.slug}</span>` : ''}
+          ${canEditSlug ? `<button class="edit-slug-btn" data-id="${section.id}" data-slug="${section.slug}">Edit slug</button>` : ''}
+          ${canEditContent ? `<button class="edit-content-btn" data-id="${section.id}">Edit</button>` : ''}
         </div>
         <h1 class="section-heading">${section.number ? `${section.number} — ` : ''}${section.title}</h1>
       </div>
       <div class="section-body" id="section-body-content">${renderMarkdown(section.content || '')}</div>
     </div>`;
 
-    if (canEdit) {
+    if (canEditSlug) {
         contentEl.querySelector('.edit-slug-btn')?.addEventListener('click', () => openSlugModal(section));
+    }
+    if (canEditContent) {
+        contentEl.querySelector('.edit-content-btn')?.addEventListener('click', () => openContentModal(section));
     }
 }
 
@@ -951,6 +966,53 @@ document.getElementById('slug-save')?.addEventListener('click', async () => {
         const sec = sections.find(s => s.id === id);
         if (sec) sec.slug = slug;
         navigate(`${DOCS[currentDoc].urlBase}/${slug}`);
+        buildSidebar();
+    } else {
+        errEl.textContent = res.error || 'Update failed';
+        errEl.classList.remove('hidden');
+    }
+});
+
+/* ─── Content Edit Modal ─── */
+function openContentModal(section) {
+    document.getElementById('content-edit-id').value = section.id;
+    document.getElementById('content-edit-table').value = currentDoc;
+    document.getElementById('content-edit-title').value = section.title || '';
+    document.getElementById('content-edit-number').value = section.number || '';
+    document.getElementById('content-edit-anchor').value = section.anchor || '';
+    document.getElementById('content-edit-content').value = section.content || '';
+    const anchorGroup = document.getElementById('content-edit-anchor-group');
+    if (anchorGroup) anchorGroup.style.display = section.type === 'subsection' ? '' : 'none';
+    document.getElementById('content-edit-error').classList.add('hidden');
+    openModal('content-modal');
+}
+
+document.getElementById('content-edit-save')?.addEventListener('click', async () => {
+    const id      = document.getElementById('content-edit-id').value;
+    const table   = document.getElementById('content-edit-table').value;
+    const title   = document.getElementById('content-edit-title').value.trim();
+    const number  = document.getElementById('content-edit-number').value.trim();
+    const anchor  = document.getElementById('content-edit-anchor').value.trim();
+    const content = document.getElementById('content-edit-content').value;
+    const errEl   = document.getElementById('content-edit-error');
+    errEl.classList.add('hidden');
+    if (!title) {
+        errEl.textContent = 'Title cannot be empty';
+        errEl.classList.remove('hidden');
+        return;
+    }
+    const token = localStorage.getItem('gftv-token');
+    const res = await apiFetch('/api/policy/update-section', {
+        method: 'PUT',
+        body: JSON.stringify({ id, table, title, content, anchor: anchor || null, number: number || null }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) {
+        closeModal('content-modal');
+        showToast('Section updated', 'success');
+        const sec = sections.find(s => s.id === id);
+        if (sec) Object.assign(sec, res.section);
+        navigate(location.pathname + location.hash, { replace: true });
         buildSidebar();
     } else {
         errEl.textContent = res.error || 'Update failed';
