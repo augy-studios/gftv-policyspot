@@ -569,6 +569,7 @@ svg {
   line-height: 1.2;
   margin-bottom: 0.75rem;
   color: var(--text);
+  font-weight: 800;
 }
 
 .hero-sub {
@@ -868,7 +869,7 @@ svg {
   font-size: 1.75rem;
   line-height: 1.2;
   color: var(--text);
-  font-weight: 400;
+  font-weight: 800;
 }
 
 .section-body {
@@ -881,7 +882,7 @@ svg {
   font-size: 1.2rem;
   margin: 1.75rem 0 0.6rem;
   color: var(--text);
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .section-body h3 {
@@ -889,7 +890,7 @@ svg {
   font-size: 1rem;
   margin: 1.25rem 0 0.5rem;
   color: var(--text-muted);
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .section-body p {
@@ -1023,14 +1024,14 @@ svg {
   font-family: var(--font);
   font-size: 1.8rem;
   margin-bottom: 1rem;
-  font-weight: 400;
+  font-weight: 800;
 }
 
 .about-card h2 {
   font-family: var(--font);
   font-size: 1.15rem;
   margin: 1.5rem 0 0.6rem;
-  font-weight: 400;
+  font-weight: 700;
   color: var(--text-muted);
 }
 
@@ -1487,7 +1488,7 @@ svg {
   font-family: var(--font);
   font-size: 1.25rem;
   color: var(--text);
-  font-weight: 400;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -1634,4 +1635,100 @@ svg {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* ─── Home Doc Cards ─── */
+.home-doc-card {
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.home-doc-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+}
+
+.home-doc-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-active);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  margin-bottom: 0.35rem;
+}
+
+.home-doc-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.home-doc-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ─── TOC Card Buttons ─── */
+.toc-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.toc-card-btn {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  text-decoration: none;
+  color: var(--text);
+  opacity: 1;
+}
+
+.toc-card-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+.toc-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.toc-card-title .card-num {
+  font-size: 0.78rem;
+  color: var(--brand-dark);
+  font-weight: 500;
+}
+
+.toc-card-subs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.toc-sub-item {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--surface-active);
+  border: 1px solid var(--border);
+  padding: 1px 8px;
+  border-radius: 10px;
 }

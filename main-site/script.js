@@ -178,6 +178,23 @@ function showPage(name) {
     const el = document.getElementById(`page-${name}`);
     if (el) el.classList.add('active');
     if (name !== 'charter') window.scrollTo(0, 0);
+
+    if (name === 'home') {
+        const nav = document.getElementById('sidebar-nav');
+        if (nav) nav.innerHTML = '';
+        const titleEl = document.querySelector('.sidebar-title');
+        if (titleEl) titleEl.textContent = '';
+        closeSidebar();
+        if (window.innerWidth >= 900) {
+            document.getElementById('sidebar')?.classList.add('collapsed');
+            document.getElementById('main-content')?.classList.add('sidebar-hidden');
+        }
+    } else {
+        if (window.innerWidth >= 900) {
+            document.getElementById('sidebar')?.classList.remove('collapsed');
+            document.getElementById('main-content')?.classList.remove('sidebar-hidden');
+        }
+    }
 }
 
 function updateActiveNav(page) {
@@ -312,47 +329,79 @@ function buildArticleCards() {
 /* ─── Doc Index (charter index generalised for all docs) ─── */
 function renderDocIndex() {
     const doc = DOCS[currentDoc];
-    const contentEl = document.getElementById(doc.contentEl);
-    if (!contentEl) return;
     updateBreadcrumb(null);
     updateDocNavFooter(null);
+    updateSidebarActive(null, null);
+
+    if (currentDoc === 'charter') {
+        const indexView = document.getElementById('charter-index-view');
+        const articleView = document.getElementById('charter-article-view');
+        if (indexView) indexView.style.display = '';
+        if (articleView) articleView.style.display = 'none';
+        buildArticleCards();
+        return;
+    }
+
+    const contentEl = document.getElementById(doc.contentEl);
+    if (!contentEl) return;
     const urlBase = doc.urlBase;
+    const pages = topLevelPages();
+
     contentEl.innerHTML = `
     <div class="section-content-inner">
       <div class="section-header">
         <div class="section-type-badge">Document</div>
         <h1 class="section-heading">${doc.label}</h1>
       </div>
+      <section class="section-grid">
+        <h2 class="section-title">Articles at a Glance</h2>
+        <div class="card-grid">
+          ${pages.map(p => `
+            <div class="glass-card article-card" data-href="${urlBase}/${p.slug}" tabindex="0" role="button">
+              ${p.number ? `<div class="card-num">${p.number}</div>` : ''}
+              <div class="card-title">${p.title}</div>
+            </div>`).join('')}
+        </div>
+      </section>
       <div class="section-body">
-        <p>Select a section from the sidebar, or use the table of contents below.</p>
         <h2>Table of Contents</h2>
-        ${topLevelPages().map(p => {
-          const children = subsectionsOf(p.id);
-          return `<div style="margin-bottom:1rem">
-            <a href="${urlBase}/${p.slug}" class="toc-link" style="font-size:1rem;color:var(--brand-dark);display:block;margin-bottom:0.3rem">
-              ${p.number ? `${p.number} — ` : ''}${p.title}
-            </a>
-            ${children.length ? `<ul style="margin:0 0 0 1.2rem;list-style:none;padding:0">
-              ${children.map(c => `<li><a href="${urlBase}/${p.slug}#${c.anchor}" class="toc-link" style="font-size:0.85rem;color:var(--text-muted)">${c.title}</a></li>`).join('')}
-            </ul>` : ''}
-          </div>`;
-        }).join('')}
+        <div class="toc-card-list">
+          ${pages.map(p => {
+            const children = subsectionsOf(p.id);
+            return `
+              <a href="${urlBase}/${p.slug}" class="toc-card-btn" data-href="${urlBase}/${p.slug}">
+                <div class="toc-card-title">${p.number ? `<span class="card-num">${p.number} — </span>` : ''}${p.title}</div>
+                ${children.length ? `<div class="toc-card-subs">${children.map(c => `<span class="toc-sub-item">${c.title}</span>`).join('')}</div>` : ''}
+              </a>`;
+          }).join('')}
+        </div>
       </div>
     </div>`;
 
-    contentEl.querySelectorAll('.toc-link').forEach(a => {
+    contentEl.querySelectorAll('.article-card').forEach(card => {
+        const fn = () => navigate(card.dataset.href);
+        card.addEventListener('click', fn);
+        card.addEventListener('keydown', e => e.key === 'Enter' && fn());
+    });
+    contentEl.querySelectorAll('.toc-card-btn').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
-            navigate(a.getAttribute('href'));
+            navigate(a.dataset.href);
         });
     });
-
-    updateSidebarActive(null, null);
 }
 
 /* ─── Page Loading ─── */
 async function loadPage(slug, anchor) {
     const doc = DOCS[currentDoc];
+
+    if (currentDoc === 'charter') {
+        const indexView = document.getElementById('charter-index-view');
+        const articleView = document.getElementById('charter-article-view');
+        if (indexView) indexView.style.display = 'none';
+        if (articleView) articleView.style.display = '';
+    }
+
     const contentEl = document.getElementById(doc.contentEl);
     if (!contentEl) return;
     contentEl.innerHTML = '<div class="section-loading"><span class="spinner large"></span><p>Loading...</p></div>';
@@ -1211,6 +1260,13 @@ function setupEventListeners() {
                 navigate(href);
             }
         });
+    });
+
+    // Home page document cards
+    document.querySelectorAll('.home-doc-card').forEach(card => {
+        const fn = () => navigate(card.dataset.href);
+        card.addEventListener('click', fn);
+        card.addEventListener('keydown', e => e.key === 'Enter' && fn());
     });
 
     setupCopyDropdown();

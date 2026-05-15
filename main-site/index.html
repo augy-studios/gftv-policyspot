@@ -125,23 +125,13 @@
     <!-- Main Content -->
     <main class="main-content" id="main-content">
         <div id="page-home" class="page active">
-            <!-- Hero -->
+            <!-- Welcome Banner -->
             <section class="hero glass-card">
                 <div class="hero-body">
-                    <div class="hero-badge">Edition 2024</div>
-                    <h1 class="hero-title">Charter of Global Furry Television</h1>
-                    <p class="hero-sub">The supreme governing framework of GFTV — establishing its ethical and
-                        operational principles.</p>
-                    <div class="hero-actions">
-                        <a href="/the-charter" class="btn btn-primary" data-navlink>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
-                                    stroke="currentColor" stroke-width="2" />
-                                <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" /></svg>
-                            Read the Charter
-                        </a>
-                        <a href="/the-charter/citation" class="btn btn-ghost" data-navlink>Start Reading</a>
-                    </div>
+                    <div class="hero-badge">GFTV PolicySpot</div>
+                    <h1 class="hero-title">Policy Documentation</h1>
+                    <p class="hero-sub">The official policy documentation portal for Global Furry Television (GFTV).
+                        Browse documents below.</p>
                 </div>
                 <div class="hero-graphic">
                     <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -153,65 +143,99 @@
                 </div>
             </section>
 
-            <!-- Quick links -->
-            <section class="section-grid" id="quick-links">
-                <h2 class="section-title">Articles at a Glance</h2>
-                <div class="card-grid" id="article-cards">
-                    <div class="glass-card article-card skeleton"></div>
-                    <div class="glass-card article-card skeleton"></div>
-                    <div class="glass-card article-card skeleton"></div>
-                    <div class="glass-card article-card skeleton"></div>
-                </div>
-            </section>
-
-            <!-- Values -->
-            <section class="values-section">
-                <h2 class="section-title">Core Values</h2>
-                <div class="values-grid">
-                    <div class="glass-card value-card">
-                        <div class="value-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="var(--brand-dark)"
-                                    stroke-width="2" stroke-linejoin="round" /></svg>
-                        </div>
-                        <div class="value-zh">诚</div>
-                        <div class="value-en">Genuine</div>
-                        <p>To serve the community with true dedication, rather than for social status.</p>
-                    </div>
-                    <div class="glass-card value-card">
-                        <div class="value-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                                <path
-                                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"
-                                    stroke="var(--brand-dark)" stroke-width="2" stroke-linejoin="round" /></svg>
-                        </div>
-                        <div class="value-zh">正</div>
-                        <div class="value-en">Fairness</div>
-                        <p>To ensure that all individuals are treated fairly and given equal opportunity.</p>
-                    </div>
-                    <div class="glass-card value-card">
-                        <div class="value-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+            <!-- Documents Grid -->
+            <section class="section-grid">
+                <h2 class="section-title">Browse Documents</h2>
+                <div class="card-grid">
+                    <div class="glass-card home-doc-card" data-href="/the-charter" tabindex="0" role="button">
+                        <div class="home-doc-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
                                     stroke="var(--brand-dark)" stroke-width="2" />
-                                <path d="M8 12l2 2 4-4" stroke="var(--brand-dark)" stroke-width="2"
-                                    stroke-linecap="round" /></svg>
+                                <polyline points="14,2 14,8 20,8" stroke="var(--brand-dark)" stroke-width="2" />
+                                <line x1="8" y1="13" x2="16" y2="13" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="8" y1="17" x2="14" y2="17" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
                         </div>
-                        <div class="value-zh">信</div>
-                        <div class="value-en">Trust</div>
-                        <p>To act with sincerity, reliability, and integrity, so as to earn and maintain the trust of
-                            the community.</p>
+                        <div class="home-doc-title">Charter</div>
+                        <div class="home-doc-desc">The supreme governing framework of GFTV — establishing its ethical
+                            and operational principles.</div>
                     </div>
-                    <div class="glass-card value-card">
-                        <div class="value-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="var(--brand-dark)" stroke-width="2" />
-                                <path d="M12 8v4l3 3" stroke="var(--brand-dark)" stroke-width="2"
-                                    stroke-linecap="round" /></svg>
+                    <div class="glass-card home-doc-card" data-href="/news" tabindex="0" role="button">
+                        <div class="home-doc-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"
+                                    stroke="var(--brand-dark)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <line x1="11" y1="7" x2="17" y2="7" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="11" y1="11" x2="17" y2="11" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="11" y1="15" x2="13" y2="15" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
                         </div>
-                        <div class="value-zh">前</div>
-                        <div class="value-en">Visionary</div>
-                        <p>To explore new ways of bringing communities together and advancing GFTV's purpose.</p>
+                        <div class="home-doc-title">News Standards</div>
+                        <div class="home-doc-desc">Editorial standards and guidelines for GFTV's news and media
+                            content.</div>
+                    </div>
+                    <div class="glass-card home-doc-card" data-href="/prs" tabindex="0" role="button">
+                        <div class="home-doc-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <polygon points="23 7 16 12 23 17 23 7" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linejoin="round" />
+                                <rect x="1" y="5" width="15" height="14" rx="2" stroke="var(--brand-dark)"
+                                    stroke-width="2" />
+                            </svg>
+                        </div>
+                        <div class="home-doc-title">Programme Rating System</div>
+                        <div class="home-doc-desc">Content rating framework for classifying GFTV programmes by audience
+                            suitability.</div>
+                    </div>
+                    <div class="glass-card home-doc-card" data-href="/rules" tabindex="0" role="button">
+                        <div class="home-doc-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="var(--brand-dark)"
+                                    stroke-width="2" stroke-linejoin="round" />
+                                <path d="M8 12l2 2 4-4" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="home-doc-title">Community Rules</div>
+                        <div class="home-doc-desc">Standards of conduct and community guidelines for GFTV
+                            participants.</div>
+                    </div>
+                    <div class="glass-card home-doc-card" data-href="/join-us" tabindex="0" role="button">
+                        <div class="home-doc-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="var(--brand-dark)"
+                                    stroke-width="2" stroke-linecap="round" />
+                                <circle cx="9" cy="7" r="4" stroke="var(--brand-dark)" stroke-width="2" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="home-doc-title">Join Us</div>
+                        <div class="home-doc-desc">Information on how to become part of the GFTV team and
+                            community.</div>
+                    </div>
+                    <div class="glass-card home-doc-card" data-href="/about" tabindex="0" role="button">
+                        <div class="home-doc-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="var(--brand-dark)" stroke-width="2" />
+                                <line x1="12" y1="8" x2="12" y2="12" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" stroke="var(--brand-dark)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="home-doc-title">About PolicySpot</div>
+                        <div class="home-doc-desc">About this documentation portal and Global Furry Television.</div>
                     </div>
                 </div>
             </section>
@@ -219,7 +243,103 @@
 
         <!-- Charter Page -->
         <div id="page-charter" class="page">
-            <div class="charter-layout">
+            <!-- Charter Index View (shown at /the-charter) -->
+            <div id="charter-index-view" style="display:none">
+                <section class="hero glass-card">
+                    <div class="hero-body">
+                        <div class="hero-badge">Edition 2026</div>
+                        <h1 class="hero-title">Charter of Global Furry Television</h1>
+                        <p class="hero-sub">The supreme governing framework of GFTV — establishing its ethical and
+                            operational principles.</p>
+                        <div class="hero-actions">
+                            <a href="/the-charter" class="btn btn-primary" data-navlink>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"
+                                        stroke="currentColor" stroke-width="2" />
+                                    <polyline points="14,2 14,8 20,8" stroke="currentColor"
+                                        stroke-width="2" /></svg>
+                                Read the Charter
+                            </a>
+                            <a href="/the-charter/citation" class="btn btn-ghost" data-navlink>Start Reading</a>
+                        </div>
+                    </div>
+                    <div class="hero-graphic">
+                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="10" width="100" height="100" rx="16" fill="var(--brand)"
+                                opacity="0.15" />
+                            <rect x="24" y="24" width="72" height="72" rx="10" fill="var(--brand)" opacity="0.25" />
+                            <path d="M35 46h50M35 60h36M35 74h44" stroke="var(--brand-dark)" stroke-width="3"
+                                stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </section>
+                <section class="section-grid" id="quick-links">
+                    <h2 class="section-title">Articles at a Glance</h2>
+                    <div class="card-grid" id="article-cards">
+                        <div class="glass-card article-card skeleton"></div>
+                        <div class="glass-card article-card skeleton"></div>
+                        <div class="glass-card article-card skeleton"></div>
+                        <div class="glass-card article-card skeleton"></div>
+                    </div>
+                </section>
+                <section class="values-section">
+                    <h2 class="section-title">Core Values</h2>
+                    <div class="values-grid">
+                        <div class="glass-card value-card">
+                            <div class="value-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                                        stroke="var(--brand-dark)" stroke-width="2"
+                                        stroke-linejoin="round" /></svg>
+                            </div>
+                            <div class="value-zh">诚</div>
+                            <div class="value-en">Genuine</div>
+                            <p>To serve the community with true dedication, rather than for social status.</p>
+                        </div>
+                        <div class="glass-card value-card">
+                            <div class="value-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"
+                                        stroke="var(--brand-dark)" stroke-width="2"
+                                        stroke-linejoin="round" /></svg>
+                            </div>
+                            <div class="value-zh">正</div>
+                            <div class="value-en">Fairness</div>
+                            <p>To ensure that all individuals are treated fairly and given equal opportunity.</p>
+                        </div>
+                        <div class="glass-card value-card">
+                            <div class="value-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                                        stroke="var(--brand-dark)" stroke-width="2" />
+                                    <path d="M8 12l2 2 4-4" stroke="var(--brand-dark)" stroke-width="2"
+                                        stroke-linecap="round" /></svg>
+                            </div>
+                            <div class="value-zh">信</div>
+                            <div class="value-en">Trust</div>
+                            <p>To act with sincerity, reliability, and integrity, so as to earn and maintain the
+                                trust of the community.</p>
+                        </div>
+                        <div class="glass-card value-card">
+                            <div class="value-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="var(--brand-dark)" stroke-width="2" />
+                                    <path d="M12 8v4l3 3" stroke="var(--brand-dark)" stroke-width="2"
+                                        stroke-linecap="round" /></svg>
+                            </div>
+                            <div class="value-zh">前</div>
+                            <div class="value-en">Visionary</div>
+                            <p>To explore new ways of bringing communities together and advancing GFTV's
+                                purpose.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- Charter Article View (shown at /the-charter/slug) -->
+            <div id="charter-article-view" class="charter-layout" style="display:none">
                 <div class="charter-main">
                     <div class="doc-toolbar">
                         <div class="doc-breadcrumb" id="doc-breadcrumb">
@@ -396,7 +516,7 @@
                     producing and distributing furry fandom entertainment and news content, and facilitating cultural
                     and community activity and exchange among participants of the furry fandom.</p>
                 <h2>Document</h2>
-                <p>The Charter of Global Furry Television (Edition 2024) is the supreme governing framework of GFTV,
+                <p>The Charter of Global Furry Television (Edition 2026) is the supreme governing framework of GFTV,
                     establishing its ethical and operational principles across nine articles and one schedule.</p>
                 <div class="about-links">
                     <a href="https://gftv.asia" target="_blank" rel="noopener" class="btn btn-ghost">
