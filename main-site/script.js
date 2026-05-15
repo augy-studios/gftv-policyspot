@@ -969,7 +969,21 @@ function setupCopyDropdown() {
                 window.open(URL.createObjectURL(new Blob([md], { type: 'text/plain' })), '_blank');
             }
         } else if (action === 'export-pdf') {
-            window.print();
+            if (!currentSection) return showToast('No page loaded', 'error');
+            const doc = DOCS[currentDoc];
+            const contentEl = document.getElementById(doc.contentEl);
+            if (!contentEl) return;
+            const title = currentSection.title || 'export';
+            const opt = {
+                margin: [12, 14, 12, 14],
+                filename: `${title}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+            showToast('Generating PDF…', 'info');
+            html2pdf().set(opt).from(contentEl).output('bloburl').then(url => window.open(url, '_blank'));
         } else if (action === 'chatgpt' || action === 'claude') {
             const urlBase = DOCS[currentDoc].urlBase;
             const pageUrl = currentSection ?
