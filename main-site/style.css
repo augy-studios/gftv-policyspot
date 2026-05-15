@@ -5,21 +5,6 @@
   margin: 0;
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
-
-  /* Chrome and Opera */
-  user-select: none;
-
-  /* Safari */
-  -webkit-user-select: none;
-
-  /* Konqueror HTML */
-  -khtml-user-select: none;
-
-  /* Firefox */
-  -moz-user-select: none;
-
-  /* Internet Explorer/Edge */
-  -ms-user-select: none;
 }
 
 :link {
