@@ -14,10 +14,10 @@ module.exports = async (req, res) => {
     if (handleOptions(req, res)) return;
     if (req.method !== 'POST') return err(res, 'Method not allowed', 405);
     const {
-        email,
+        username,
         password
     } = req.body || {};
-    if (!email || !password) return err(res, 'Email and password required');
+    if (!username || !password) return err(res, 'Username and password required');
     const supabase = getSupabaseClient();
     const {
         data: user,
@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
     } = await supabase
         .from('gftvhello_users')
         .select('*')
-        .eq('email', email.toLowerCase())
+        .eq('username', username.toLowerCase())
         .single();
     if (error || !user) return err(res, 'Invalid credentials', 401);
     if (!user.is_approved) return err(res, 'Account pending approval', 403);

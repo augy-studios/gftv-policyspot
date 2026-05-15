@@ -598,15 +598,15 @@ async function logout() {
 }
 
 /* ─── Auth Form ─── */
-document.getElementById('login-submit')?.addEventListener('click', async () => {
-    const email = document.getElementById('login-email').value.trim();
+document.getElementById('login-form')?.addEventListener('submit', async () => {
+    const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
     clearAuthError();
-    if (!email || !password) return showAuthError('Please fill in all fields.');
+    if (!username || !password) return showAuthError('Please fill in all fields.');
     const res = await apiFetch('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({
-            email,
+            username,
             password
         }),
         headers: {
