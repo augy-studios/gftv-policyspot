@@ -983,7 +983,18 @@ function setupCopyDropdown() {
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
             showToast('Generating PDF…', 'info');
-            html2pdf().set(opt).from(contentEl).output('bloburl').then(url => window.open(url, '_blank'));
+            const loadHtml2pdf = () => new Promise((resolve, reject) => {
+                if (window.html2pdf) return resolve(window.html2pdf);
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+                s.onload = () => resolve(window.html2pdf);
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+            loadHtml2pdf()
+                .then(h2p => h2p().set(opt).from(contentEl).output('bloburl'))
+                .then(url => window.open(url, '_blank'))
+                .catch(() => showToast('Failed to load PDF library', 'error'));
         } else if (action === 'chatgpt' || action === 'claude') {
             const urlBase = DOCS[currentDoc].urlBase;
             const pageUrl = currentSection ?
