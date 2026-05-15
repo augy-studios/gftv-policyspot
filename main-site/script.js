@@ -179,7 +179,7 @@ function showPage(name) {
     if (el) el.classList.add('active');
     if (name !== 'charter') window.scrollTo(0, 0);
 
-    if (name === 'home' || name === 'about' || name === 'admin') {
+    if (name === 'home' || name === 'about' || name === 'admin' || name === 'join') {
         const nav = document.getElementById('sidebar-nav');
         if (name === 'home' && nav) nav.innerHTML = '';
         const titleEl = document.querySelector('.sidebar-title');
@@ -188,12 +188,6 @@ function showPage(name) {
         if (window.innerWidth >= 900) {
             document.getElementById('sidebar')?.classList.add('collapsed');
             document.getElementById('main-content')?.classList.add('sidebar-hidden');
-        }
-    } else if (name === 'join') {
-        closeSidebar();
-        if (window.innerWidth >= 900) {
-            document.getElementById('sidebar')?.classList.remove('collapsed');
-            document.getElementById('main-content')?.classList.remove('sidebar-hidden');
         }
     } else {
         if (window.innerWidth >= 900) {
