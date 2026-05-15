@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Jua", sans-serif;
+  font-family: "Inter", sans-serif;
 
   /* Chrome and Opera */
   user-select: none;
@@ -50,7 +50,7 @@
   --glass-blur: 16px;
   --radius: 14px;
   --radius-sm: 8px;
-  --font: 'Jua', sans-serif;
+  --font: 'Inter', sans-serif;
 }
 
 [data-theme="ng1"] {
