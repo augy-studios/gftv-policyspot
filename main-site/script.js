@@ -204,31 +204,23 @@ function buildHomeSidebar() {
     const titleEl = document.querySelector('.sidebar-title');
     if (titleEl) titleEl.textContent = 'Site Navigation';
     if (!nav) return;
+    nav.innerHTML = '';
 
-    const pages = [
-        { label: 'Charter', href: '/the-charter', page: 'charter', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>` },
-        { label: 'News Standards', href: '/news', page: 'news', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
-        { label: 'Programme Rating System', href: '/prs', page: 'prs', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="23 7 16 12 23 17 23 7" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>` },
-        { label: 'Community Rules', href: '/rules', page: 'rules', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>` },
-        { label: 'Join Us', href: '/join-us', page: 'join', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` },
-        { label: 'About PolicySpot', href: '/about', page: 'about', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` },
-    ];
-
-    nav.innerHTML = pages.map(p => `
-        <div class="nav-article">
-            <div class="nav-article-row">
-                <a href="${p.href}" class="nav-article-btn home-sidebar-link" data-navlink data-page="${p.page}" style="text-decoration:none">
-                    ${p.icon}${p.label}
-                </a>
-            </div>
-        </div>`).join('');
-
-    nav.querySelectorAll('.home-sidebar-link').forEach(a => {
-        a.addEventListener('click', e => {
-            e.preventDefault();
-            navigate(a.getAttribute('href'));
+    SITE_PAGES.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'nav-article';
+        const btn = document.createElement('button');
+        btn.className = 'nav-article-btn';
+        btn.innerHTML = `${p.icon} ${p.label}`;
+        btn.addEventListener('click', () => {
+            navigate(p.href);
             if (window.innerWidth < 900) closeSidebar();
         });
+        const row = document.createElement('div');
+        row.className = 'nav-article-row';
+        row.appendChild(btn);
+        div.appendChild(row);
+        nav.appendChild(div);
     });
 }
 
@@ -349,6 +341,58 @@ function buildSidebar() {
         addBtn.addEventListener('click', () => openAddSectionModal(null));
         nav.appendChild(addBtn);
     }
+
+    nav.appendChild(buildSiteNavSection());
+}
+
+const SITE_PAGES = [
+    { label: 'Charter', href: '/the-charter', icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>` },
+    { label: 'News Standards', href: '/news', icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
+    { label: 'Programme Rating System', href: '/prs', icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polygon points="23 7 16 12 23 17 23 7" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>` },
+    { label: 'Community Rules', href: '/rules', icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>` },
+    { label: 'Join Us', href: '/join-us', icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>` },
+    { label: 'About PolicySpot', href: '/about', icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` },
+];
+
+function buildSiteNavSection() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'site-nav-section';
+
+    const header = document.createElement('button');
+    header.className = 'site-nav-header';
+    header.setAttribute('aria-expanded', 'false');
+    header.innerHTML = `
+        <span>Site Navigation</span>
+        <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>`;
+
+    const list = document.createElement('div');
+    list.className = 'site-nav-list';
+    list.hidden = true;
+
+    const currentHref = DOCS[currentDoc]?.urlBase;
+    SITE_PAGES.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-sub-btn site-nav-link' + (p.href === currentHref ? ' active' : '');
+        btn.innerHTML = `${p.icon} ${p.label}`;
+        btn.addEventListener('click', () => {
+            navigate(p.href);
+            if (window.innerWidth < 900) closeSidebar();
+        });
+        list.appendChild(btn);
+    });
+
+    header.addEventListener('click', () => {
+        const open = !list.hidden;
+        list.hidden = open;
+        header.setAttribute('aria-expanded', String(!open));
+        header.querySelector('.nav-chevron').style.transform = open ? '' : 'rotate(90deg)';
+    });
+
+    wrapper.appendChild(header);
+    wrapper.appendChild(list);
+    return wrapper;
 }
 
 function buildArticleCards() {
