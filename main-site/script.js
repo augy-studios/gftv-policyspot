@@ -56,7 +56,7 @@ const DOCS = {
         contentEl:   'join-content',
         breadcrumbEl:'join-breadcrumb',
         navFooterEl: 'join-nav-footer',
-        defaultSlug: 'index',
+        defaultSlug: 'home',
     },
 };
 
