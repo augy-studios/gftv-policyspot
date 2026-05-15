@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('gftvpolicy_join')
-        .select('id, slug, number, title, type, parent_id, order_index, is_published')
+        .select('id, slug, anchor, number, title, type, parent_id, order_index, is_published, content')
         .eq('is_published', true)
         .order('order_index');
     if (error) return err(res, 'Failed to load sections');
