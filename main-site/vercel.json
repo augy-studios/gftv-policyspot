@@ -8,19 +8,19 @@
         },
         {
             "source": "/the-charter",
-            "destination": "/"
+            "destination": "/index.html"
         },
         {
             "source": "/the-charter/(.*)",
-            "destination": "/"
+            "destination": "/index.html"
         },
         {
             "source": "/about",
-            "destination": "/"
+            "destination": "/index.html"
         },
         {
             "source": "/admin",
-            "destination": "/"
+            "destination": "/index.html"
         },
         {
             "source": "/(.*)",
