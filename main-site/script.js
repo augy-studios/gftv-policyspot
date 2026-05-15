@@ -108,7 +108,7 @@ function navigate(path, {
     handleRoute(path);
 }
 
-function handleRoute(fullPath) {
+async function handleRoute(fullPath) {
     const [path, hash] = fullPath.split('#');
     const cleanPath = path.replace(/\/$/, '') || '/';
 
@@ -133,7 +133,7 @@ function handleRoute(fullPath) {
     for (const [docKey, doc] of Object.entries(DOCS)) {
         const base = doc.urlBase; // e.g. '/the-charter', '/news'
         if (cleanPath === base) {
-            switchDoc(docKey);
+            await switchDoc(docKey);
             showPage(docKey === 'charter' ? 'charter' : docKey);
             updateActiveNav(doc.navPage);
             if (doc.defaultSlug) {
@@ -146,7 +146,7 @@ function handleRoute(fullPath) {
         }
         if (cleanPath.startsWith(base + '/')) {
             const slug = cleanPath.slice(base.length + 1);
-            switchDoc(docKey);
+            await switchDoc(docKey);
             showPage(docKey === 'charter' ? 'charter' : docKey);
             updateActiveNav(doc.navPage);
             loadPage(slug, hash || null);
