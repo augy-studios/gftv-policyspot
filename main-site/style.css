@@ -1551,6 +1551,10 @@ svg {
     box-shadow: none;
   }
 
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+
   .sidebar-overlay {
     display: none !important;
   }
@@ -1561,10 +1565,11 @@ svg {
 
   .main-content {
     padding-left: 296px;
+    transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .menu-btn {
-    display: none;
+  .main-content.sidebar-hidden {
+    padding-left: 1.5rem;
   }
 }
 

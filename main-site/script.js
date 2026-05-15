@@ -624,6 +624,18 @@ function closeSidebar() {
     document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
+function toggleSidebar() {
+    if (window.innerWidth >= 900) {
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main-content');
+        sidebar.classList.toggle('collapsed');
+        main.classList.toggle('sidebar-hidden');
+    } else {
+        const isOpen = document.getElementById('sidebar').classList.contains('open');
+        isOpen ? closeSidebar() : openSidebar();
+    }
+}
+
 /* ─── Session / Auth ─── */
 async function restoreSession() {
     const token = localStorage.getItem('gftv-token');
@@ -1104,7 +1116,7 @@ async function apiFetch(url, options = {}) {
 /* ─── Event Listeners ─── */
 function setupEventListeners() {
     document.getElementById('theme-btn')?.addEventListener('click', () => openModal('theme-modal'));
-    document.getElementById('menu-btn')?.addEventListener('click', openSidebar);
+    document.getElementById('menu-btn')?.addEventListener('click', toggleSidebar);
     document.getElementById('sidebar-close')?.addEventListener('click', closeSidebar);
     document.getElementById('sidebar-overlay')?.addEventListener('click', closeSidebar);
     document.getElementById('login-btn')?.addEventListener('click', () => openModal('auth-modal'));
