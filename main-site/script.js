@@ -1254,7 +1254,6 @@ async function loadAdmin() {
       </td>
     </tr>`).join('')}</tbody></table>`;
 
-    document.getElementById('seed-btn')?.addEventListener('click', runSeed);
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1300,28 +1299,6 @@ window.makeEditor = async function (id) {
         loadAdmin();
     } else showToast(res.error || 'Failed', 'error');
 };
-async function runSeed() {
-    const token = localStorage.getItem('gftv-token');
-    const btn = document.getElementById('seed-btn');
-    const out = document.getElementById('seed-output');
-    btn.disabled = true;
-    btn.textContent = 'Seeding...';
-    const res = await apiFetch('/api/admin/seed', {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-    btn.disabled = false;
-    btn.textContent = 'Run Seed';
-    out.classList.remove('hidden');
-    out.textContent = JSON.stringify(res, null, 2);
-    if (res.ok) {
-        showToast(`Seeded ${res.seeded} sections`, 'success');
-        await loadSections();
-    } else showToast(res.error || 'Seed failed', 'error');
-}
-
 /* ─── Modals ─── */
 function openModal(id) {
     const el = document.getElementById(id);

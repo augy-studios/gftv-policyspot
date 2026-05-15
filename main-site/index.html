@@ -535,20 +535,9 @@
         <div id="page-admin" class="page">
             <div class="admin-layout">
                 <h1>Admin Panel</h1>
-                <div class="admin-tabs">
-                    <button class="tab-btn active" data-tab="users">Users</button>
-                    <button class="tab-btn" data-tab="seed">Seed Data</button>
-                </div>
                 <div class="tab-content" id="tab-users">
                     <h2>User Management</h2>
                     <div id="admin-users-list">Loading...</div>
-                </div>
-                <div class="tab-content hidden" id="tab-seed">
-                    <h2>Seed Policy Sections</h2>
-                    <p>This will populate the database with all sections from the Charter. Safe to run multiple times
-                        (upserts on slug).</p>
-                    <button class="btn btn-primary" id="seed-btn">Run Seed</button>
-                    <pre id="seed-output" class="seed-output hidden"></pre>
                 </div>
             </div>
         </div>
