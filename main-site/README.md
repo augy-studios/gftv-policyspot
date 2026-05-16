@@ -55,7 +55,7 @@ gftv-policyspot/
 │   ├── CODE_OF_CONDUCT.md
 │   ├── GHS-192.png               App icon 192×192 (PWA manifest)
 │   ├── GHS-512.png               App icon 512×512 (PWA manifest)
-│   ├── GHS-icon.png              App icon used in header logo
+│   ├── GHS-main.png              App icon used in header logo
 │   ├── GHS-main.png              App icon used for social/OG embeds
 │   ├── browserconfig.xml
 │   ├── favicon.ico
