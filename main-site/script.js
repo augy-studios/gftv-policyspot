@@ -796,20 +796,23 @@ function toggleSidebar() {
 /* ─── Session / Auth ─── */
 async function restoreSession() {
     const token = localStorage.getItem('gftv-token');
-    if (!token) return;
-    try {
-        const res = await apiFetch('/api/auth/me', {
-            headers: {
-                Authorization: `Bearer ${token}`
+    if (token) {
+        try {
+            const res = await apiFetch('/api/auth/me', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (res.ok) {
+                currentUser = res.user;
+            } else {
+                localStorage.removeItem('gftv-token');
             }
-        });
-        if (res.ok) {
-            currentUser = res.user;
-            updateUserUI();
-        } else localStorage.removeItem('gftv-token');
-    } catch (e) {
-        localStorage.removeItem('gftv-token');
+        } catch (e) {
+            localStorage.removeItem('gftv-token');
+        }
     }
+    updateUserUI();
 }
 
 function updateUserUI() {
