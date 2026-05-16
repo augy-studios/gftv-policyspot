@@ -8,34 +8,67 @@ The official policy documentation site for **Global Furry Television (GFTV)**.
 
 ```bash
 gftv-policyspot/
-├── api/
-│   ├── auth/
-│   │   ├── login.js          POST /api/auth/login
-│   │   ├── logout.js         POST /api/auth/logout
-│   │   ├── me.js             GET  /api/auth/me
-│   │   └── register.js       POST /api/auth/register
-│   ├── policy/
-│   │   ├── sections.js       GET  /api/policy/sections
-│   │   ├── section.js        GET  /api/policy/section?slug=...
-│   │   └── update-slug.js    PUT  /api/policy/update-slug (admin/editor)
-│   └── admin/
-│       ├── users.js          GET/PUT /api/admin/users (admin)
-│       └── seed.js           POST /api/admin/seed (admin)
-├── lib/
-│   ├── supabase.js           Supabase client helper
-│   ├── auth.js               Session validation
-│   └── response.js           API response helpers
-├── public/
-│   ├── index.html            Main SPA shell
-│   ├── style.css             All styles (glassmorphism + 7 themes)
-│   ├── app.js                SPA logic, router, auth, content loading
-│   ├── manifest.json         PWA manifest
-│   ├── sw.js                 Service worker (offline cache)
-│   └── favicon.svg           SVG favicon
-├── supabase-migration.sql    Run this in Supabase SQL Editor first
-├── .env.example              Environment variable reference
-├── package.json
-└── vercel.json
+├── discord-bot/
+│   └── bot.py                Discord bot
+├── main-site/
+│   ├── .well-known/
+│   │   └── assetlinks.json
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── login.js          POST /api/auth/login
+│   │   │   ├── logout.js         POST /api/auth/logout
+│   │   │   ├── me.js             GET  /api/auth/me
+│   │   │   ├── register.js       POST /api/auth/register
+│   │   │   └── totp-verify.js    POST /api/auth/totp-verify
+│   │   ├── policy/
+│   │   │   ├── join/
+│   │   │   │   ├── section.js    GET  /api/policy/join/section?slug=...
+│   │   │   │   └── sections.js   GET  /api/policy/join/sections
+│   │   │   ├── news/
+│   │   │   │   ├── section.js    GET  /api/policy/news/section?slug=...
+│   │   │   │   └── sections.js   GET  /api/policy/news/sections
+│   │   │   ├── prs/
+│   │   │   │   ├── section.js    GET  /api/policy/prs/section?slug=...
+│   │   │   │   └── sections.js   GET  /api/policy/prs/sections
+│   │   │   ├── rules/
+│   │   │   │   ├── section.js    GET  /api/policy/rules/section?slug=...
+│   │   │   │   └── sections.js   GET  /api/policy/rules/sections
+│   │   │   ├── add-section.js    POST   /api/policy/add-section (admin/editor)
+│   │   │   ├── delete-section.js DELETE /api/policy/delete-section (admin/editor)
+│   │   │   ├── reorder-section.js PUT   /api/policy/reorder-section (admin/editor)
+│   │   │   ├── section.js        GET    /api/policy/section?slug=...
+│   │   │   ├── sections.js       GET    /api/policy/sections
+│   │   │   ├── update-section.js PUT    /api/policy/update-section (admin/editor)
+│   │   │   └── update-slug.js    PUT    /api/policy/update-slug (admin/editor)
+│   │   └── admin/
+│   │       └── users.js          GET/PUT /api/admin/users (admin)
+│   ├── images/
+│   │   ├── screenshot_1.png
+│   │   └── screenshot_2.png
+│   ├── lib/
+│   │   ├── auth.js               Session validation
+│   │   ├── response.js           API response helpers
+│   │   ├── supabase.js           Supabase client helper
+│   │   └── totp.js               TOTP helper
+│   ├── 404.css
+│   ├── 404.html
+│   ├── CODE_OF_CONDUCT.md
+│   ├── GHS-192.png               App icon 192×192 (PWA manifest)
+│   ├── GHS-512.png               App icon 512×512 (PWA manifest)
+│   ├── GHS-icon.png              App icon used in header logo
+│   ├── GHS-main.png              App icon used for social/OG embeds
+│   ├── browserconfig.xml
+│   ├── favicon.ico
+│   ├── index.html                Main SPA shell
+│   ├── manifest.json             PWA manifest
+│   ├── package.json
+│   ├── robots.txt
+│   ├── script.js                 SPA logic, router, auth, content loading
+│   ├── style.css                 All styles (glassmorphism + 7 themes)
+│   ├── sw.js                     Service worker (offline cache)
+│   └── vercel.json
+└── telegram-bot/
+    └── bot.py                Telegram bot
 ```
 
 ---
