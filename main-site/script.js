@@ -814,9 +814,11 @@ async function restoreSession() {
 
 function updateUserUI() {
     const area = document.getElementById('user-area');
-    if (!area) return;
+    const sidebarArea = document.getElementById('sidebar-user-area');
+
     if (currentUser) {
-        area.innerHTML = `
+        if (area) {
+            area.innerHTML = `
       <div class="user-chip" id="user-chip" tabindex="0">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2"/></svg>
         ${currentUser.display_name}
@@ -826,23 +828,53 @@ function updateUserUI() {
           <button class="user-dropdown-item danger" id="logout-btn">Sign Out</button>
         </div>
       </div>`;
-        const chip = document.getElementById('user-chip');
-        chip.addEventListener('click', e => {
-            e.stopPropagation();
-            const dd = document.getElementById('user-dropdown');
-            dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
-        });
-        document.getElementById('logout-btn')?.addEventListener('click', logout);
-        document.getElementById('goto-admin')?.addEventListener('click', () => navigate('/admin'));
-        document.addEventListener('click', () => {
-            const dd = document.getElementById('user-dropdown');
-            if (dd) dd.style.display = 'none';
-        }, {
-            once: true
-        });
+            const chip = document.getElementById('user-chip');
+            chip.addEventListener('click', e => {
+                e.stopPropagation();
+                const dd = document.getElementById('user-dropdown');
+                dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+            });
+            document.getElementById('logout-btn')?.addEventListener('click', logout);
+            document.getElementById('goto-admin')?.addEventListener('click', () => navigate('/admin'));
+            document.addEventListener('click', () => {
+                const dd = document.getElementById('user-dropdown');
+                if (dd) dd.style.display = 'none';
+            }, { once: true });
+        }
+
+        if (sidebarArea) {
+            sidebarArea.innerHTML = `
+      <div class="user-chip" id="sidebar-user-chip" tabindex="0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2"/></svg>
+        ${currentUser.display_name}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"/></svg>
+        <div class="user-dropdown" id="sidebar-user-dropdown" style="display:none">
+          ${currentUser.is_admin ? `<button class="user-dropdown-item" id="sidebar-goto-admin">Admin Panel</button>` : ''}
+          <button class="user-dropdown-item danger" id="sidebar-logout-btn">Sign Out</button>
+        </div>
+      </div>`;
+            const sidebarChip = document.getElementById('sidebar-user-chip');
+            sidebarChip.addEventListener('click', e => {
+                e.stopPropagation();
+                const dd = document.getElementById('sidebar-user-dropdown');
+                dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+            });
+            document.getElementById('sidebar-logout-btn')?.addEventListener('click', logout);
+            document.getElementById('sidebar-goto-admin')?.addEventListener('click', () => navigate('/admin'));
+            document.addEventListener('click', () => {
+                const dd = document.getElementById('sidebar-user-dropdown');
+                if (dd) dd.style.display = 'none';
+            }, { once: true });
+        }
     } else {
-        area.innerHTML = `<button class="btn btn-ghost btn-sm" id="login-btn">Sign In</button>`;
-        document.getElementById('login-btn')?.addEventListener('click', () => openModal('auth-modal'));
+        if (area) {
+            area.innerHTML = `<button class="btn btn-ghost btn-sm" id="login-btn">Sign In</button>`;
+            document.getElementById('login-btn')?.addEventListener('click', () => openModal('auth-modal'));
+        }
+        if (sidebarArea) {
+            sidebarArea.innerHTML = `<button class="btn btn-ghost btn-sm" id="sidebar-login-btn">Sign In</button>`;
+            document.getElementById('sidebar-login-btn')?.addEventListener('click', () => openModal('auth-modal'));
+        }
     }
 }
 async function logout() {

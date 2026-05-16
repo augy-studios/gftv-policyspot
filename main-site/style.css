@@ -443,6 +443,12 @@ svg {
   height: 28px;
 }
 
+.sidebar-user-area {
+  display: none;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
 .sidebar-nav {
   padding: 0 0.5rem;
 }
@@ -1658,6 +1664,14 @@ svg {
 
   .header-nav {
     display: none;
+  }
+
+  .user-area {
+    display: none;
+  }
+
+  .sidebar-user-area {
+    display: block;
   }
 
   .theme-grid {
