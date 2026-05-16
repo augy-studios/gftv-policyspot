@@ -3,7 +3,11 @@
     "short_name": "GFTV PolicySpot",
     "description": "The official policy documentation site for Global Furry Television (GFTV).",
     "icons": [{
-        "src": "templateicon1.png",
+        "src": "GHS-192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+    }, {
+        "src": "GHS-512.png",
         "type": "image/png",
         "sizes": "512x512"
     }],
