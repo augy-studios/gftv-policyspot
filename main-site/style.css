@@ -1034,11 +1034,22 @@ svg {
 /* ─── Doc Nav Footer ─── */
 .doc-nav-footer {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-top: 2.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
+}
+
+.doc-last-updated {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.doc-nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 

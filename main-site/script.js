@@ -734,20 +734,34 @@ function updateDocNavFooter(section) {
         footer.innerHTML = '';
         return;
     }
+
+    // Most recent updated_at across the section and all its subsections
+    const candidates = [section, ...sections.filter(s => s.parent_id === section.id)]
+        .map(s => s.updated_at).filter(Boolean);
+    const latestDate = candidates.length
+        ? new Date(candidates.reduce((a, b) => (a > b ? a : b)))
+        : null;
+    const lastUpdated = latestDate
+        ? latestDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+        : null;
+
     const urlBase = doc.urlBase;
     const pages = topLevelPages();
     const idx = pages.findIndex(s => s.id === section.id);
     const prev = idx > 0 ? pages[idx - 1] : null;
     const next = idx < pages.length - 1 ? pages[idx + 1] : null;
     footer.innerHTML = `
-    ${prev ? `<button class="doc-nav-btn" data-slug="${prev.slug}">
-      <span class="doc-nav-label">← Previous</span>
-      <span class="doc-nav-title">${prev.number ? prev.number + ' — ' : ''}${prev.title}</span>
-    </button>` : '<span></span>'}
-    ${next ? `<button class="doc-nav-btn next" data-slug="${next.slug}">
-      <span class="doc-nav-label">Next →</span>
-      <span class="doc-nav-title">${next.number ? next.number + ' — ' : ''}${next.title}</span>
-    </button>` : ''}`;
+    ${lastUpdated ? `<p class="doc-last-updated">Last updated: ${lastUpdated}</p>` : ''}
+    <div class="doc-nav-buttons">
+      ${prev ? `<button class="doc-nav-btn" data-slug="${prev.slug}">
+        <span class="doc-nav-label">← Previous</span>
+        <span class="doc-nav-title">${prev.number ? prev.number + ' — ' : ''}${prev.title}</span>
+      </button>` : '<span></span>'}
+      ${next ? `<button class="doc-nav-btn next" data-slug="${next.slug}">
+        <span class="doc-nav-label">Next →</span>
+        <span class="doc-nav-title">${next.number ? next.number + ' — ' : ''}${next.title}</span>
+      </button>` : ''}
+    </div>`;
     footer.querySelectorAll('.doc-nav-btn').forEach(btn =>
         btn.addEventListener('click', () => navigate(`${urlBase}/${btn.dataset.slug}`)));
 }
