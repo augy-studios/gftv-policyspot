@@ -10,29 +10,29 @@ module.exports.config = {
 };
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
-const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
+const MAX_BYTES = 8 * 1024 * 1024; // 8 MB after compression
 
 module.exports = async (req, res) => {
     if (handleOptions(req, res)) return;
     if (req.method !== 'POST') return err(res, 'Method not allowed', 405);
 
     const user = await validateSession(req);
-    if (!user)       return err(res, 'Unauthorized', 401);
+    if (!user)          return err(res, 'Unauthorized', 401);
     if (!user.is_admin) return err(res, 'Forbidden', 403);
 
-    const { filename, mime_type, data } = req.body || {};
+    const { filename, mime_type, data, width, height } = req.body || {};
     if (!filename || !mime_type || !data) return err(res, 'filename, mime_type, and data are required');
     if (!ALLOWED_MIME.has(mime_type))     return err(res, 'Unsupported file type');
 
     const buffer = Buffer.from(data, 'base64');
     if (buffer.byteLength > MAX_BYTES)    return err(res, 'File too large (max 8 MB)');
 
-    // Build a unique storage path
-    const ext        = filename.split('.').pop().toLowerCase();
-    const safeName   = filename.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60);
+    const ext         = filename.split('.').pop().toLowerCase();
+    const safeName    = filename.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60);
     const storagePath = `${Date.now()}-${safeName}.${ext}`;
 
     const supabase = getSupabaseClient();
+
     const { error: uploadError } = await supabase.storage
         .from('policy-images')
         .upload(storagePath, buffer, { contentType: mime_type, upsert: false });
@@ -43,5 +43,25 @@ module.exports = async (req, res) => {
         .from('policy-images')
         .getPublicUrl(storagePath);
 
-    return ok(res, { url: publicUrl });
+    // Record the upload in the catalogue table
+    const { data: record, error: dbError } = await supabase
+        .from('gftvpolicy_images')
+        .insert({
+            filename,
+            storage_path: storagePath,
+            public_url:   publicUrl,
+            mime_type,
+            file_size:    buffer.byteLength,
+            width:        width  || null,
+            height:       height || null,
+        })
+        .select('id, filename, public_url, mime_type, file_size, width, height, uploaded_at')
+        .single();
+
+    if (dbError) {
+        // Storage succeeded; return the URL even if DB logging fails
+        return ok(res, { url: publicUrl, image: null });
+    }
+
+    return ok(res, { url: publicUrl, image: record });
 };

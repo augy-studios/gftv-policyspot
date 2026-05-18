@@ -1397,10 +1397,7 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
         case 'i':
             e.preventDefault();
             if (e.shiftKey) {
-                const imgInput = document.getElementById('image-upload-input');
-                imgInput._ta        = ta;
-                imgInput._cursorPos = ta.selectionStart;
-                imgInput.click();
+                openImagePicker(ta);
             } else {
                 applyMarkdownFormat(ta, '*', '*');
             }
@@ -1436,47 +1433,212 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
     }
 });
 
-/* ─── Image Upload (Ctrl+Shift+I) ─── */
-document.getElementById('image-upload-input')?.addEventListener('change', async e => {
-    const file = e.target.files?.[0];
-    e.target.value = ''; // reset so the same file can be re-selected
+/* ─── Image Picker (Ctrl+Shift+I) ─── */
+const imgPicker = { ta: null, cursorPos: 0, selectedUrl: null, compressed: null, originalFile: null };
+
+// Client-side compression via Canvas. Returns { base64, mime, width, height, size }.
+function compressImage(file, maxWidth = 1920, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objUrl = URL.createObjectURL(file);
+        img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error('Failed to load image')); };
+        img.onload = () => {
+            URL.revokeObjectURL(objUrl);
+            let w = img.naturalWidth, h = img.naturalHeight;
+            if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            // GIF stays GIF; small PNGs stay PNG; everything else → WebP
+            const outMime = file.type === 'image/gif'  ? 'image/gif'
+                          : file.type === 'image/png' && file.size < 100_000 ? 'image/png'
+                          : 'image/webp';
+            canvas.toBlob(blob => {
+                const reader = new FileReader();
+                reader.onload = () => resolve({
+                    base64: reader.result.split(',')[1],
+                    mime: blob.type, width: w, height: h, size: blob.size,
+                });
+                reader.readAsDataURL(blob);
+            }, outMime, quality);
+        };
+        img.src = objUrl;
+    });
+}
+
+function openImagePicker(ta) {
+    imgPicker.ta        = ta;
+    imgPicker.cursorPos = ta.selectionStart;
+    imgPicker.selectedUrl  = null;
+    imgPicker.compressed   = null;
+    imgPicker.originalFile = null;
+
+    // Reset upload pane
+    document.getElementById('img-drop-zone').hidden    = false;
+    document.getElementById('img-preview-wrap').hidden = true;
+    document.getElementById('img-alt-upload').value    = '';
+    document.getElementById('img-insert-btn').disabled = true;
+    switchImgTab('upload');
+    openModal('image-picker-modal');
+}
+
+function switchImgTab(tab) {
+    document.querySelectorAll('.img-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.img-tab-pane').forEach(p => p.classList.toggle('hidden', p.id !== `img-pane-${tab}`));
+    if (tab === 'library') loadImageLibrary();
+}
+
+let libraryLoaded = false;
+async function loadImageLibrary() {
+    const grid = document.getElementById('img-library-grid');
+    if (libraryLoaded) return; // already populated this session
+    grid.innerHTML = '<p class="img-library-empty">Loading&hellip;</p>';
+
+    const res = await apiFetch('/api/policy/images');
+    libraryLoaded = true;
+    if (!res.ok || !res.images?.length) {
+        grid.innerHTML = '<p class="img-library-empty">No images uploaded yet.</p>';
+        return;
+    }
+
+    grid.innerHTML = '';
+    res.images.forEach(img => {
+        const tile = document.createElement('div');
+        tile.className   = 'img-library-tile';
+        tile.dataset.url = img.public_url;
+        const kb  = Math.round(img.file_size / 1024);
+        const dim = img.width ? `${img.width}×${img.height}` : '';
+        tile.innerHTML = `
+            <img src="${img.public_url}" alt="${img.filename}" loading="lazy">
+            <span class="img-tile-name" title="${img.filename}">${img.filename}</span>
+            <span class="img-tile-meta">${dim}${dim && kb ? ' · ' : ''}${kb ? kb + ' KB' : ''}</span>`;
+        tile.addEventListener('click', () => {
+            document.querySelectorAll('.img-library-tile').forEach(t => t.classList.remove('selected'));
+            tile.classList.add('selected');
+            imgPicker.selectedUrl = img.public_url;
+            const defaultAlt = img.filename.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+            document.getElementById('img-alt-library').value = defaultAlt;
+            document.getElementById('img-alt-library-group').style.display = '';
+            document.getElementById('img-insert-btn').disabled = false;
+        });
+        grid.appendChild(tile);
+    });
+}
+
+async function handleImgFileSelected(file) {
     if (!file) return;
+    document.getElementById('img-drop-zone').hidden    = false;
+    document.getElementById('img-preview-wrap').hidden = true;
+    document.getElementById('img-insert-btn').disabled = true;
+    document.getElementById('img-compress-info').textContent = 'Compressing…';
+    document.getElementById('img-drop-zone').hidden    = true;
+    document.getElementById('img-preview-wrap').hidden = false;
 
-    const ta        = e.target._ta;
-    const cursorPos = e.target._cursorPos ?? ta?.selectionStart ?? 0;
+    try {
+        const c = await compressImage(file);
+        imgPicker.compressed   = c;
+        imgPicker.originalFile = file;
+        document.getElementById('img-preview').src = `data:${c.mime};base64,${c.base64}`;
+        document.getElementById('img-alt-upload').value =
+            file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+        const savings = file.size > 0 ? Math.round((1 - c.size / file.size) * 100) : 0;
+        document.getElementById('img-compress-info').textContent =
+            `${c.width}×${c.height} · ${Math.round(c.size / 1024)} KB` +
+            (savings > 5 ? ` (${savings}% smaller than original)` : '');
+        document.getElementById('img-insert-btn').disabled = false;
+    } catch {
+        document.getElementById('img-compress-info').textContent = 'Could not process image.';
+    }
+}
+
+function insertImageMarkdown(url, alt) {
+    const ta = imgPicker.ta;
     if (!ta) return;
+    editorSaveState(ta);
+    const md  = `![${alt}](${url})`;
+    const pos = imgPicker.cursorPos;
+    ta.value          = ta.value.substring(0, pos) + md + ta.value.substring(pos);
+    ta.selectionStart = pos + md.length;
+    ta.selectionEnd   = pos + md.length;
+    ta.focus();
+}
 
-    showToast('Uploading image…', '');
+// Tab switching
+document.querySelectorAll('.img-tab-btn').forEach(btn =>
+    btn.addEventListener('click', () => switchImgTab(btn.dataset.tab)));
 
-    const reader = new FileReader();
-    reader.onerror = () => showToast('Could not read file', 'error');
-    reader.onload = async () => {
-        try {
-            const base64 = reader.result.split(',')[1];
-            const res    = await apiFetch('/api/policy/upload-image', {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ filename: file.name, mime_type: file.type, data: base64 }),
-            });
+// Browse button & file input
+document.getElementById('img-browse-btn')?.addEventListener('click', () =>
+    document.getElementById('img-file-input').click());
 
-            if (!res.ok) {
-                showToast(res.error || 'Upload failed', 'error');
-                return;
-            }
+document.getElementById('img-file-input')?.addEventListener('change', e => {
+    handleImgFileSelected(e.target.files?.[0]);
+    e.target.value = '';
+});
 
-            editorSaveState(ta);
-            const altText = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
-            const md      = `![${altText}](${res.url})`;
-            ta.value          = ta.value.substring(0, cursorPos) + md + ta.value.substring(cursorPos);
-            ta.selectionStart = cursorPos + md.length;
-            ta.selectionEnd   = cursorPos + md.length;
-            ta.focus();
-            showToast('Image inserted', 'success');
-        } catch (err) {
-            showToast('Upload error: ' + (err?.message || 'Unknown'), 'error');
-        }
-    };
-    reader.readAsDataURL(file);
+// Drag and drop
+const dropZone = document.getElementById('img-drop-zone');
+dropZone?.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone?.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files?.[0];
+    if (file?.type.startsWith('image/')) handleImgFileSelected(file);
+});
+
+// Insert button
+document.getElementById('img-insert-btn')?.addEventListener('click', async () => {
+    const activeTab = document.querySelector('.img-tab-btn.active')?.dataset.tab;
+    const btn = document.getElementById('img-insert-btn');
+
+    if (activeTab === 'library') {
+        if (!imgPicker.selectedUrl) return;
+        const alt = document.getElementById('img-alt-library').value.trim();
+        insertImageMarkdown(imgPicker.selectedUrl, alt);
+        closeModal('image-picker-modal');
+        return;
+    }
+
+    // Upload tab
+    if (!imgPicker.compressed) return;
+    btn.disabled    = true;
+    btn.textContent = 'Uploading…';
+
+    try {
+        const c    = imgPicker.compressed;
+        const file = imgPicker.originalFile;
+        const ext  = c.mime === 'image/webp' ? 'webp' : c.mime === 'image/png' ? 'png'
+                   : c.mime === 'image/gif'  ? 'gif'  : 'jpg';
+        const baseName = file.name.replace(/\.[^.]+$/, '');
+        const res = await apiFetch('/api/policy/upload-image', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                filename:  `${baseName}.${ext}`,
+                mime_type: c.mime,
+                data:      c.base64,
+                width:     c.width,
+                height:    c.height,
+            }),
+        });
+
+        if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
+
+        // Prepend new image to the library grid so it's visible immediately
+        libraryLoaded = false; // force reload next time library tab opens
+
+        const alt = document.getElementById('img-alt-upload').value.trim()
+                 || baseName.replace(/[_-]/g, ' ');
+        insertImageMarkdown(res.url, alt);
+        closeModal('image-picker-modal');
+        showToast('Image uploaded and inserted', 'success');
+    } catch (e) {
+        showToast('Upload error: ' + (e?.message || 'Unknown'), 'error');
+    } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Insert';
+    }
 });
 
 document.getElementById('content-edit-save')?.addEventListener('click', async () => {
