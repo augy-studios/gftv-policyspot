@@ -972,6 +972,15 @@ svg {
   text-decoration: underline;
 }
 
+.section-body .section-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
 .section-body strong {
   color: var(--text);
 }

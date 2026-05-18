@@ -670,6 +670,8 @@ function renderMarkdown(md) {
     html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
     html = html.replace(/__(.+?)__/g, '<u>$1</u>');
     html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+    // Images (must come before links so ![alt](url) isn't partially matched)
+    html = html.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, '<img class="section-img" src="$2" alt="$1">');
     // Links
     html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     // Inline code
@@ -1394,7 +1396,14 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
             break;
         case 'i':
             e.preventDefault();
-            applyMarkdownFormat(ta, '*', '*');
+            if (e.shiftKey) {
+                const imgInput = document.getElementById('image-upload-input');
+                imgInput._ta        = ta;
+                imgInput._cursorPos = ta.selectionStart;
+                imgInput.click();
+            } else {
+                applyMarkdownFormat(ta, '*', '*');
+            }
             break;
         case 'u':
             e.preventDefault();
@@ -1425,6 +1434,45 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
             document.getElementById('content-edit-save')?.click();
             break;
     }
+});
+
+/* ─── Image Upload (Ctrl+Shift+I) ─── */
+document.getElementById('image-upload-input')?.addEventListener('change', async e => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // reset so the same file can be re-selected
+    if (!file) return;
+
+    const ta        = e.target._ta;
+    const cursorPos = e.target._cursorPos ?? ta?.selectionStart ?? 0;
+    if (!ta) return;
+
+    showToast('Uploading image…', '');
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+        const base64 = reader.result.split(',')[1];
+        const token  = localStorage.getItem('gftv-token');
+        const res    = await apiFetch('/api/policy/upload-image', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body:    JSON.stringify({ filename: file.name, mime_type: file.type, data: base64 }),
+        });
+
+        if (!res.ok) {
+            showToast(res.error || 'Upload failed', 'error');
+            return;
+        }
+
+        editorSaveState(ta);
+        const altText = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+        const md      = `![${altText}](${res.url})`;
+        ta.value          = ta.value.substring(0, cursorPos) + md + ta.value.substring(cursorPos);
+        ta.selectionStart = cursorPos + md.length;
+        ta.selectionEnd   = cursorPos + md.length;
+        ta.focus();
+        showToast('Image inserted', 'success');
+    };
+    reader.readAsDataURL(file);
 });
 
 document.getElementById('content-edit-save')?.addEventListener('click', async () => {
