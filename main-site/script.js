@@ -80,7 +80,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 /* ─── Theme ─── */
 function initTheme() {
-    applyTheme(localStorage.getItem('gftv-theme') || 'classic');
+    const saved = localStorage.getItem('gftv-theme');
+    const valid = ['light', 'singapore', 'hello'];
+    applyTheme(valid.includes(saved) ? saved : 'light');
 }
 
 function applyTheme(theme) {
@@ -1183,10 +1185,19 @@ function setupCopyDropdown() {
                 s.onerror = reject;
                 document.head.appendChild(s);
             });
+            const savedTheme = document.body.dataset.theme;
+            applyTheme('light');
             loadHtml2pdf()
                 .then(h2p => h2p().set(opt).from(contentEl).output('bloburl'))
-                .then(url => { window.open(url, '_blank'); showToast('PDF opened in new tab', 'success'); })
-                .catch(() => showToast('Failed to load PDF library', 'error'));
+                .then(url => {
+                    applyTheme(savedTheme);
+                    window.open(url, '_blank');
+                    showToast('PDF opened in new tab', 'success');
+                })
+                .catch(() => {
+                    applyTheme(savedTheme);
+                    showToast('Failed to load PDF library', 'error');
+                });
         } else if (action === 'chatgpt' || action === 'claude') {
             const urlBase = DOCS[currentDoc].urlBase;
             const pageUrl = currentSection ?

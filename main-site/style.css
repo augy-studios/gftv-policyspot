@@ -16,134 +16,45 @@
 }
 
 /* ─── Theme Variables ─── */
-:root {
-  --brand: #ccffcc;
-  --brand-mid: #aaf5aa;
-  --brand-dark: #3d9e3d;
-  --brand-text: #1a4a1a;
-  --bg: #f0fff0;
-  --bg-alt: #e8fce8;
-  --surface: rgba(204, 255, 204, 0.35);
-  --surface-hover: rgba(204, 255, 204, 0.55);
-  --surface-active: rgba(204, 255, 204, 0.7);
-  --border: rgba(100, 200, 100, 0.3);
-  --border-strong: rgba(80, 160, 80, 0.5);
-  --text: #1a2e1a;
-  --text-muted: #4a6e4a;
-  --text-light: #6a8e6a;
-  --shadow: rgba(80, 160, 80, 0.15);
+:root,
+[data-theme="light"] {
+  --brand: #ffffff;
+  --brand-mid: #f0f0f0;
+  --brand-dark: #4a6a8a;
+  --brand-text: #1a3a5a;
+  --bg: #ffffff;
+  --bg-alt: #f5f5f5;
+  --surface: rgba(255, 255, 255, 0.6);
+  --surface-hover: rgba(245, 245, 245, 0.8);
+  --surface-active: rgba(235, 235, 235, 0.95);
+  --border: rgba(180, 190, 200, 0.4);
+  --border-strong: rgba(140, 155, 170, 0.6);
+  --text: #1a1a2e;
+  --text-muted: #4a5568;
+  --text-light: #6b7280;
+  --shadow: rgba(100, 120, 140, 0.12);
   --glass-blur: 16px;
   --radius: 14px;
   --radius-sm: 8px;
   --font: 'Inter', sans-serif;
 }
 
-[data-theme="ng1"] {
-  --brand: #ffcccc;
-  --brand-mid: #f5aaaa;
-  --brand-dark: #9e3d3d;
-  --brand-text: #4a1a1a;
-  --bg: #fff0f0;
-  --bg-alt: #fce8e8;
-  --surface: rgba(255, 204, 204, 0.35);
-  --surface-hover: rgba(255, 204, 204, 0.55);
-  --surface-active: rgba(255, 204, 204, 0.7);
-  --border: rgba(200, 100, 100, 0.3);
-  --border-strong: rgba(160, 80, 80, 0.5);
-  --text: #2e1a1a;
-  --text-muted: #6e4a4a;
-  --text-light: #8e6a6a;
-  --shadow: rgba(160, 80, 80, 0.15);
-}
-
-[data-theme="ng2"] {
-  --brand: #ccccff;
-  --brand-mid: #aaaaff;
-  --brand-dark: #3d3d9e;
-  --brand-text: #1a1a4a;
-  --bg: #f0f0ff;
-  --bg-alt: #e8e8fc;
-  --surface: rgba(204, 204, 255, 0.35);
-  --surface-hover: rgba(204, 204, 255, 0.55);
-  --surface-active: rgba(204, 204, 255, 0.7);
-  --border: rgba(100, 100, 200, 0.3);
-  --border-strong: rgba(80, 80, 160, 0.5);
-  --text: #1a1a2e;
-  --text-muted: #4a4a6e;
-  --text-light: #6a6a8e;
-  --shadow: rgba(80, 80, 160, 0.15);
-}
-
-[data-theme="ng3"] {
-  --brand: #ffffcc;
-  --brand-mid: #fffaa0;
-  --brand-dark: #9e9e3d;
-  --brand-text: #3a3a1a;
-  --bg: #fffff0;
-  --bg-alt: #fffce8;
-  --surface: rgba(255, 255, 204, 0.35);
-  --surface-hover: rgba(255, 255, 204, 0.55);
-  --surface-active: rgba(255, 255, 204, 0.7);
-  --border: rgba(180, 180, 80, 0.3);
-  --border-strong: rgba(150, 150, 60, 0.5);
-  --text: #2e2e1a;
-  --text-muted: #5a5a40;
-  --text-light: #7a7a5a;
-  --shadow: rgba(140, 140, 60, 0.15);
-}
-
-[data-theme="ng4"] {
-  --brand: #ffccff;
-  --brand-mid: #f5aaf5;
-  --brand-dark: #9e3d9e;
-  --brand-text: #4a1a4a;
-  --bg: #fff0ff;
-  --bg-alt: #fce8fc;
-  --surface: rgba(255, 204, 255, 0.35);
-  --surface-hover: rgba(255, 204, 255, 0.55);
-  --surface-active: rgba(255, 204, 255, 0.7);
-  --border: rgba(190, 100, 190, 0.3);
-  --border-strong: rgba(150, 70, 150, 0.5);
-  --text: #2e1a2e;
-  --text-muted: #6e4a6e;
-  --text-light: #8e6a8e;
-  --shadow: rgba(150, 70, 150, 0.15);
-}
-
-[data-theme="ng5"] {
-  --brand: #ccffff;
-  --brand-mid: #aaf5f5;
-  --brand-dark: #3d9e9e;
-  --brand-text: #1a3a3a;
-  --bg: #f0ffff;
-  --bg-alt: #e8fcfc;
-  --surface: rgba(204, 255, 255, 0.35);
-  --surface-hover: rgba(204, 255, 255, 0.55);
-  --surface-active: rgba(204, 255, 255, 0.7);
-  --border: rgba(80, 190, 190, 0.3);
-  --border-strong: rgba(60, 150, 150, 0.5);
-  --text: #1a2e2e;
-  --text-muted: #3a6060;
-  --text-light: #5a8080;
-  --shadow: rgba(60, 150, 150, 0.15);
-}
-
-[data-theme="white"] {
-  --brand: #ffffff;
-  --brand-mid: #f0f0f0;
-  --brand-dark: #5a7a5a;
-  --brand-text: #2a4a2a;
-  --bg: #fafafa;
-  --bg-alt: #f2f2f2;
-  --surface: rgba(255, 255, 255, 0.5);
-  --surface-hover: rgba(255, 255, 255, 0.7);
-  --surface-active: rgba(255, 255, 255, 0.85);
-  --border: rgba(180, 200, 180, 0.4);
-  --border-strong: rgba(140, 170, 140, 0.6);
-  --text: #1a2e1a;
-  --text-muted: #4a6a4a;
-  --text-light: #6a8a6a;
-  --shadow: rgba(100, 130, 100, 0.15);
+[data-theme="singapore"] {
+  --brand: #EF3340;
+  --brand-mid: #e01f2d;
+  --brand-dark: #b5001e;
+  --brand-text: #5a0010;
+  --bg: #fff5f5;
+  --bg-alt: #ffe8ea;
+  --surface: rgba(239, 51, 64, 0.08);
+  --surface-hover: rgba(239, 51, 64, 0.15);
+  --surface-active: rgba(239, 51, 64, 0.22);
+  --border: rgba(239, 51, 64, 0.25);
+  --border-strong: rgba(181, 0, 30, 0.45);
+  --text: #2e0a0e;
+  --text-muted: #6e2a2e;
+  --text-light: #8e4a50;
+  --shadow: rgba(181, 0, 30, 0.15);
 }
 
 [data-theme="hello"] {
