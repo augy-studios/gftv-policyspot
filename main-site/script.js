@@ -655,7 +655,7 @@ function renderMarkdown(md) {
             const tds = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
             return `<tr>${tds}</tr>`;
         }).join('');
-        return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+        return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>\n`;
     });
     // Headings
     html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
