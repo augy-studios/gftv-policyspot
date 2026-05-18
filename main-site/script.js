@@ -686,7 +686,7 @@ function renderMarkdown(md) {
             const numPart = m[1];
             const text = m[2];
             const depth = (numPart.match(/\./g) || []).length - 1;
-            return `<li class="ol-depth-${depth}">${numPart} ${text}</li>`;
+            return `<li class="ol-depth-${depth}"><strong>${numPart}</strong> ${text}</li>`;
         }).filter(Boolean).join('');
         return `<ol class="decimal-list">${items}</ol>`;
     });
@@ -1202,6 +1202,7 @@ function openContentModal(section) {
 
     document.getElementById('content-edit-error').classList.add('hidden');
     openModal('content-modal');
+    editorInitHistory(document.getElementById('content-edit-content'));
 }
 
 function openAddSectionModal(parentSection) {
@@ -1226,10 +1227,54 @@ function openAddSectionModal(parentSection) {
 
     document.getElementById('content-edit-error').classList.add('hidden');
     openModal('content-modal');
+    editorInitHistory(document.getElementById('content-edit-content'));
 }
+
+/* ─── Markdown Editor History (undo/redo) ─── */
+const editorHistory = { stack: [], pos: -1, debounceTimer: null };
+
+function editorSaveState(ta) {
+    editorHistory.stack = editorHistory.stack.slice(0, editorHistory.pos + 1);
+    editorHistory.stack.push({ value: ta.value, ss: ta.selectionStart, se: ta.selectionEnd });
+    if (editorHistory.stack.length > 200) editorHistory.stack.shift();
+    editorHistory.pos = editorHistory.stack.length - 1;
+}
+
+function editorInitHistory(ta) {
+    clearTimeout(editorHistory.debounceTimer);
+    editorHistory.stack = [{ value: ta.value, ss: 0, se: 0 }];
+    editorHistory.pos = 0;
+}
+
+function editorUndo(ta) {
+    if (editorHistory.pos > 0) {
+        editorHistory.pos--;
+        const s = editorHistory.stack[editorHistory.pos];
+        ta.value = s.value;
+        ta.selectionStart = s.ss;
+        ta.selectionEnd   = s.se;
+    }
+}
+
+function editorRedo(ta) {
+    if (editorHistory.pos < editorHistory.stack.length - 1) {
+        editorHistory.pos++;
+        const s = editorHistory.stack[editorHistory.pos];
+        ta.value = s.value;
+        ta.selectionStart = s.ss;
+        ta.selectionEnd   = s.se;
+    }
+}
+
+// Debounced history push on regular typing (groups keystrokes ~600ms apart)
+document.getElementById('content-edit-content')?.addEventListener('input', e => {
+    clearTimeout(editorHistory.debounceTimer);
+    editorHistory.debounceTimer = setTimeout(() => editorSaveState(e.target), 600);
+});
 
 /* ─── Markdown Editor Keyboard Shortcuts ─── */
 function applyMarkdownFormat(ta, open, close) {
+    editorSaveState(ta);
     const start = ta.selectionStart;
     const end   = ta.selectionEnd;
     const val   = ta.value;
@@ -1262,6 +1307,14 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
     if (!e.ctrlKey && !e.metaKey) return;
     const ta = e.target;
     switch (e.key.toLowerCase()) {
+        case 'z':
+            e.preventDefault();
+            if (e.shiftKey) editorRedo(ta); else editorUndo(ta);
+            break;
+        case 'y':
+            e.preventDefault();
+            editorRedo(ta);
+            break;
         case 'b':
             e.preventDefault();
             applyMarkdownFormat(ta, '**', '**');
@@ -1276,6 +1329,7 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
             break;
         case 'k': {
             e.preventDefault();
+            editorSaveState(ta);
             const start = ta.selectionStart;
             const sel   = ta.value.substring(start, ta.selectionEnd);
             if (sel) {
