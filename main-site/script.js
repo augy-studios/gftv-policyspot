@@ -1239,6 +1239,8 @@ function setupCopyDropdown() {
                             pdf.text(pageUrl, 14, pageH - 13.5);
                             pdf.text(`Exported: ${exportDateTime}`, 14, pageH - 9);
                             pdf.text(`Exporting IP: ${ip}`, 14, pageH - 4.5);
+                            const pageLabel = `${i} / ${totalPages}`;
+                            pdf.text(pageLabel, pageW - 14 - pdf.getTextWidth(pageLabel), pageH - 4.5);
                         }
                         return pdf.output('bloburl');
                     })
