@@ -1483,6 +1483,57 @@ svg {
   box-sizing: border-box;
 }
 
+.admin-img-staging {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  margin-bottom: 1rem;
+}
+
+.admin-img-staging.hidden {
+  display: none;
+}
+
+.admin-img-staging-thumb img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  display: block;
+}
+
+.admin-img-staging-thumb {
+  width: 48px;
+  height: 48px;
+  background: var(--surface-active);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.admin-img-staging-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-img-staging-name {
+  display: block;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-img-staging-meta {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 /* ─── Modals ─── */
 .modal-overlay {
   position: fixed;

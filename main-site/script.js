@@ -1842,23 +1842,7 @@ async function loadAdminImages(force = false) {
     }
     listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
     <thead><tr><th></th><th>Filename</th><th>Description</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
-    <tbody>${images.map(img => {
-        const kb  = Math.round(img.file_size / 1024);
-        const dim = img.width ? `${img.width}×${img.height}` : '';
-        const date = new Date(img.uploaded_at).toLocaleDateString();
-        const desc = (img.description || '').replace(/"/g, '&quot;');
-        return `<tr data-img-id="${img.id}">
-          <td><img class="admin-img-thumb" src="${img.public_url}" alt="" loading="lazy"></td>
-          <td class="admin-img-filename">${img.filename}</td>
-          <td><span class="admin-img-desc" data-id="${img.id}" data-desc="${desc}" onclick="editImageDesc(this)">${img.description || '<em style="color:var(--text-muted);font-style:normal">—</em>'}</span></td>
-          <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${dim ? dim + '<br>' : ''}${kb} KB</td>
-          <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${date}</td>
-          <td style="white-space:nowrap">
-            <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${img.public_url}')">Copy URL</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteAdminImage('${img.id}', this)">Delete</button>
-          </td>
-        </tr>`;
-    }).join('')}</tbody></table></div>`;
+    <tbody>${images.map(adminImgRowHtml).join('')}</tbody></table></div>`;
 }
 
 window.copyImageUrl = function(url) {
@@ -1915,6 +1899,118 @@ window.editImageDesc = function(el) {
         }
     });
 };
+
+/* ─── Admin Image Upload ─── */
+function adminImgRowHtml(img) {
+    const kb  = Math.round(img.file_size / 1024);
+    const dim = img.width ? `${img.width}×${img.height}` : '';
+    const date = new Date(img.uploaded_at).toLocaleDateString();
+    const desc = (img.description || '').replace(/"/g, '&quot;');
+    return `<tr data-img-id="${img.id}">
+      <td><img class="admin-img-thumb" src="${img.public_url}" alt="" loading="lazy"></td>
+      <td class="admin-img-filename">${img.filename}</td>
+      <td><span class="admin-img-desc" data-id="${img.id}" data-desc="${desc}" onclick="editImageDesc(this)">${img.description || '<em style="color:var(--text-muted);font-style:normal">—</em>'}</span></td>
+      <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${dim ? dim + '<br>' : ''}${kb} KB</td>
+      <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${date}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${img.public_url}')">Copy URL</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAdminImage('${img.id}', this)">Delete</button>
+      </td>
+    </tr>`;
+}
+
+{
+    let adminStagedCompressed = null;
+    let adminStagedFile = null;
+
+    const fileInput  = document.getElementById('admin-img-file-input');
+    const uploadBtn  = document.getElementById('admin-img-upload-btn');
+    const stagingEl  = document.getElementById('admin-img-staging');
+
+    uploadBtn?.addEventListener('click', () => fileInput?.click());
+
+    fileInput?.addEventListener('change', async e => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        if (!file) return;
+
+        adminStagedCompressed = null;
+        adminStagedFile = file;
+        stagingEl.className = 'admin-img-staging';
+        stagingEl.innerHTML = `
+            <div class="admin-img-staging-thumb"></div>
+            <div class="admin-img-staging-info">
+                <span class="admin-img-staging-name">${file.name}</span>
+                <span class="admin-img-staging-meta">Compressing…</span>
+            </div>
+            <button class="btn btn-sm btn-primary" id="admin-img-staging-go" disabled>Upload</button>
+            <button class="btn btn-sm btn-ghost" id="admin-img-staging-cancel">Cancel</button>`;
+
+        document.getElementById('admin-img-staging-cancel').addEventListener('click', () => {
+            stagingEl.className = 'admin-img-staging hidden';
+            stagingEl.innerHTML = '';
+            adminStagedCompressed = null;
+            adminStagedFile = null;
+        });
+
+        try {
+            const c = await compressImage(file);
+            adminStagedCompressed = c;
+            const thumb = stagingEl.querySelector('.admin-img-staging-thumb');
+            thumb.innerHTML = `<img src="data:${c.mime};base64,${c.base64}" alt="">`;
+            const savings = file.size > 0 ? Math.round((1 - c.size / file.size) * 100) : 0;
+            stagingEl.querySelector('.admin-img-staging-meta').textContent =
+                `${c.width}×${c.height} · ${Math.round(c.size / 1024)} KB` +
+                (savings > 5 ? ` (${savings}% smaller)` : '');
+            const goBtn = document.getElementById('admin-img-staging-go');
+            goBtn.disabled = false;
+            goBtn.addEventListener('click', async () => {
+                goBtn.disabled = true;
+                goBtn.textContent = 'Uploading…';
+                const ext = c.mime === 'image/webp' ? 'webp' : c.mime === 'image/png' ? 'png'
+                          : c.mime === 'image/gif'  ? 'gif'  : 'jpg';
+                const baseName = file.name.replace(/\.[^.]+$/, '');
+                const token = localStorage.getItem('gftv-token');
+                const res = await apiFetch('/api/policy/upload-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({
+                        filename:  `${baseName}.${ext}`,
+                        mime_type: c.mime,
+                        data:      c.base64,
+                        width:     c.width,
+                        height:    c.height,
+                    }),
+                });
+                if (!res.ok) {
+                    showToast(res.error || 'Upload failed', 'error');
+                    goBtn.disabled = false;
+                    goBtn.textContent = 'Upload';
+                    return;
+                }
+                showToast('Image uploaded', 'success');
+                stagingEl.className = 'admin-img-staging hidden';
+                stagingEl.innerHTML = '';
+                adminStagedCompressed = null;
+                adminStagedFile = null;
+                libraryLoaded = false; // invalidate image picker library cache
+
+                // Prepend row to admin table, or rebuild if table doesn't exist yet
+                const listEl = document.getElementById('admin-images-list');
+                const tbody = listEl?.querySelector('tbody');
+                if (tbody && res.image) {
+                    tbody.insertAdjacentHTML('afterbegin', adminImgRowHtml(res.image));
+                } else {
+                    adminImagesLoaded = false;
+                    loadAdminImages();
+                }
+            });
+        } catch {
+            stagingEl.querySelector('.admin-img-staging-meta').textContent = 'Could not process image.';
+        }
+    });
+}
+
 window.approveUser = async function (id) {
     const token = localStorage.getItem('gftv-token');
     const res = await apiFetch('/api/admin/users', {

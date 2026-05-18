@@ -726,8 +726,13 @@
                 <div class="tab-content hidden" id="tab-images">
                     <div class="admin-images-toolbar">
                         <h2>Image Library</h2>
-                        <button class="btn btn-sm btn-ghost" onclick="loadAdminImages(true)">Refresh</button>
+                        <div style="display:flex;gap:0.5rem">
+                            <button class="btn btn-sm btn-primary" id="admin-img-upload-btn">Upload Image</button>
+                            <button class="btn btn-sm btn-ghost" onclick="loadAdminImages(true)">Refresh</button>
+                        </div>
                     </div>
+                    <input type="file" id="admin-img-file-input" accept="image/*" style="display:none">
+                    <div id="admin-img-staging" class="admin-img-staging hidden"></div>
                     <div id="admin-images-list"></div>
                 </div>
             </div>
