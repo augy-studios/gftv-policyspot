@@ -1167,85 +1167,107 @@ function setupCopyDropdown() {
             const docCfg = DOCS[currentDoc];
             const contentEl = document.getElementById(docCfg.contentEl);
             if (!contentEl) return;
+            const title = currentSection.title || 'export';
             const pageUrl = `https://policy.globalfurry.tv${docCfg.urlBase}/${currentSection.slug}`;
             const exportDateTime = new Date().toLocaleString('en-GB', {
                 year: 'numeric', month: 'long', day: 'numeric',
                 hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
             });
-            showToast('Preparing print…', 'info');
-            fetch('https://api.ipify.org?format=json')
-                .then(r => r.json()).then(d => d.ip).catch(() => 'Unknown')
-                .then(ip => {
-                    const savedTheme = document.body.dataset.theme;
-                    applyTheme('light');
-
-                    const printHeader = document.createElement('div');
-                    printHeader.id = 'pdf-ph';
-                    printHeader.innerHTML = `<img src="/GHS-main.png" width="24" height="24"><strong>PolicySpot</strong><span id="pdf-ph-badge">GFTV</span>`;
-
-                    const printFooter = document.createElement('div');
-                    printFooter.id = 'pdf-pf';
-                    printFooter.innerHTML = `<div id="pdf-pf-left"><div>${pageUrl}</div><div>Exported: ${exportDateTime}</div><div>Exporting IP: ${ip}</div></div><div id="pdf-pf-pg"></div>`;
-
-                    document.body.appendChild(printHeader);
-                    document.body.appendChild(printFooter);
-
-                    const printStyle = document.createElement('style');
-                    printStyle.id = 'pdf-ps';
-                    printStyle.textContent = `
-                        @media print {
-                            @page { size: A4; margin: 26mm 14mm 30mm 14mm; }
-                            body > *:not(#pdf-ph):not(#pdf-pf):not(#main-content) { display: none !important; }
-                            #main-content .page { display: none !important; }
-                            #main-content .page.active { display: block !important; }
-                            .site-header, .doc-toolbar, .doc-nav-footer, .charter-toc,
-                            .sidebar, .sidebar-overlay, .toast-container,
-                            .modal-overlay { display: none !important; }
-                            .charter-layout { display: block !important; }
-                            .charter-main { max-width: 100%; padding: 0; margin: 0; }
-                            .section-content { padding: 0; }
-                            h1, h2, h3, h4 { break-after: avoid; }
-                            p, li { orphans: 3; widows: 3; }
-                            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-                            #pdf-ph {
-                                position: fixed;
-                                top: -23mm; left: 0; right: 0; height: 21mm;
-                                display: flex !important;
-                                align-items: center; gap: 7pt;
-                                border-bottom: 0.4pt solid #b4bec8;
-                                font-family: 'Inter', Helvetica, Arial, sans-serif;
-                            }
-                            #pdf-ph img { display: block; }
-                            #pdf-ph strong { font-size: 13pt; color: #1e1e32; font-weight: 700; }
-                            #pdf-ph-badge {
-                                background: #4a6a8a; color: #fff;
-                                font-size: 6.5pt; font-weight: 700;
-                                padding: 1.5pt 4pt; border-radius: 2.5pt;
-                            }
-                            #pdf-pf {
-                                position: fixed;
-                                bottom: -27mm; left: 0; right: 0; height: 24mm;
-                                display: flex !important;
-                                justify-content: space-between; align-items: flex-start;
-                                border-top: 0.4pt solid #b4bec8; padding-top: 3mm;
-                                font-family: 'Inter', Helvetica, Arial, sans-serif;
-                                font-size: 7.5pt; color: #646e78;
-                            }
-                            #pdf-pf-left { display: flex; flex-direction: column; gap: 1.5mm; }
-                            #pdf-pf-pg::after { content: counter(page) " / " counter(pages); }
+            const opt = {
+                margin: [22, 14, 24, 14],
+                filename: `${title}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, windowWidth: 900 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: {
+                    mode: ['css', 'legacy'],
+                    avoid: ['tr', 'td', 'h1', 'h2', 'h3', 'h4', 'h5', 'img', 'figure', 'blockquote', 'li']
+                }
+            };
+            showToast('Generating PDF…', 'info');
+            // Inject temporary CSS so html2canvas captures correct break hints
+            const pdfPrepStyle = document.createElement('style');
+            pdfPrepStyle.id = 'pdf-prep-style';
+            pdfPrepStyle.textContent = `
+                #${docCfg.contentEl} h1, #${docCfg.contentEl} h2,
+                #${docCfg.contentEl} h3, #${docCfg.contentEl} h4 { page-break-after: avoid; }
+                #${docCfg.contentEl} tr, #${docCfg.contentEl} img,
+                #${docCfg.contentEl} li, #${docCfg.contentEl} blockquote { page-break-inside: avoid; }
+            `;
+            document.head.appendChild(pdfPrepStyle);
+            const loadHtml2pdf = () => new Promise((resolve, reject) => {
+                if (window.html2pdf) return resolve(window.html2pdf);
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+                s.onload = () => resolve(window.html2pdf);
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+            const getIp = () => fetch('https://api.ipify.org?format=json')
+                .then(r => r.json()).then(d => d.ip).catch(() => 'Unknown');
+            const loadLogo = () => new Promise(resolve => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => resolve(null);
+                img.src = '/GHS-main.png';
+            });
+            const savedTheme = document.body.dataset.theme;
+            applyTheme('light');
+            Promise.all([loadHtml2pdf(), getIp(), loadLogo()])
+                .then(([h2p, ip, logoDataUrl]) =>
+                    h2p().set(opt).from(contentEl).toPdf().get('pdf').then(pdf => {
+                        const totalPages = pdf.internal.getNumberOfPages();
+                        const pageW = pdf.internal.pageSize.getWidth();
+                        const pageH = pdf.internal.pageSize.getHeight();
+                        for (let i = 1; i <= totalPages; i++) {
+                            pdf.setPage(i);
+                            // Header
+                            if (logoDataUrl) pdf.addImage(logoDataUrl, 'PNG', 14, 5, 9, 9);
+                            const textX = logoDataUrl ? 25 : 14;
+                            pdf.setFontSize(12);
+                            pdf.setFont('helvetica', 'bold');
+                            pdf.setTextColor(30, 30, 50);
+                            pdf.text('PolicySpot', textX, 10.5);
+                            const badgeX = textX + pdf.getTextWidth('PolicySpot') + 2;
+                            pdf.setFillColor(74, 106, 138);
+                            pdf.setFontSize(6.5);
+                            pdf.roundedRect(badgeX, 6.2, pdf.getTextWidth('GFTV') + 3, 5, 1, 1, 'F');
+                            pdf.setTextColor(255, 255, 255);
+                            pdf.text('GFTV', badgeX + 1.5, 10.2);
+                            pdf.setDrawColor(180, 190, 200);
+                            pdf.setLineWidth(0.3);
+                            pdf.line(14, 17, pageW - 14, 17);
+                            // Footer
+                            pdf.line(14, pageH - 18, pageW - 14, pageH - 18);
+                            pdf.setFontSize(7.5);
+                            pdf.setFont('helvetica', 'normal');
+                            pdf.setTextColor(100, 110, 120);
+                            pdf.text(pageUrl, 14, pageH - 13.5);
+                            pdf.text(`Exported: ${exportDateTime}`, 14, pageH - 9);
+                            pdf.text(`Exporting IP: ${ip}`, 14, pageH - 4.5);
+                            const pageLabel = `${i} / ${totalPages}`;
+                            pdf.text(pageLabel, pageW - 14 - pdf.getTextWidth(pageLabel), pageH - 4.5);
                         }
-                    `;
-                    document.head.appendChild(printStyle);
-
-                    const cleanup = () => {
-                        printHeader.remove();
-                        printFooter.remove();
-                        printStyle.remove();
-                        applyTheme(savedTheme);
-                    };
-                    window.addEventListener('afterprint', cleanup, { once: true });
-                    window.print();
+                        return pdf.output('bloburl');
+                    })
+                )
+                .then(url => {
+                    document.getElementById('pdf-prep-style')?.remove();
+                    applyTheme(savedTheme);
+                    window.open(url, '_blank');
+                    showToast('PDF opened in new tab', 'success');
+                })
+                .catch(() => {
+                    document.getElementById('pdf-prep-style')?.remove();
+                    applyTheme(savedTheme);
+                    showToast('Failed to generate PDF', 'error');
                 });
         } else if (action === 'chatgpt' || action === 'claude') {
             const urlBase = DOCS[currentDoc].urlBase;
