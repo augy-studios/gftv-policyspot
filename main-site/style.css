@@ -8,7 +8,7 @@
 }
 
 :link {
-  color: #6f6;
+  color: #EF3340;
 }
 
 :visited {
@@ -39,23 +39,6 @@
   --font: 'Inter', sans-serif;
 }
 
-[data-theme="singapore"] {
-  --brand: #EF3340;
-  --brand-mid: #e01f2d;
-  --brand-dark: #b5001e;
-  --brand-text: #5a0010;
-  --bg: #fff5f5;
-  --bg-alt: #ffe8ea;
-  --surface: rgba(239, 51, 64, 0.08);
-  --surface-hover: rgba(239, 51, 64, 0.15);
-  --surface-active: rgba(239, 51, 64, 0.22);
-  --border: rgba(239, 51, 64, 0.25);
-  --border-strong: rgba(181, 0, 30, 0.45);
-  --text: #2e0a0e;
-  --text-muted: #6e2a2e;
-  --text-light: #8e4a50;
-  --shadow: rgba(181, 0, 30, 0.15);
-}
 
 [data-theme="hello"] {
   --brand: #fedc00;

@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ─── Theme ─── */
 function initTheme() {
     const saved = localStorage.getItem('gftv-theme');
-    const valid = ['light', 'singapore', 'hello'];
+    const valid = ['light', 'hello'];
     applyTheme(valid.includes(saved) ? saved : 'light');
 }
 
