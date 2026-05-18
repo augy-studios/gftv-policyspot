@@ -141,7 +141,7 @@ async function handleRoute(fullPath) {
             if (doc.defaultSlug) {
                 loadPage(doc.defaultSlug, null);
             } else {
-                renderDocIndex();
+                await renderDocIndex();
             }
             ensureSidebarOpen();
             return;
@@ -240,7 +240,7 @@ async function loadSections(docKey = 'charter', { force = false } = {}) {
             docSectionsCache[docKey] = res.sections || [];
             sections = docSectionsCache[docKey];
             buildSidebar();
-            if (docKey === 'charter') buildArticleCards();
+            if (docKey === 'charter') await buildArticleCards();
         }
     } catch (e) {
         console.error('Failed to load sections for', docKey, e);
@@ -391,16 +391,39 @@ function buildSiteNavSection() {
     return wrapper;
 }
 
-function buildArticleCards() {
+async function buildArticleCards() {
     const grid = document.getElementById('article-cards');
     if (!grid) return;
     const pages = topLevelPages();
     if (!pages.length) return;
     const urlBase = DOCS['charter'].urlBase;
-    grid.innerHTML = pages.map(p => `
+
+    let viewCounts = {};
+    try {
+        const res = await apiFetch('/api/policy/section-views?doc=charter');
+        if (res.ok) viewCounts = res.views || {};
+    } catch {}
+
+    const pagesWithViews = pages.map(p => {
+        const subs = subsectionsOf(p.id);
+        const allIds = [p.id, ...subs.map(s => s.id)];
+        const total = allIds.reduce((sum, id) => sum + (viewCounts[id] || 0), 0);
+        return { ...p, totalViews: total };
+    });
+
+    const hasAnyViews = pagesWithViews.some(p => p.totalViews > 0);
+    if (hasAnyViews) {
+        pagesWithViews.sort((a, b) => {
+            if (b.totalViews !== a.totalViews) return b.totalViews - a.totalViews;
+            return a.order_index - b.order_index;
+        });
+    }
+
+    grid.innerHTML = pagesWithViews.map(p => `
     <div class="glass-card article-card" data-slug="${p.slug}" tabindex="0" role="button">
       ${p.number ? `<div class="card-num">${p.number}</div>` : ''}
       <div class="card-title">${p.title}</div>
+      ${p.totalViews > 0 ? `<div class="card-views">${Number(p.totalViews).toLocaleString()} view${p.totalViews === 1 ? '' : 's'}</div>` : ''}
     </div>`).join('');
     grid.querySelectorAll('.article-card').forEach(card => {
         const fn = () => navigate(`${urlBase}/${card.dataset.slug}`);
@@ -410,7 +433,7 @@ function buildArticleCards() {
 }
 
 /* ─── Doc Index (charter index generalised for all docs) ─── */
-function renderDocIndex() {
+async function renderDocIndex() {
     const doc = DOCS[currentDoc];
     updateBreadcrumb(null);
     updateDocNavFooter(null);
@@ -421,7 +444,7 @@ function renderDocIndex() {
         const articleView = document.getElementById('charter-article-view');
         if (indexView) indexView.style.display = '';
         if (articleView) articleView.style.display = 'none';
-        buildArticleCards();
+        await buildArticleCards();
         return;
     }
 
@@ -437,13 +460,9 @@ function renderDocIndex() {
         <h1 class="section-heading">${doc.label}</h1>
       </div>
       <section class="section-grid">
-        <h2 class="section-title">Articles at a Glance</h2>
-        <div class="card-grid">
-          ${pages.map(p => `
-            <div class="glass-card article-card" data-href="${urlBase}/${p.slug}" tabindex="0" role="button">
-              ${p.number ? `<div class="card-num">${p.number}</div>` : ''}
-              <div class="card-title">${p.title}</div>
-            </div>`).join('')}
+        <h2 class="section-title">Most Viewed Pages</h2>
+        <div class="card-grid" id="doc-index-cards">
+          ${pages.map(() => '<div class="glass-card article-card skeleton"></div>').join('')}
         </div>
       </section>
       <div class="section-body">
@@ -461,17 +480,48 @@ function renderDocIndex() {
       </div>
     </div>`;
 
-    contentEl.querySelectorAll('.article-card').forEach(card => {
-        const fn = () => navigate(card.dataset.href);
-        card.addEventListener('click', fn);
-        card.addEventListener('keydown', e => e.key === 'Enter' && fn());
-    });
     contentEl.querySelectorAll('.toc-card-btn').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
             navigate(a.dataset.href);
         });
     });
+
+    let viewCounts = {};
+    try {
+        const res = await apiFetch(`/api/policy/section-views?doc=${currentDoc}`);
+        if (res.ok) viewCounts = res.views || {};
+    } catch {}
+
+    const pagesWithViews = pages.map(p => {
+        const subs = subsectionsOf(p.id);
+        const allIds = [p.id, ...subs.map(s => s.id)];
+        const total = allIds.reduce((sum, id) => sum + (viewCounts[id] || 0), 0);
+        return { ...p, totalViews: total };
+    });
+
+    const hasAnyViews = pagesWithViews.some(p => p.totalViews > 0);
+    if (hasAnyViews) {
+        pagesWithViews.sort((a, b) => {
+            if (b.totalViews !== a.totalViews) return b.totalViews - a.totalViews;
+            return a.order_index - b.order_index;
+        });
+    }
+
+    const cardGrid = contentEl.querySelector('#doc-index-cards');
+    if (cardGrid) {
+        cardGrid.innerHTML = pagesWithViews.map(p => `
+            <div class="glass-card article-card" data-href="${urlBase}/${p.slug}" tabindex="0" role="button">
+              ${p.number ? `<div class="card-num">${p.number}</div>` : ''}
+              <div class="card-title">${p.title}</div>
+              ${p.totalViews > 0 ? `<div class="card-views">${Number(p.totalViews).toLocaleString()} view${p.totalViews === 1 ? '' : 's'}</div>` : ''}
+            </div>`).join('');
+        cardGrid.querySelectorAll('.article-card').forEach(card => {
+            const fn = () => navigate(card.dataset.href);
+            card.addEventListener('click', fn);
+            card.addEventListener('keydown', e => e.key === 'Enter' && fn());
+        });
+    }
 }
 
 /* ─── Page Loading ─── */
