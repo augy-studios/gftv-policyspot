@@ -1449,28 +1449,32 @@ document.getElementById('image-upload-input')?.addEventListener('change', async 
     showToast('Uploading image…', '');
 
     const reader = new FileReader();
+    reader.onerror = () => showToast('Could not read file', 'error');
     reader.onload = async () => {
-        const base64 = reader.result.split(',')[1];
-        const token  = localStorage.getItem('gftv-token');
-        const res    = await apiFetch('/api/policy/upload-image', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body:    JSON.stringify({ filename: file.name, mime_type: file.type, data: base64 }),
-        });
+        try {
+            const base64 = reader.result.split(',')[1];
+            const res    = await apiFetch('/api/policy/upload-image', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ filename: file.name, mime_type: file.type, data: base64 }),
+            });
 
-        if (!res.ok) {
-            showToast(res.error || 'Upload failed', 'error');
-            return;
+            if (!res.ok) {
+                showToast(res.error || 'Upload failed', 'error');
+                return;
+            }
+
+            editorSaveState(ta);
+            const altText = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+            const md      = `![${altText}](${res.url})`;
+            ta.value          = ta.value.substring(0, cursorPos) + md + ta.value.substring(cursorPos);
+            ta.selectionStart = cursorPos + md.length;
+            ta.selectionEnd   = cursorPos + md.length;
+            ta.focus();
+            showToast('Image inserted', 'success');
+        } catch (err) {
+            showToast('Upload error: ' + (err?.message || 'Unknown'), 'error');
         }
-
-        editorSaveState(ta);
-        const altText = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
-        const md      = `![${altText}](${res.url})`;
-        ta.value          = ta.value.substring(0, cursorPos) + md + ta.value.substring(cursorPos);
-        ta.selectionStart = cursorPos + md.length;
-        ta.selectionEnd   = cursorPos + md.length;
-        ta.focus();
-        showToast('Image inserted', 'success');
     };
     reader.readAsDataURL(file);
 });
@@ -1786,6 +1790,4 @@ function setupEventListeners() {
 }
 
 /* ─── PWA ─── */
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
-}
+// SW is registered and the controllerchange reload listener is set up in index.html.

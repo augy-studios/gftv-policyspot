@@ -958,6 +958,16 @@
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
+
+            // When a new SW takes control (update deployed), reload the page
+            // so it picks up fresh JS/CSS immediately.
+            // The `refreshing` guard prevents an infinite reload loop.
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                refreshing = true;
+                location.reload();
+            });
         }
     </script>
 

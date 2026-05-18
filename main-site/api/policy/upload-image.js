@@ -4,6 +4,11 @@ const { getSupabaseClient } = require('../../lib/supabase');
 const { validateSession }   = require('../../lib/auth');
 const { ok, err, handleOptions } = require('../../lib/response');
 
+// Raise Vercel's default 1 MB JSON body-parser limit so base64-encoded images fit
+module.exports.config = {
+    api: { bodyParser: { sizeLimit: '12mb' } },
+};
+
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 
