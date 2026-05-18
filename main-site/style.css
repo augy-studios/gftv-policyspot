@@ -1097,6 +1097,33 @@ svg {
   color: var(--text-muted);
 }
 
+/* ─── Site Footer Bar ─── */
+.site-footer-bar {
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.site-footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+.site-footer-line {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.footer-heart {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
 /* ─── Doc Nav Footer ─── */
 .doc-nav-footer {
   display: flex;
