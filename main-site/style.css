@@ -1452,6 +1452,10 @@ svg {
   padding: 1.75rem;
   max-height: 90vh;
   overflow-y: auto;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: #1a1a2e;
 }
 
 .modal-header {

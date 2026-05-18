@@ -1168,8 +1168,13 @@ function setupCopyDropdown() {
             const contentEl = document.getElementById(doc.contentEl);
             if (!contentEl) return;
             const title = currentSection.title || 'export';
+            const pageUrl = `https://policy.globalfurry.tv${DOCS[currentDoc].urlBase}/${currentSection.slug}`;
+            const exportDateTime = new Date().toLocaleString('en-GB', {
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
+            });
             const opt = {
-                margin: [12, 14, 12, 14],
+                margin: [22, 14, 24, 14],
                 filename: `${title}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
@@ -1185,10 +1190,59 @@ function setupCopyDropdown() {
                 s.onerror = reject;
                 document.head.appendChild(s);
             });
+            const getIp = () => fetch('https://api.ipify.org?format=json')
+                .then(r => r.json()).then(d => d.ip).catch(() => 'Unknown');
+            const loadLogo = () => new Promise(resolve => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => resolve(null);
+                img.src = '/GHS-main.png';
+            });
             const savedTheme = document.body.dataset.theme;
             applyTheme('light');
-            loadHtml2pdf()
-                .then(h2p => h2p().set(opt).from(contentEl).output('bloburl'))
+            Promise.all([loadHtml2pdf(), getIp(), loadLogo()])
+                .then(([h2p, ip, logoDataUrl]) =>
+                    h2p().set(opt).from(contentEl).toPdf().get('pdf').then(pdf => {
+                        const totalPages = pdf.internal.getNumberOfPages();
+                        const pageW = pdf.internal.pageSize.getWidth();
+                        const pageH = pdf.internal.pageSize.getHeight();
+                        for (let i = 1; i <= totalPages; i++) {
+                            pdf.setPage(i);
+                            // Header
+                            if (logoDataUrl) pdf.addImage(logoDataUrl, 'PNG', 14, 5, 9, 9);
+                            const textX = logoDataUrl ? 25 : 14;
+                            pdf.setFontSize(12);
+                            pdf.setFont('helvetica', 'bold');
+                            pdf.setTextColor(30, 30, 50);
+                            pdf.text('PolicySpot', textX, 10.5);
+                            const badgeX = textX + pdf.getTextWidth('PolicySpot') + 2;
+                            pdf.setFillColor(74, 106, 138);
+                            pdf.setFontSize(6.5);
+                            pdf.roundedRect(badgeX, 6.2, pdf.getTextWidth('GFTV') + 3, 5, 1, 1, 'F');
+                            pdf.setTextColor(255, 255, 255);
+                            pdf.text('GFTV', badgeX + 1.5, 10.2);
+                            pdf.setDrawColor(180, 190, 200);
+                            pdf.setLineWidth(0.3);
+                            pdf.line(14, 17, pageW - 14, 17);
+                            // Footer
+                            pdf.line(14, pageH - 18, pageW - 14, pageH - 18);
+                            pdf.setFontSize(7.5);
+                            pdf.setFont('helvetica', 'normal');
+                            pdf.setTextColor(100, 110, 120);
+                            pdf.text(pageUrl, 14, pageH - 13.5);
+                            pdf.text(`Exported: ${exportDateTime}`, 14, pageH - 9);
+                            pdf.text(`Exporting IP: ${ip}`, 14, pageH - 4.5);
+                        }
+                        return pdf.output('bloburl');
+                    })
+                )
                 .then(url => {
                     applyTheme(savedTheme);
                     window.open(url, '_blank');
@@ -1196,7 +1250,7 @@ function setupCopyDropdown() {
                 })
                 .catch(() => {
                     applyTheme(savedTheme);
-                    showToast('Failed to load PDF library', 'error');
+                    showToast('Failed to generate PDF', 'error');
                 });
         } else if (action === 'chatgpt' || action === 'claude') {
             const urlBase = DOCS[currentDoc].urlBase;
