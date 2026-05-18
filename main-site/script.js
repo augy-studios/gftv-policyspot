@@ -678,15 +678,21 @@ function renderMarkdown(md) {
         const items = match.trim().split('\n').map(l => `<li>${l.replace(/^- /, '')}</li>`).join('');
         return `<ul>${items}</ul>`;
     });
-    // Ordered / decimal-outline lists (1., 2.1., 2.1.1., etc.)
-    html = html.replace(/((?:^(?:\d+\.)+[ \t].+\n?)+)/gm, match => {
+    // Ordered / decimal-outline lists (1., 2.1., 2.1.1., etc.) with optional (a)/(b) sub-items
+    html = html.replace(/((?:^(?:(?:\d+\.)+[ \t].+|\([a-zA-Z]\)[ \t].+)\n?)+)/gm, match => {
+        let currentDepth = 0;
         const items = match.trim().split('\n').map(line => {
-            const m = line.match(/^((?:\d+\.)+)[ \t](.+)$/);
-            if (!m) return '';
-            const numPart = m[1];
-            const text = m[2];
-            const depth = (numPart.match(/\./g) || []).length - 1;
-            return `<li class="ol-depth-${depth}"><strong>${numPart}</strong> ${text}</li>`;
+            const dm = line.match(/^((?:\d+\.)+)[ \t](.+)$/);
+            if (dm) {
+                const numPart = dm[1];
+                currentDepth = (numPart.match(/\./g) || []).length - 1;
+                return `<li class="ol-depth-${currentDepth}"><strong>${numPart}</strong> ${dm[2]}</li>`;
+            }
+            const am = line.match(/^(\([a-zA-Z]\))[ \t](.+)$/);
+            if (am) {
+                return `<li class="ol-depth-${currentDepth}">${am[1]} ${am[2]}</li>`;
+            }
+            return '';
         }).filter(Boolean).join('');
         return `<ol class="decimal-list">${items}</ol>`;
     });
