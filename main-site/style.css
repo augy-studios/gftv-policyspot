@@ -1041,9 +1041,34 @@ svg {
   border-top: 1px solid var(--border);
 }
 
-.doc-last-updated {
+.doc-page-meta {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.doc-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.doc-views-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.doc-views-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--border);
+  border-top-color: var(--text-muted);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
 }
 
 .doc-nav-buttons {

@@ -525,6 +525,7 @@ async function loadPage(slug, anchor) {
     updateBreadcrumb(section);
     updateDocNavFooter(section);
     updateSidebarActive(slug, anchor);
+    trackPageViews(section);
 
     if (anchor) {
         setTimeout(() => {
@@ -751,7 +752,15 @@ function updateDocNavFooter(section) {
     const prev = idx > 0 ? pages[idx - 1] : null;
     const next = idx < pages.length - 1 ? pages[idx + 1] : null;
     footer.innerHTML = `
-    ${lastUpdated ? `<p class="doc-last-updated">Last updated: ${lastUpdated}</p>` : ''}
+    <div class="doc-page-meta">
+      ${lastUpdated ? `<span class="doc-last-updated">Last updated: ${lastUpdated}</span>` : ''}
+      <span class="doc-views" id="doc-views-count">
+        <svg class="doc-views-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <span class="doc-views-spinner"></span>
+      </span>
+    </div>
     <div class="doc-nav-buttons">
       ${prev ? `<button class="doc-nav-btn" data-slug="${prev.slug}">
         <span class="doc-nav-label">← Previous</span>
@@ -764,6 +773,50 @@ function updateDocNavFooter(section) {
     </div>`;
     footer.querySelectorAll('.doc-nav-btn').forEach(btn =>
         btn.addEventListener('click', () => navigate(`${urlBase}/${btn.dataset.slug}`)));
+}
+
+/* ─── Page Visit Tracking ─── */
+function detectDeviceType() {
+    const ua = navigator.userAgent;
+    if (/iPad|Tablet/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua))) return 'Tablet';
+    if (/Mobile|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return 'Mobile';
+    if (typeof window !== 'undefined' && window.innerWidth < 768) return 'Mobile';
+    return 'Desktop';
+}
+
+async function trackPageViews(section) {
+    const countEl = document.getElementById('doc-views-count');
+    const subs    = sections.filter(s => s.parent_id === section.id);
+    const allIds  = [section.id, ...subs.map(s => s.id)];
+
+    try {
+        const res = await apiFetch('/api/policy/track-visit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                section_id:  section.id,
+                doc:         currentDoc,
+                slug:        section.slug,
+                device_type: detectDeviceType(),
+                all_ids:     allIds,
+            }),
+        });
+        if (countEl) {
+            const spinner = countEl.querySelector('.doc-views-spinner');
+            if (spinner) spinner.remove();
+            const label = countEl.querySelector('.doc-views-label') || document.createElement('span');
+            label.className = 'doc-views-label';
+            label.textContent = res.ok && res.total != null
+                ? `${Number(res.total).toLocaleString()} view${res.total === 1 ? '' : 's'}`
+                : '';
+            if (!countEl.contains(label)) countEl.appendChild(label);
+        }
+    } catch {
+        if (countEl) {
+            const spinner = countEl.querySelector('.doc-views-spinner');
+            if (spinner) spinner.remove();
+        }
+    }
 }
 
 /* ─── Sidebar Active State ─── */
