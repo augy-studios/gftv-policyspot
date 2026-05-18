@@ -1397,7 +1397,15 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
         case 'i':
             e.preventDefault();
             if (e.shiftKey) {
-                openImagePicker(ta);
+                editorSaveState(ta);
+                const start = ta.selectionStart;
+                const sel   = ta.value.substring(start, ta.selectionEnd);
+                const alt   = sel || 'img';
+                const md    = `![${alt}](url)`;
+                ta.value = ta.value.substring(0, start) + md + ta.value.substring(ta.selectionEnd);
+                ta.selectionStart = start + alt.length + 4;
+                ta.selectionEnd   = start + alt.length + 7;
+                ta.focus();
             } else {
                 applyMarkdownFormat(ta, '*', '*');
             }
@@ -1778,11 +1786,22 @@ async function loadAdmin() {
         showToast('Admin access required', 'error');
         return;
     }
+    loadAdminUsers();
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            btn.classList.add('active');
+            document.getElementById(`tab-${btn.dataset.tab}`)?.classList.remove('hidden');
+            if (btn.dataset.tab === 'images') loadAdminImages();
+        });
+    });
+}
+
+async function loadAdminUsers() {
     const token = localStorage.getItem('gftv-token');
     const res = await apiFetch('/api/admin/users', {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
     });
     const listEl = document.getElementById('admin-users-list');
     if (!res.ok || !listEl) return;
@@ -1799,16 +1818,103 @@ async function loadAdmin() {
         ${!u.is_editor ? `<button class="btn btn-sm btn-ghost" onclick="makeEditor('${u.id}')">Make Editor</button>` : ''}
       </td>
     </tr>`).join('')}</tbody></table>`;
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            btn.classList.add('active');
-            document.getElementById(`tab-${btn.dataset.tab}`)?.classList.remove('hidden');
-        });
-    });
 }
+
+let adminImagesLoaded = false;
+async function loadAdminImages(force = false) {
+    if (adminImagesLoaded && !force) return;
+    const listEl = document.getElementById('admin-images-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Loading images…</p>';
+    const token = localStorage.getItem('gftv-token');
+    const res = await apiFetch('/api/policy/images', {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    adminImagesLoaded = true;
+    if (!res.ok) {
+        listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Failed to load images.</p>';
+        return;
+    }
+    const images = res.images || [];
+    if (!images.length) {
+        listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">No images uploaded yet.</p>';
+        return;
+    }
+    listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
+    <thead><tr><th></th><th>Filename</th><th>Description</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
+    <tbody>${images.map(img => {
+        const kb  = Math.round(img.file_size / 1024);
+        const dim = img.width ? `${img.width}×${img.height}` : '';
+        const date = new Date(img.uploaded_at).toLocaleDateString();
+        const desc = (img.description || '').replace(/"/g, '&quot;');
+        return `<tr data-img-id="${img.id}">
+          <td><img class="admin-img-thumb" src="${img.public_url}" alt="" loading="lazy"></td>
+          <td class="admin-img-filename">${img.filename}</td>
+          <td><span class="admin-img-desc" data-id="${img.id}" data-desc="${desc}" onclick="editImageDesc(this)">${img.description || '<em style="color:var(--text-muted);font-style:normal">—</em>'}</span></td>
+          <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${dim ? dim + '<br>' : ''}${kb} KB</td>
+          <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${date}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${img.public_url}')">Copy URL</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAdminImage('${img.id}', this)">Delete</button>
+          </td>
+        </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+window.copyImageUrl = function(url) {
+    navigator.clipboard.writeText(url).then(() => showToast('URL copied to clipboard', 'success'));
+};
+
+window.deleteAdminImage = async function(id, btn) {
+    if (!confirm('Delete this image? This cannot be undone.')) return;
+    btn.disabled = true;
+    const token = localStorage.getItem('gftv-token');
+    const res = await apiFetch(`/api/policy/manage-image?id=${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) {
+        document.querySelector(`tr[data-img-id="${id}"]`)?.remove();
+        showToast('Image deleted', 'success');
+    } else {
+        btn.disabled = false;
+        showToast(res.error || 'Failed to delete', 'error');
+    }
+};
+
+window.editImageDesc = function(el) {
+    if (el.querySelector('input')) return;
+    const id = el.dataset.id;
+    const current = el.dataset.desc || '';
+    el.innerHTML = `<input class="admin-img-desc-input" type="text" value="${current.replace(/"/g, '&quot;')}" placeholder="Add description…">`;
+    const input = el.querySelector('input');
+    input.focus();
+    input.select();
+    let cancelled = false;
+
+    async function save() {
+        if (cancelled) return;
+        const val = input.value.trim();
+        el.dataset.desc = val;
+        el.innerHTML = val || '<em style="color:var(--text-muted);font-style:normal">—</em>';
+        const token = localStorage.getItem('gftv-token');
+        const res = await apiFetch(`/api/policy/manage-image?id=${id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ description: val || null }),
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) showToast('Failed to save description', 'error');
+    }
+
+    input.addEventListener('blur', save);
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        if (e.key === 'Escape') {
+            cancelled = true;
+            el.innerHTML = el.dataset.desc || '<em style="color:var(--text-muted);font-style:normal">—</em>';
+        }
+    });
+};
 window.approveUser = async function (id) {
     const token = localStorage.getItem('gftv-token');
     const res = await apiFetch('/api/admin/users', {

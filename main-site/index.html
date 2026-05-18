@@ -715,9 +715,20 @@
         <div id="page-admin" class="page">
             <div class="admin-layout">
                 <h1>Admin Panel</h1>
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-tab="users">Users</button>
+                    <button class="tab-btn" data-tab="images">Image Library</button>
+                </div>
                 <div class="tab-content" id="tab-users">
                     <h2>User Management</h2>
                     <div id="admin-users-list">Loading...</div>
+                </div>
+                <div class="tab-content hidden" id="tab-images">
+                    <div class="admin-images-toolbar">
+                        <h2>Image Library</h2>
+                        <button class="btn btn-sm btn-ghost" onclick="loadAdminImages(true)">Refresh</button>
+                    </div>
+                    <div id="admin-images-list"></div>
                 </div>
             </div>
         </div>
