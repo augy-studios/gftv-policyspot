@@ -664,9 +664,10 @@ function renderMarkdown(md) {
     html = html.replace(/^---$/gm, '<hr/>');
     // Blockquote
     html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-    // Bold / italic
+    // Bold / italic / underline
     html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    html = html.replace(/__(.+?)__/g, '<u>$1</u>');
     html = html.replace(/_(.+?)_/g, '<em>$1</em>');
     // Links
     html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
@@ -677,10 +678,17 @@ function renderMarkdown(md) {
         const items = match.trim().split('\n').map(l => `<li>${l.replace(/^- /, '')}</li>`).join('');
         return `<ul>${items}</ul>`;
     });
-    // Ordered lists
-    html = html.replace(/((?:^\d+\. .+\n?)+)/gm, match => {
-        const items = match.trim().split('\n').map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`).join('');
-        return `<ol>${items}</ol>`;
+    // Ordered / decimal-outline lists (1., 2.1., 2.1.1., etc.)
+    html = html.replace(/((?:^(?:\d+\.)+[ \t].+\n?)+)/gm, match => {
+        const items = match.trim().split('\n').map(line => {
+            const m = line.match(/^((?:\d+\.)+)[ \t](.+)$/);
+            if (!m) return '';
+            const numPart = m[1];
+            const text = m[2];
+            const depth = (numPart.match(/\./g) || []).length - 1;
+            return `<li class="ol-depth-${depth}">${numPart} ${text}</li>`;
+        }).filter(Boolean).join('');
+        return `<ol class="decimal-list">${items}</ol>`;
     });
     // Paragraphs
     html = html.split(/\n\n+/).map(para => {
@@ -1219,6 +1227,78 @@ function openAddSectionModal(parentSection) {
     document.getElementById('content-edit-error').classList.add('hidden');
     openModal('content-modal');
 }
+
+/* ─── Markdown Editor Keyboard Shortcuts ─── */
+function applyMarkdownFormat(ta, open, close) {
+    const start = ta.selectionStart;
+    const end   = ta.selectionEnd;
+    const val   = ta.value;
+    const sel   = val.substring(start, end);
+
+    // Toggle off if selection is already wrapped
+    const charsBefore = val.substring(Math.max(0, start - open.length), start);
+    const charsAfter  = val.substring(end, end + close.length);
+    if (charsBefore === open && charsAfter === close) {
+        ta.value = val.substring(0, start - open.length) + sel + val.substring(end + close.length);
+        ta.selectionStart = start - open.length;
+        ta.selectionEnd   = end - open.length;
+        return;
+    }
+    if (sel.startsWith(open) && sel.endsWith(close) && sel.length > open.length + close.length) {
+        const inner = sel.slice(open.length, sel.length - close.length);
+        ta.value = val.substring(0, start) + inner + val.substring(end);
+        ta.selectionStart = start;
+        ta.selectionEnd   = start + inner.length;
+        return;
+    }
+
+    const placeholder = sel || 'text';
+    ta.value = val.substring(0, start) + open + placeholder + close + val.substring(end);
+    ta.selectionStart = start + open.length;
+    ta.selectionEnd   = start + open.length + placeholder.length;
+}
+
+document.getElementById('content-edit-content')?.addEventListener('keydown', e => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    const ta = e.target;
+    switch (e.key.toLowerCase()) {
+        case 'b':
+            e.preventDefault();
+            applyMarkdownFormat(ta, '**', '**');
+            break;
+        case 'i':
+            e.preventDefault();
+            applyMarkdownFormat(ta, '*', '*');
+            break;
+        case 'u':
+            e.preventDefault();
+            applyMarkdownFormat(ta, '__', '__');
+            break;
+        case 'k': {
+            e.preventDefault();
+            const start = ta.selectionStart;
+            const sel   = ta.value.substring(start, ta.selectionEnd);
+            if (sel) {
+                ta.value = ta.value.substring(0, start) + '[' + sel + '](url)' + ta.value.substring(ta.selectionEnd);
+                ta.selectionStart = start + sel.length + 3;
+                ta.selectionEnd   = start + sel.length + 6;
+            } else {
+                ta.value = ta.value.substring(0, start) + '[link text](url)' + ta.value.substring(start);
+                ta.selectionStart = start + 1;
+                ta.selectionEnd   = start + 10;
+            }
+            break;
+        }
+        case '`':
+            e.preventDefault();
+            applyMarkdownFormat(ta, '`', '`');
+            break;
+        case 's':
+            e.preventDefault();
+            document.getElementById('content-edit-save')?.click();
+            break;
+    }
+});
 
 document.getElementById('content-edit-save')?.addEventListener('click', async () => {
     const id       = document.getElementById('content-edit-id').value;
