@@ -1177,7 +1177,7 @@ function setupCopyDropdown() {
                 margin: [22, 14, 24, 14],
                 filename: `${title}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 900 },
+                html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: {
                     mode: ['css', 'legacy'],
