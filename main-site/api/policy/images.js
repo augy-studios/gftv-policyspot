@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('gftvpolicy_images')
-        .select('id, filename, public_url, mime_type, file_size, width, height, uploaded_at, description')
+        .select('id, filename, public_url, mime_type, file_size, width, height, uploaded_at')
         .order('uploaded_at', { ascending: false });
 
     if (error) return err(res, 'Failed to load images');
