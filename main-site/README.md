@@ -81,7 +81,7 @@ gftv-policyspot/
 │   ├── package.json
 │   ├── robots.txt
 │   ├── script.js                 SPA logic, router, auth, content loading
-│   ├── style.css                 All styles (glassmorphism + 7 themes)
+│   ├── style.css                 All styles (glassmorphism + 2 themes)
 │   ├── sw.js                     Service worker (offline cache)
 │   └── vercel.json
 └── telegram-bot/
