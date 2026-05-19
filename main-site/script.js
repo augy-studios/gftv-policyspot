@@ -2323,6 +2323,22 @@ window.editImageDesc = function(el) {
 };
 
 /* ─── Admin Documents ─── */
+function adminDocRowHtml(d) {
+    const kb   = Math.round(d.file_size / 1024);
+    const ext  = d.filename.split('.').pop().toUpperCase();
+    const date = new Date(d.uploaded_at).toLocaleDateString();
+    return `<tr data-doc-id="${d.id}">
+      <td class="admin-img-filename">${d.filename}</td>
+      <td style="color:var(--text-muted);font-size:0.8rem">${ext}</td>
+      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${kb} KB</td>
+      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${date}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${d.public_url}')">Copy URL</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAdminDocument('${d.id}', this)">Delete</button>
+      </td>
+    </tr>`;
+}
+
 let adminDocsLoaded = false;
 async function loadAdminDocuments(force = false) {
     if (adminDocsLoaded && !force) return;
@@ -2336,21 +2352,7 @@ async function loadAdminDocuments(force = false) {
     if (!docs.length) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">No documents uploaded yet.</p>'; return; }
     listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
     <thead><tr><th>Filename</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
-    <tbody>${docs.map(d => {
-        const kb   = Math.round(d.file_size / 1024);
-        const ext  = d.filename.split('.').pop().toUpperCase();
-        const date = new Date(d.uploaded_at).toLocaleDateString();
-        return `<tr data-doc-id="${d.id}">
-          <td class="admin-img-filename">${d.filename}</td>
-          <td style="color:var(--text-muted);font-size:0.8rem">${ext}</td>
-          <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${kb} KB</td>
-          <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${date}</td>
-          <td style="white-space:nowrap">
-            <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${d.public_url}')">Copy URL</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteAdminDocument('${d.id}', this)">Delete</button>
-          </td>
-        </tr>`;
-    }).join('')}</tbody></table></div>`;
+    <tbody>${docs.map(adminDocRowHtml).join('')}</tbody></table></div>`;
 }
 
 window.deleteAdminDocument = async function(id, btn) {
@@ -2361,7 +2363,66 @@ window.deleteAdminDocument = async function(id, btn) {
     else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
 };
 
+/* ─── Admin Document Upload ─── */
+{
+    const fileInput = document.getElementById('admin-doc-file-input');
+    const uploadBtn = document.getElementById('admin-doc-upload-btn');
+
+    uploadBtn?.addEventListener('click', () => fileInput?.click());
+
+    fileInput?.addEventListener('change', async e => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        if (!file) return;
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Uploading…';
+        try {
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+            const token = localStorage.getItem('gftv-token');
+            const res = await apiFetch('/api/policy/upload-document', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ filename: file.name, mime_type: file.type, data: base64 }),
+            });
+            if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
+            showToast('Document uploaded', 'success');
+            const listEl = document.getElementById('admin-documents-list');
+            const tbody = listEl?.querySelector('tbody');
+            if (tbody && res.document) {
+                tbody.insertAdjacentHTML('afterbegin', adminDocRowHtml(res.document));
+            } else {
+                adminDocsLoaded = false;
+                loadAdminDocuments();
+            }
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Upload Document';
+        }
+    });
+}
+
 /* ─── Admin Sounds ─── */
+function adminSndRowHtml(s) {
+    const kb   = Math.round(s.file_size / 1024);
+    const ext  = s.filename.split('.').pop().toUpperCase();
+    const date = new Date(s.uploaded_at).toLocaleDateString();
+    return `<tr data-snd-id="${s.id}">
+      <td class="admin-img-filename">${s.filename}</td>
+      <td style="color:var(--text-muted);font-size:0.8rem">${ext}</td>
+      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${kb} KB</td>
+      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${date}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${s.public_url}')">Copy URL</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAdminSound('${s.id}', this)">Delete</button>
+      </td>
+    </tr>`;
+}
+
 let adminSoundsLoaded = false;
 async function loadAdminSounds(force = false) {
     if (adminSoundsLoaded && !force) return;
@@ -2375,21 +2436,7 @@ async function loadAdminSounds(force = false) {
     if (!sounds.length) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">No audio files uploaded yet.</p>'; return; }
     listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
     <thead><tr><th>Filename</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
-    <tbody>${sounds.map(s => {
-        const kb   = Math.round(s.file_size / 1024);
-        const ext  = s.filename.split('.').pop().toUpperCase();
-        const date = new Date(s.uploaded_at).toLocaleDateString();
-        return `<tr data-snd-id="${s.id}">
-          <td class="admin-img-filename">${s.filename}</td>
-          <td style="color:var(--text-muted);font-size:0.8rem">${ext}</td>
-          <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${kb} KB</td>
-          <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${date}</td>
-          <td style="white-space:nowrap">
-            <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${s.public_url}')">Copy URL</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteAdminSound('${s.id}', this)">Delete</button>
-          </td>
-        </tr>`;
-    }).join('')}</tbody></table></div>`;
+    <tbody>${sounds.map(adminSndRowHtml).join('')}</tbody></table></div>`;
 }
 
 window.deleteAdminSound = async function(id, btn) {
@@ -2399,6 +2446,49 @@ window.deleteAdminSound = async function(id, btn) {
     if (res.ok) { document.querySelector(`tr[data-snd-id="${id}"]`)?.remove(); showToast('Audio deleted', 'success'); }
     else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
 };
+
+/* ─── Admin Sound Upload ─── */
+{
+    const fileInput = document.getElementById('admin-snd-file-input');
+    const uploadBtn = document.getElementById('admin-snd-upload-btn');
+
+    uploadBtn?.addEventListener('click', () => fileInput?.click());
+
+    fileInput?.addEventListener('change', async e => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        if (!file) return;
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Uploading…';
+        try {
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+            const token = localStorage.getItem('gftv-token');
+            const res = await apiFetch('/api/policy/upload-sound', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ filename: file.name, mime_type: file.type, data: base64 }),
+            });
+            if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
+            showToast('Sound uploaded', 'success');
+            const listEl = document.getElementById('admin-sounds-list');
+            const tbody = listEl?.querySelector('tbody');
+            if (tbody && res.sound) {
+                tbody.insertAdjacentHTML('afterbegin', adminSndRowHtml(res.sound));
+            } else {
+                adminSoundsLoaded = false;
+                loadAdminSounds();
+            }
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Upload Sound';
+        }
+    });
+}
 
 /* ─── Admin Image Upload ─── */
 function adminImgRowHtml(img) {

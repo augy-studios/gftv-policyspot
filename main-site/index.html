@@ -740,15 +740,23 @@
                 <div class="tab-content hidden" id="tab-documents">
                     <div class="admin-images-toolbar">
                         <h2>Documents</h2>
-                        <button class="btn btn-sm btn-ghost" onclick="loadAdminDocuments(true)">Refresh</button>
+                        <div style="display:flex;gap:0.5rem">
+                            <button class="btn btn-sm btn-primary" id="admin-doc-upload-btn">Upload Document</button>
+                            <button class="btn btn-sm btn-ghost" onclick="loadAdminDocuments(true)">Refresh</button>
+                        </div>
                     </div>
+                    <input type="file" id="admin-doc-file-input" accept=".pdf,.doc,.docx" style="display:none">
                     <div id="admin-documents-list"></div>
                 </div>
                 <div class="tab-content hidden" id="tab-sounds">
                     <div class="admin-images-toolbar">
                         <h2>Sounds</h2>
-                        <button class="btn btn-sm btn-ghost" onclick="loadAdminSounds(true)">Refresh</button>
+                        <div style="display:flex;gap:0.5rem">
+                            <button class="btn btn-sm btn-primary" id="admin-snd-upload-btn">Upload Sound</button>
+                            <button class="btn btn-sm btn-ghost" onclick="loadAdminSounds(true)">Refresh</button>
+                        </div>
                     </div>
+                    <input type="file" id="admin-snd-file-input" accept=".mp3,.aac,.m4a,.ogg" style="display:none">
                     <div id="admin-sounds-list"></div>
                 </div>
             </div>
