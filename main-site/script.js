@@ -1116,7 +1116,11 @@ function updateUserUI() {
           ${currentUser.is_admin ? `<button class="user-dropdown-item" id="sidebar-goto-admin">Admin Panel</button>` : ''}
           <button class="user-dropdown-item danger" id="sidebar-logout-btn">Sign Out</button>
         </div>
-      </div>`;
+      </div>
+      <button class="btn btn-ghost btn-sm" id="sidebar-search-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Search
+      </button>`;
             const sidebarChip = document.getElementById('sidebar-user-chip');
             sidebarChip.addEventListener('click', e => {
                 e.stopPropagation();
@@ -1125,6 +1129,7 @@ function updateUserUI() {
             });
             document.getElementById('sidebar-logout-btn')?.addEventListener('click', logout);
             document.getElementById('sidebar-goto-admin')?.addEventListener('click', () => navigate('/admin'));
+            document.getElementById('sidebar-search-btn')?.addEventListener('click', () => { closeSidebar(); openSearch(); });
             document.addEventListener('click', () => {
                 const dd = document.getElementById('sidebar-user-dropdown');
                 if (dd) dd.style.display = 'none';
@@ -1136,8 +1141,14 @@ function updateUserUI() {
             document.getElementById('login-btn')?.addEventListener('click', () => openModal('auth-modal'));
         }
         if (sidebarArea) {
-            sidebarArea.innerHTML = `<button class="btn btn-ghost btn-sm" id="sidebar-login-btn">Sign In</button>`;
+            sidebarArea.innerHTML = `
+      <button class="btn btn-ghost btn-sm" id="sidebar-login-btn">Sign In</button>
+      <button class="btn btn-ghost btn-sm" id="sidebar-search-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Search
+      </button>`;
             document.getElementById('sidebar-login-btn')?.addEventListener('click', () => openModal('auth-modal'));
+            document.getElementById('sidebar-search-btn')?.addEventListener('click', () => { closeSidebar(); openSearch(); });
         }
     }
 }

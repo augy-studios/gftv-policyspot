@@ -167,6 +167,23 @@ svg {
   margin-left: 1rem;
 }
 
+@media (max-width: 1060px) {
+  .header-nav {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-shrink: 1;
+  }
+
+  .header-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-link {
+    flex-shrink: 0;
+  }
+}
+
 .nav-link {
   font-family: var(--font);
   font-size: 0.9rem;
