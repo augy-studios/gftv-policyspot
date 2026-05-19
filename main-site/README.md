@@ -37,7 +37,9 @@ gftv-policyspot/
 │   │   │   ├── delete-section.js     DELETE /api/policy/delete-section (admin/editor)
 │   │   │   ├── documents.js          GET    /api/policy/documents (admin)
 │   │   │   ├── images.js             GET    /api/policy/images (admin)
+│   │   │   ├── manage-document.js    DELETE /api/policy/manage-document (admin)
 │   │   │   ├── manage-image.js       DELETE/PATCH /api/policy/manage-image (admin)
+│   │   │   ├── manage-sound.js       DELETE /api/policy/manage-sound (admin)
 │   │   │   ├── reorder-section.js    PUT    /api/policy/reorder-section (admin/editor)
 │   │   │   ├── section.js            GET    /api/policy/section?slug=...
 │   │   │   ├── section-views.js      POST   /api/policy/section-views
@@ -98,7 +100,7 @@ gftv-policyspot/
 - **Media Library** — Upload and manage images (`policy-images`), documents/PDFs (`policy-documents`), and audio files (`policy-sounds`) from the "Insert Media" picker in the editor
 - **Rich Embeds** — `{{embed: url}}` markdown syntax renders inline audio players, PDF viewers, Google Docs/Sheets/Slides iframes, and generic iframes
 - **Image Lightbox** — Clicking any image in section content opens it full-screen in a lightbox overlay
-- **Admin Panel** — User approval, role management (admin/editor), database seeder
+- **Admin Panel** — User approval, role management (admin/editor), database seeder; Images/Documents/Sounds tabs each support upload, Copy URL, and Delete (with modal confirmation) directly from the admin panel
 - **PWA** — Installable, offline-capable via service worker
 - **Buy Augy a Coffee** — Coffee button in header linking to Stripe donation page
 
@@ -126,8 +128,8 @@ These shortcuts work inside the content editor textarea (admin/editor role):
 | --- | --- | --- |
 | Upload New | `![alt](url)` or caption figure | JPG, PNG, GIF, WebP — max 8 MB, auto-compressed |
 | Images | `![alt](url)` from library | — |
-| Documents | `{{embed: url}}` (PDF viewer) | PDF, DOCX — max 20 MB |
-| Sounds | `{{embed: url}}` (audio player) | MP3, AAC, M4A — max 20 MB |
+| Documents | `![filename]{doc}(url)` → renders as a download card | PDF, DOCX — max 20 MB |
+| Sounds | `![filename]{audio}(url)` → renders as `<audio controls>` | MP3, AAC, M4A — max 20 MB |
 | Embeds | `{{embed: url}}` | Google Docs, Sheets, Slides, PDF, audio, any iframe URL |
 
 ### Embed syntax
@@ -140,6 +142,10 @@ Paste `{{embed: <url>}}` anywhere in markdown content. The renderer auto-detects
 - `docs.google.com/spreadsheets/` → Google Sheet preview
 - `docs.google.com/presentation/` → Google Slides embed
 - Anything else → generic `<iframe>`
+
+### Document card syntax
+
+Documents inserted from the media library use `![filename]{doc}(url)` and render as a styled card with a file icon, filename, extension label, and **Download** / **Open** buttons (no iframe).
 
 ---
 

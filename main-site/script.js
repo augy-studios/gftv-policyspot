@@ -747,8 +747,30 @@ function renderMarkdown(md) {
         }
         if (type === 'audio')
             return `<audio class="section-audio" controls src="${src}"></audio>`;
-        if (type === 'doc')
-            return `<iframe class="section-embed section-embed-pdf" src="${src}" loading="lazy"></iframe>`;
+        if (type === 'doc') {
+            const filename = alt || src.split('/').pop();
+            const ext = filename.split('.').pop().toUpperCase();
+            return `<div class="doc-card">
+              <div class="doc-card-icon">
+                <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 0h14l11 10v21a3 3 0 01-3 3H3a3 3 0 01-3-3V3a3 3 0 013-3z" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+                  <path d="M17 0l11 10H20a3 3 0 01-3-3V0z" fill="var(--border-hover, var(--border))"/>
+                  <line x1="6" y1="16" x2="22" y2="16" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
+                  <line x1="6" y1="21" x2="22" y2="21" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
+                  <line x1="6" y1="26" x2="15" y2="26" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="doc-card-ext">${ext}</span>
+              </div>
+              <div class="doc-card-info">
+                <span class="doc-card-name">${filename}</span>
+                <span class="doc-card-type">${ext}</span>
+              </div>
+              <div class="doc-card-actions">
+                <a class="btn btn-sm btn-ghost doc-card-btn" href="${src}" download="${filename}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
+                <a class="btn btn-sm btn-ghost doc-card-btn" href="${src}" target="_blank" rel="noopener noreferrer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open</a>
+              </div>
+            </div>`;
+        }
         if (type === 'embed') {
             if (src.includes('docs.google.com/document/'))
                 return `<iframe class="section-embed section-embed-gdoc" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
@@ -2375,13 +2397,33 @@ async function loadAdminDocuments(force = false) {
     <tbody>${docs.map(adminDocRowHtml).join('')}</tbody></table></div>`;
 }
 
-window.deleteAdminDocument = async function(id, btn) {
-    if (!confirm('Delete this document? This cannot be undone.')) return;
-    btn.disabled = true;
-    const res = await apiFetch(`/api/policy/manage-document?id=${id}`, { method: 'DELETE' });
-    if (res.ok) { document.querySelector(`tr[data-doc-id="${id}"]`)?.remove(); showToast('Document deleted', 'success'); }
-    else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
-};
+/* ─── Delete Document Modal ─── */
+{
+    let pendingDocId  = null;
+    let pendingDocBtn = null;
+
+    window.deleteAdminDocument = function(id, btn) {
+        const row = btn.closest('tr');
+        const filename = row?.querySelector('.admin-img-filename')?.textContent || 'this document';
+        document.getElementById('delete-document-filename').textContent = filename;
+        pendingDocId  = id;
+        pendingDocBtn = btn;
+        openModal('delete-document-modal');
+    };
+
+    document.getElementById('delete-document-confirm')?.addEventListener('click', async () => {
+        if (!pendingDocId) return;
+        const id  = pendingDocId;
+        const btn = pendingDocBtn;
+        pendingDocId  = null;
+        pendingDocBtn = null;
+        closeModal('delete-document-modal');
+        btn.disabled = true;
+        const res = await apiFetch(`/api/policy/manage-document?id=${id}`, { method: 'DELETE' });
+        if (res.ok) { document.querySelector(`tr[data-doc-id="${id}"]`)?.remove(); showToast('Document deleted', 'success'); }
+        else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
+    });
+}
 
 /* ─── Admin Document Upload ─── */
 {
@@ -2459,13 +2501,33 @@ async function loadAdminSounds(force = false) {
     <tbody>${sounds.map(adminSndRowHtml).join('')}</tbody></table></div>`;
 }
 
-window.deleteAdminSound = async function(id, btn) {
-    if (!confirm('Delete this audio file? This cannot be undone.')) return;
-    btn.disabled = true;
-    const res = await apiFetch(`/api/policy/manage-sound?id=${id}`, { method: 'DELETE' });
-    if (res.ok) { document.querySelector(`tr[data-snd-id="${id}"]`)?.remove(); showToast('Audio deleted', 'success'); }
-    else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
-};
+/* ─── Delete Sound Modal ─── */
+{
+    let pendingSndId  = null;
+    let pendingSndBtn = null;
+
+    window.deleteAdminSound = function(id, btn) {
+        const row = btn.closest('tr');
+        const filename = row?.querySelector('.admin-img-filename')?.textContent || 'this audio file';
+        document.getElementById('delete-sound-filename').textContent = filename;
+        pendingSndId  = id;
+        pendingSndBtn = btn;
+        openModal('delete-sound-modal');
+    };
+
+    document.getElementById('delete-sound-confirm')?.addEventListener('click', async () => {
+        if (!pendingSndId) return;
+        const id  = pendingSndId;
+        const btn = pendingSndBtn;
+        pendingSndId  = null;
+        pendingSndBtn = null;
+        closeModal('delete-sound-modal');
+        btn.disabled = true;
+        const res = await apiFetch(`/api/policy/manage-sound?id=${id}`, { method: 'DELETE' });
+        if (res.ok) { document.querySelector(`tr[data-snd-id="${id}"]`)?.remove(); showToast('Audio deleted', 'success'); }
+        else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
+    });
+}
 
 /* ─── Admin Sound Upload ─── */
 {
