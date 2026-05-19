@@ -124,6 +124,18 @@ async function handleRoute(fullPath) {
         updateActiveNav('about');
         return;
     }
+    if (cleanPath === '/terms') {
+        showPage('terms');
+        updateActiveNav('');
+        renderStaticPage('terms');
+        return;
+    }
+    if (cleanPath === '/privacy') {
+        showPage('privacy');
+        updateActiveNav('');
+        renderStaticPage('privacy');
+        return;
+    }
     if (cleanPath === '/admin') {
         showPage('admin');
         updateActiveNav('');
@@ -181,7 +193,7 @@ function showPage(name) {
     if (el) el.classList.add('active');
     if (name !== 'charter') window.scrollTo(0, 0);
 
-    if (name === 'home' || name === 'join' || name === 'about' || name === 'admin') {
+    if (name === 'home' || name === 'join' || name === 'about' || name === 'admin' || name === 'terms' || name === 'privacy') {
         buildHomeSidebar();
         if (window.innerWidth >= 900) {
             document.getElementById('sidebar')?.classList.remove('collapsed');
@@ -872,6 +884,106 @@ function renderMarkdown(md) {
     stash.forEach((block, i) => { html = html.replace(`\x02${i}\x02`, () => block); });
 
     return html;
+}
+
+/* ─── Static Pages (Terms / Privacy) ─── */
+const STATIC_PAGES = {
+    terms: `# Terms of Service
+
+*Last updated: May 2026*
+
+## 1. Acceptance of Terms
+
+By accessing or using GFTV PolicySpot ("the Site"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Site.
+
+## 2. Use of the Site
+
+The Site provides access to policy documentation published by Global Furry Television (GFTV). You may read, share, and reference this content for personal and non-commercial purposes, provided you credit GFTV appropriately.
+
+## 3. Accounts
+
+Registered accounts are for authorised GFTV staff only. Account holders are responsible for maintaining the confidentiality of their credentials and for all activity under their account. We reserve the right to suspend or terminate accounts at our discretion.
+
+## 4. Content Accuracy
+
+We strive to keep policy documents accurate and up to date. However, documents on this Site may not always reflect the most current policies. In case of conflict, the official documents held by GFTV leadership take precedence.
+
+## 5. Intellectual Property
+
+All content on this Site — including policy text, design, and branding — is the property of Global Furry Television International and is protected under applicable copyright law. Unauthorised reproduction or redistribution is prohibited.
+
+## 6. Limitation of Liability
+
+The Site is provided "as is" without warranties of any kind. GFTV is not liable for any damages arising from your use of or inability to use the Site.
+
+## 7. Changes to Terms
+
+We may update these Terms at any time. Continued use of the Site after changes are posted constitutes your acceptance of the revised Terms.
+
+## 8. Contact
+
+For questions about these Terms, contact us via [globalfurry.tv](https://globalfurry.tv).`,
+
+    privacy: `# Privacy Policy
+
+*Last updated: May 2026*
+
+## 1. Overview
+
+Global Furry Television ("GFTV", "we", "us") operates PolicySpot. This Privacy Policy explains what information we collect, how we use it, and your rights in relation to it.
+
+## 2. Information We Collect
+
+**Usage data** — We use Google Analytics to collect anonymised information about how visitors interact with the Site (pages visited, time on site, approximate location). This data does not identify you personally.
+
+**Account data** — If you register for an account, we collect your display name, username, and email address. This information is used solely for account authentication and administration.
+
+## 3. Cookies
+
+The Site uses cookies for analytics (Google Analytics) and to maintain your login session. You can disable cookies in your browser settings; note that this may affect Site functionality.
+
+## 4. How We Use Your Information
+
+- To operate and improve the Site
+- To authenticate registered users
+- To monitor Site performance and usage trends
+
+We do not sell, rent, or share your personal information with third parties except as required by law.
+
+## 5. Data Retention
+
+Account data is retained for as long as your account is active. You may request deletion of your account and associated data by contacting us.
+
+## 6. Third-Party Services
+
+The Site uses the following third-party services, each with their own privacy policies:
+
+- Google Analytics (usage analytics)
+- Google AdSense (advertising)
+- Supabase (account data storage)
+
+## 7. Your Rights
+
+Depending on your jurisdiction, you may have the right to access, correct, or delete personal data we hold about you. To exercise these rights, contact us via [globalfurry.tv](https://globalfurry.tv).
+
+## 8. Changes to This Policy
+
+We may update this Privacy Policy from time to time. We will note the date of the latest update at the top of this page.
+
+## 9. Contact
+
+For privacy-related queries, contact us via [globalfurry.tv](https://globalfurry.tv).`,
+};
+
+const _renderedStaticPages = new Set();
+
+function renderStaticPage(name) {
+    if (_renderedStaticPages.has(name)) return;
+    const el = document.getElementById(`${name}-content`);
+    if (el && STATIC_PAGES[name]) {
+        el.innerHTML = renderMarkdown(STATIC_PAGES[name]);
+        _renderedStaticPages.add(name);
+    }
 }
 
 /* ─── Breadcrumb ─── */
