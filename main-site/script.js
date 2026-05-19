@@ -285,11 +285,10 @@ function buildSidebar() {
     const titleEl = document.querySelector('.sidebar-title');
     if (titleEl) titleEl.textContent = DOCS[currentDoc].sidebarTitle;
 
+    nav.innerHTML = '';
     if (!sections.length) {
         nav.innerHTML = '<div class="sidebar-loading">No sections found.</div>';
-        return;
     }
-    nav.innerHTML = '';
 
     const urlBase = DOCS[currentDoc].urlBase;
     const pages = topLevelPages();
