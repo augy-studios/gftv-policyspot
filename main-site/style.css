@@ -1118,6 +1118,7 @@ svg {
 .section-body .decimal-list .ol-depth-2 { padding-left: 3rem; }
 .section-body .decimal-list .ol-depth-3 { padding-left: 4.5rem; }
 .section-body .decimal-list .ol-depth-4 { padding-left: 6rem; }
+.section-body .decimal-list .ol-depth-5 { padding-left: 7.5rem; }
 
 .section-body u {
   text-decoration: underline;

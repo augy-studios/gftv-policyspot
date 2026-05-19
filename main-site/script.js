@@ -863,7 +863,7 @@ function renderMarkdown(md) {
             }
             const am = line.match(/^(\([a-zA-Z]\))[ \t](.+)$/);
             if (am) {
-                return `<li class="ol-depth-${currentDepth}">${am[1]} ${am[2]}</li>`;
+                return `<li class="ol-depth-${currentDepth + 1}">${am[1]} ${am[2]}</li>`;
             }
             return '';
         }).filter(Boolean).join('');
