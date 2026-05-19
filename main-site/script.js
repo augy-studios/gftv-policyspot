@@ -723,7 +723,9 @@ function renderMarkdown(md) {
     html = html.replace(/__(.+?)__/g, '<u>$1</u>');
     html = html.replace(/_(.+?)_/g, '<em>$1</em>');
     // Images (must come before links so ![alt](url) isn't partially matched)
-    html = html.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, '<img class="section-img" src="$2" alt="$1">');
+    html = html.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, (_, alt, src) =>
+        alt ? `<figure class="section-img-figure"><img class="section-img" src="${src}" alt="${alt}"><figcaption class="section-img-caption">${alt}</figcaption></figure>`
+            : `<img class="section-img" src="${src}" alt="">`);
     // Links
     html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     // Inline code

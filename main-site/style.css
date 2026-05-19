@@ -1038,6 +1038,22 @@ svg {
   border: 1px solid var(--border);
 }
 
+.section-body .section-img-figure {
+  margin: 1rem 0;
+}
+
+.section-body .section-img-figure .section-img {
+  margin: 0;
+}
+
+.section-body .section-img-caption {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .section-body strong {
   color: var(--text);
 }
