@@ -29,7 +29,7 @@
     "background_color": "#cfc",
     "display": "standalone",
     "display_override": ["fullscreen", "minimal-ui", "window-controls-overlay"],
-    "orientation": "portrait-primary",
+    "orientation": "portrait",
     "id": "gftv-policyspot",
     "dir": "ltr",
     "scope": "/",
