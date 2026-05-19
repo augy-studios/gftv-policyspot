@@ -717,7 +717,9 @@
                 <h1>Admin Panel</h1>
                 <div class="admin-tabs">
                     <button class="tab-btn active" data-tab="users">Users</button>
-                    <button class="tab-btn" data-tab="images">Image Library</button>
+                    <button class="tab-btn" data-tab="images">Images</button>
+                    <button class="tab-btn" data-tab="documents">Documents</button>
+                    <button class="tab-btn" data-tab="sounds">Sounds</button>
                 </div>
                 <div class="tab-content" id="tab-users">
                     <h2>User Management</h2>
@@ -725,7 +727,7 @@
                 </div>
                 <div class="tab-content hidden" id="tab-images">
                     <div class="admin-images-toolbar">
-                        <h2>Image Library</h2>
+                        <h2>Images</h2>
                         <div style="display:flex;gap:0.5rem">
                             <button class="btn btn-sm btn-primary" id="admin-img-upload-btn">Upload Image</button>
                             <button class="btn btn-sm btn-ghost" onclick="loadAdminImages(true)">Refresh</button>
@@ -734,6 +736,20 @@
                     <input type="file" id="admin-img-file-input" accept="image/*" style="display:none">
                     <div id="admin-img-staging" class="admin-img-staging hidden"></div>
                     <div id="admin-images-list"></div>
+                </div>
+                <div class="tab-content hidden" id="tab-documents">
+                    <div class="admin-images-toolbar">
+                        <h2>Documents</h2>
+                        <button class="btn btn-sm btn-ghost" onclick="loadAdminDocuments(true)">Refresh</button>
+                    </div>
+                    <div id="admin-documents-list"></div>
+                </div>
+                <div class="tab-content hidden" id="tab-sounds">
+                    <div class="admin-images-toolbar">
+                        <h2>Sounds</h2>
+                        <button class="btn btn-sm btn-ghost" onclick="loadAdminSounds(true)">Refresh</button>
+                    </div>
+                    <div id="admin-sounds-list"></div>
                 </div>
             </div>
         </div>

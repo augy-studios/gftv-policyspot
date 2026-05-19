@@ -1637,12 +1637,18 @@ function openImagePicker(ta) {
     document.getElementById('img-insert-btn').disabled = true;
 
     // Reset doc/snd/embed panes
-    document.getElementById('doc-drop-zone').hidden  = false;
-    document.getElementById('doc-file-ready').hidden = true;
-    document.getElementById('snd-drop-zone').hidden  = false;
-    document.getElementById('snd-file-ready').hidden = true;
-    document.getElementById('embed-url-input').value = '';
-    document.getElementById('embed-type-badge').hidden = true;
+    const _docDrop  = document.getElementById('doc-drop-zone');
+    const _docReady = document.getElementById('doc-file-ready');
+    const _sndDrop  = document.getElementById('snd-drop-zone');
+    const _sndReady = document.getElementById('snd-file-ready');
+    const _embedIn  = document.getElementById('embed-url-input');
+    const _embedBdg = document.getElementById('embed-type-badge');
+    if (_docDrop)  _docDrop.hidden  = false;
+    if (_docReady) _docReady.hidden = true;
+    if (_sndDrop)  _sndDrop.hidden  = false;
+    if (_sndReady) _sndReady.hidden = true;
+    if (_embedIn)  _embedIn.value   = '';
+    if (_embedBdg) _embedBdg.hidden = true;
 
     switchImgTab('upload');
     openModal('image-picker-modal');
@@ -2205,7 +2211,9 @@ async function loadAdmin() {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             btn.classList.add('active');
             document.getElementById(`tab-${btn.dataset.tab}`)?.classList.remove('hidden');
-            if (btn.dataset.tab === 'images') loadAdminImages();
+            if (btn.dataset.tab === 'images')    loadAdminImages();
+            if (btn.dataset.tab === 'documents') loadAdminDocuments();
+            if (btn.dataset.tab === 'sounds')    loadAdminSounds();
         });
     });
 }
@@ -2310,6 +2318,84 @@ window.editImageDesc = function(el) {
             el.innerHTML = el.dataset.desc || '<em style="color:var(--text-muted);font-style:normal">—</em>';
         }
     });
+};
+
+/* ─── Admin Documents ─── */
+let adminDocsLoaded = false;
+async function loadAdminDocuments(force = false) {
+    if (adminDocsLoaded && !force) return;
+    const listEl = document.getElementById('admin-documents-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Loading documents…</p>';
+    const res = await apiFetch('/api/policy/documents');
+    adminDocsLoaded = true;
+    if (!res.ok) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Failed to load documents.</p>'; return; }
+    const docs = res.documents || [];
+    if (!docs.length) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">No documents uploaded yet.</p>'; return; }
+    listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
+    <thead><tr><th>Filename</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
+    <tbody>${docs.map(d => {
+        const kb   = Math.round(d.file_size / 1024);
+        const ext  = d.filename.split('.').pop().toUpperCase();
+        const date = new Date(d.uploaded_at).toLocaleDateString();
+        return `<tr data-doc-id="${d.id}">
+          <td class="admin-img-filename">${d.filename}</td>
+          <td style="color:var(--text-muted);font-size:0.8rem">${ext}</td>
+          <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${kb} KB</td>
+          <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${date}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${d.public_url}')">Copy URL</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAdminDocument('${d.id}', this)">Delete</button>
+          </td>
+        </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+window.deleteAdminDocument = async function(id, btn) {
+    if (!confirm('Delete this document? This cannot be undone.')) return;
+    btn.disabled = true;
+    const res = await apiFetch(`/api/policy/manage-document?id=${id}`, { method: 'DELETE' });
+    if (res.ok) { document.querySelector(`tr[data-doc-id="${id}"]`)?.remove(); showToast('Document deleted', 'success'); }
+    else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
+};
+
+/* ─── Admin Sounds ─── */
+let adminSoundsLoaded = false;
+async function loadAdminSounds(force = false) {
+    if (adminSoundsLoaded && !force) return;
+    const listEl = document.getElementById('admin-sounds-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Loading audio files…</p>';
+    const res = await apiFetch('/api/policy/sounds');
+    adminSoundsLoaded = true;
+    if (!res.ok) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Failed to load sounds.</p>'; return; }
+    const sounds = res.sounds || [];
+    if (!sounds.length) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">No audio files uploaded yet.</p>'; return; }
+    listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
+    <thead><tr><th>Filename</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
+    <tbody>${sounds.map(s => {
+        const kb   = Math.round(s.file_size / 1024);
+        const ext  = s.filename.split('.').pop().toUpperCase();
+        const date = new Date(s.uploaded_at).toLocaleDateString();
+        return `<tr data-snd-id="${s.id}">
+          <td class="admin-img-filename">${s.filename}</td>
+          <td style="color:var(--text-muted);font-size:0.8rem">${ext}</td>
+          <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${kb} KB</td>
+          <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${date}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${s.public_url}')">Copy URL</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAdminSound('${s.id}', this)">Delete</button>
+          </td>
+        </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+window.deleteAdminSound = async function(id, btn) {
+    if (!confirm('Delete this audio file? This cannot be undone.')) return;
+    btn.disabled = true;
+    const res = await apiFetch(`/api/policy/manage-sound?id=${id}`, { method: 'DELETE' });
+    if (res.ok) { document.querySelector(`tr[data-snd-id="${id}"]`)?.remove(); showToast('Audio deleted', 'success'); }
+    else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
 };
 
 /* ─── Admin Image Upload ─── */
