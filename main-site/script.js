@@ -794,10 +794,38 @@ function renderMarkdown(md) {
     html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     // Inline code
     html = html.replace(/`(.+?)`/g, '<code>$1</code>');
-    // Unordered lists
-    html = html.replace(/((?:^- .+\n?)+)/gm, match => {
-        const items = match.trim().split('\n').map(l => `<li>${l.replace(/^- /, '')}</li>`).join('');
-        return `<ul>${items}</ul>`;
+    // Unordered lists — supports nesting via leading spaces (2 spaces = 1 level)
+    html = html.replace(/((?:^[ ]*- .+\n?)+)/gm, match => {
+        const lines = match.trimEnd().split('\n').filter(l => /^\s*- /.test(l));
+        let out = '';
+        const stack = []; // stack of indent depths, one entry per open <ul>
+        for (const line of lines) {
+            const m = line.match(/^(\s*)- (.*)$/);
+            if (!m) continue;
+            const indent = m[1].length;
+            const text  = m[2];
+            if (stack.length === 0) {
+                out += '<ul>';
+                stack.push(indent);
+                out += `<li>${text}`;
+            } else if (indent > stack[stack.length - 1]) {
+                out += `<ul><li>${text}`;
+                stack.push(indent);
+            } else if (indent === stack[stack.length - 1]) {
+                out += `</li><li>${text}`;
+            } else {
+                out += '</li>';
+                while (stack.length > 0 && stack[stack.length - 1] > indent) {
+                    out += '</ul>';
+                    stack.pop();
+                    if (stack.length > 0) out += '</li>';
+                }
+                out += `<li>${text}`;
+            }
+        }
+        out += '</li>';
+        while (stack.length > 0) { out += '</ul>'; stack.pop(); }
+        return out;
     });
     // Ordered / decimal-outline lists (1., 2.1., 2.1.1., etc.) with optional (a)/(b) sub-items
     html = html.replace(/((?:^(?:(?:\d+\.)+[ \t].+|\([a-zA-Z]\)[ \t].+)\n?)+)/gm, match => {
