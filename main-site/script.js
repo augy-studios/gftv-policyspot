@@ -717,10 +717,15 @@ function renderMarkdown(md) {
         .replace(/>/g, '&gt;');
 
     // Tables
+    const allowedCellTags = new Set(['p','ul','ol','li','mark','strong','em','b','i','u','br','a','code','span','div','h1','h2','h3','h4','h5','h6']);
+    const unescapeCell = text => text.replace(/&lt;(\/?\w+.*?)&gt;/g, (match, inner) => {
+        const tag = (inner.match(/^\/?([\w]+)/)?.[1] || '').toLowerCase();
+        return allowedCellTags.has(tag) ? `<${inner}>` : match;
+    });
     html = html.replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)+)/gm, (_, header, body) => {
-        const ths = header.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+        const ths = header.split('|').filter(c => c.trim()).map(c => `<th>${unescapeCell(c.trim())}</th>`).join('');
         const trs = body.trim().split('\n').map(row => {
-            const tds = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+            const tds = row.split('|').filter(c => c.trim()).map(c => `<td>${unescapeCell(c.trim())}</td>`).join('');
             return `<tr>${tds}</tr>`;
         }).join('');
         return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>\n`;
