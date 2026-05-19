@@ -1190,14 +1190,6 @@ details[open] > .md-collapse-summary::before {
   color: var(--brand-dark);
 }
 
-.md-collapse-hash {
-  margin-left: auto;
-  font-size: 1rem;
-  font-weight: 400;
-  color: var(--text-muted);
-  opacity: 0.5;
-}
-
 .md-collapse-body {
   padding: 0.25rem 1.25rem 1rem;
   border-top: 1px solid var(--border);

@@ -706,7 +706,7 @@ function renderMarkdown(md) {
     md = md.replace(/^\+\+\+ (.+)\n([\s\S]*?)^\+\+\+[ \t]*$/gm, (_, title, content) => {
         const safeTitle = title.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         return S(`<details class="md-collapse">
-          <summary class="md-collapse-summary"><span class="md-collapse-title">${safeTitle}</span><span class="md-collapse-hash">#</span></summary>
+          <summary class="md-collapse-summary"><span class="md-collapse-title">${safeTitle}</span></summary>
           <div class="md-collapse-body">${renderMarkdown(content.trim())}</div>
         </details>`);
     });
