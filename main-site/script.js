@@ -466,7 +466,7 @@ async function renderDocIndex() {
     contentEl.innerHTML = `
     <div class="section-content-inner">
       <div class="section-header">
-        <div class="section-type-badge">Document</div>
+        ${currentUser && (currentUser.is_admin || currentUser.is_editor) ? '<div class="section-type-badge">Document</div>' : ''}
         <h1 class="section-heading">${doc.label}</h1>
       </div>
       <section class="section-grid">
@@ -611,7 +611,7 @@ function renderArticlePage(article, activeAnchor) {
 
     let html = `<div class="section-content-inner">
     <div class="section-header">
-      <div class="section-type-badge">Article</div>
+      ${currentUser && (currentUser.is_admin || currentUser.is_editor) ? '<div class="section-type-badge">Article</div>' : ''}
       <div class="section-meta">
         ${currentUser ? `<span class="section-slug-display">${urlBase}/${article.slug}</span>` : ''}
         ${canEditSlug ? `<button class="edit-slug-btn" data-id="${article.id}" data-slug="${article.slug}">Edit slug</button>` : ''}
@@ -685,7 +685,7 @@ function renderStandalonePage(section) {
     contentEl.innerHTML = `
     <div class="section-content-inner">
       <div class="section-header">
-        <div class="section-type-badge">${typeLabel}</div>
+        ${currentUser && (currentUser.is_admin || currentUser.is_editor) ? `<div class="section-type-badge">${typeLabel}</div>` : ''}
         <div class="section-meta">
           ${currentUser ? `<span class="section-slug-display">${urlBase}/${section.slug}</span>` : ''}
           ${canEditSlug ? `<button class="edit-slug-btn" data-id="${section.id}" data-slug="${section.slug}">Edit slug</button>` : ''}
