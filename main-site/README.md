@@ -101,7 +101,7 @@ gftv-policyspot/
   - `/the-charter/citation` — Standalone page
   - `/the-charter/article-i` — Article I with all subsections rendered inline
   - `/the-charter/article-i#name` — Deep-link anchor to a specific subsection
-- **Legal pages** — `/terms` (Terms of Service) and `/privacy` (Privacy Policy), each backed by their own Supabase table (`gftvpolicy_terms`, `gftvpolicy_privacy`) and fully editable by admins via the same section system; linked from the About page
+- **Legal pages** — `/legal/terms` (Terms of Service) and `/legal/privacy` (Privacy Policy), each backed by their own Supabase table (`gftvpolicy_terms`, `gftvpolicy_privacy`) and fully editable by admins via the same section system; linked from the About page
 - **Slug Editing** — Admin/editor users can customise any page's URL slug in-app
 - **Copy Toolbar** — Copy as Markdown for LLMs, view as plain text, export as PDF (browser print), open in ChatGPT, open in Claude
 - **Media Library** — Upload and manage images (`policy-images`), documents/PDFs (`policy-documents`), and audio files (`policy-sounds`) from the "Insert Media" picker in the editor

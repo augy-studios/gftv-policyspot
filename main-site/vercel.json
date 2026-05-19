@@ -55,19 +55,19 @@
             "destination": "/index.html"
         },
         {
-            "source": "/terms",
+            "source": "/legal/terms",
             "destination": "/index.html"
         },
         {
-            "source": "/terms/(.*)",
+            "source": "/legal/terms/(.*)",
             "destination": "/index.html"
         },
         {
-            "source": "/privacy",
+            "source": "/legal/privacy",
             "destination": "/index.html"
         },
         {
-            "source": "/privacy/(.*)",
+            "source": "/legal/privacy/(.*)",
             "destination": "/index.html"
         },
         {
