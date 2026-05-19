@@ -2271,22 +2271,42 @@ window.copyImageUrl = function(url) {
     navigator.clipboard.writeText(url).then(() => showToast('URL copied to clipboard', 'success'));
 };
 
-window.deleteAdminImage = async function(id, btn) {
-    if (!confirm('Delete this image? This cannot be undone.')) return;
-    btn.disabled = true;
-    const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch(`/api/policy/manage-image?id=${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+/* ─── Delete Image Modal ─── */
+{
+    let pendingDeleteId  = null;
+    let pendingDeleteBtn = null;
+
+    window.deleteAdminImage = function(id, btn) {
+        const row = btn.closest('tr');
+        const filename = row?.querySelector('.admin-img-filename')?.textContent || 'this image';
+        document.getElementById('delete-image-filename').textContent = filename;
+        pendingDeleteId  = id;
+        pendingDeleteBtn = btn;
+        openModal('delete-image-modal');
+    };
+
+    document.getElementById('delete-image-confirm')?.addEventListener('click', async () => {
+        if (!pendingDeleteId) return;
+        const id  = pendingDeleteId;
+        const btn = pendingDeleteBtn;
+        pendingDeleteId  = null;
+        pendingDeleteBtn = null;
+        closeModal('delete-image-modal');
+        btn.disabled = true;
+        const token = localStorage.getItem('gftv-token');
+        const res = await apiFetch(`/api/policy/manage-image?id=${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+            document.querySelector(`tr[data-img-id="${id}"]`)?.remove();
+            showToast('Image deleted', 'success');
+        } else {
+            btn.disabled = false;
+            showToast(res.error || 'Failed to delete', 'error');
+        }
     });
-    if (res.ok) {
-        document.querySelector(`tr[data-img-id="${id}"]`)?.remove();
-        showToast('Image deleted', 'success');
-    } else {
-        btn.disabled = false;
-        showToast(res.error || 'Failed to delete', 'error');
-    }
-};
+}
 
 window.editImageDesc = function(el) {
     if (el.querySelector('input')) return;

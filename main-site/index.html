@@ -779,6 +779,25 @@
     <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
 
     <!-- Modals -->
+    <!-- Delete Image Confirm Modal -->
+    <div class="modal-overlay" id="delete-image-modal" hidden>
+        <div class="modal glass-card">
+            <div class="modal-header">
+                <h2 class="modal-title">Delete Image</h2>
+                <button class="icon-btn modal-close" data-close="delete-image-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <p style="margin:0 0 1rem;font-size:0.95rem">Are you sure you want to delete <strong id="delete-image-filename"></strong>? This cannot be undone.</p>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" data-close="delete-image-modal">Cancel</button>
+                <button class="btn btn-danger" id="delete-image-confirm">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Theme Picker Modal -->
     <div class="modal-overlay" id="theme-modal" hidden>
         <div class="modal glass-card">
