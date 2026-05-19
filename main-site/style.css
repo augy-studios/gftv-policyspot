@@ -358,6 +358,15 @@ svg {
   display: none;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border);
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .sidebar-user-area {
+    display: flex;
+  }
 }
 
 .sidebar-nav {
@@ -2222,10 +2231,6 @@ mark {
 
   .user-area {
     display: none;
-  }
-
-  .sidebar-user-area {
-    display: block;
   }
 
   .theme-grid {
