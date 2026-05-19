@@ -815,7 +815,10 @@ function renderMarkdown(md) {
     html = html.replace(/__(.+?)__/g, '<u>$1</u>');
     html = html.replace(/_(.+?)_/g, '<em>$1</em>');
     // Links
-    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    html = html.replace(/\[([^\]]+)\]\(((?:https?:\/\/|mailto:)[^)]+)\)/g, (_, text, href) => {
+        const external = href.startsWith('http');
+        return `<a href="${href}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''}>${text}</a>`;
+    });
     // Inline code
     html = html.replace(/`(.+?)`/g, '<code>$1</code>');
     // Unordered lists — supports nesting via leading spaces (2 spaces = 1 level)
