@@ -101,7 +101,7 @@ gftv-policyspot/
   - `/the-charter/citation` — Standalone page
   - `/the-charter/article-i` — Article I with all subsections rendered inline
   - `/the-charter/article-i#name` — Deep-link anchor to a specific subsection
-- **Legal pages** — `/legal/terms` (Terms of Service) and `/legal/privacy` (Privacy Policy), each backed by their own Supabase table (`gftvpolicy_terms`, `gftvpolicy_privacy`) and fully editable by admins via the same section system; linked from the About page
+- **Legal page** — `/legal` backed by `gftvpolicy_legal`; sections (e.g. Terms of Service, Privacy Policy) are managed via the same admin section system and linked from the About page
 - **Slug Editing** — Admin/editor users can customise any page's URL slug in-app
 - **Copy Toolbar** — Copy as Markdown for LLMs, view as plain text, export as PDF (browser print), open in ChatGPT, open in Claude
 - **Media Library** — Upload and manage images (`policy-images`), documents/PDFs (`policy-documents`), and audio files (`policy-sounds`) from the "Insert Media" picker in the editor
@@ -160,7 +160,7 @@ Documents inserted from the media library use `![filename]{doc}(url)` and render
 
 - Sessions are stored in `gftvhello_sessions` and persist across page refreshes via `localStorage` token.
 - No Supabase Auth is used — custom session management only.
-- Policy tables use the `gftvpolicy_` prefix: `gftvpolicy_charter`, `gftvpolicy_news`, `gftvpolicy_prs`, `gftvpolicy_rules`, `gftvpolicy_join`, `gftvpolicy_terms`, `gftvpolicy_privacy`.
+- Policy tables use the `gftvpolicy_` prefix: `gftvpolicy_charter`, `gftvpolicy_news`, `gftvpolicy_prs`, `gftvpolicy_rules`, `gftvpolicy_join`, `gftvpolicy_legal`.
 - The table includes an `anchor` column (text, nullable) — this stores the `#fragment` id for subsection rows so they can be deep-linked within their parent article page (e.g. `anchor = 'name'` → `/the-charter/article-i#name`).
 - Article-type rows render all their subsections inline on one page; subsection rows have no standalone URL of their own.
 - PDF export uses the browser's native `window.print()` — no server-side PDF generation needed.

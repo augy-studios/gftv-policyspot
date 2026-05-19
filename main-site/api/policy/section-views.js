@@ -3,7 +3,7 @@
 const { getSupabaseClient } = require('../../lib/supabase');
 const { ok, err, handleOptions } = require('../../lib/response');
 
-const VALID_DOCS = new Set(['charter', 'news', 'prs', 'rules', 'join', 'terms', 'privacy']);
+const VALID_DOCS = new Set(['charter', 'news', 'prs', 'rules', 'join', 'legal']);
 
 module.exports = async (req, res) => {
     if (handleOptions(req, res)) return;

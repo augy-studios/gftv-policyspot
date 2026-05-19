@@ -1,4 +1,4 @@
-// api/policy/privacy/sections.js - List all Privacy Policy sections
+// api/policy/legal/sections.js - List all Legal sections
 const { getSupabaseClient } = require('../../../lib/supabase');
 const { ok, err, handleOptions } = require('../../../lib/response');
 
@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     if (req.method !== 'GET') return err(res, 'Method not allowed', 405);
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
-        .from('gftvpolicy_privacy')
+        .from('gftvpolicy_legal')
         .select('id, slug, anchor, number, title, type, parent_id, order_index, is_published, content, updated_at')
         .eq('is_published', true)
         .order('order_index');

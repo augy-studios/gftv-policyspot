@@ -1,4 +1,4 @@
-// api/policy/terms/section.js - Get a Terms of Service section by slug
+// api/policy/legal/section.js - Get a Legal section by slug
 const { getSupabaseClient } = require('../../../lib/supabase');
 const { ok, err, handleOptions } = require('../../../lib/response');
 
@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
     if (!slug) return err(res, 'Slug required');
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
-        .from('gftvpolicy_terms')
+        .from('gftvpolicy_legal')
         .select('*')
         .eq('slug', slug)
         .eq('is_published', true)
