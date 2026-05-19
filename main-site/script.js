@@ -719,40 +719,41 @@ function renderMarkdown(md) {
     html = html.replace(/^---$/gm, '<hr/>');
     // Blockquote
     html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-    // Bold / italic / underline
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    html = html.replace(/__(.+?)__/g, '<u>$1</u>');
-    html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+    // Stash all block-level generated HTML before inline formatting runs.
+    // This prevents underscores in filenames/URLs being turned into <em> tags.
+    const stash = [];
+    const S = h => { const t = `\x02${stash.length}\x02`; stash.push(h); return t; };
+
     // Embeds: {{embed: url}}
     html = html.replace(/\{\{embed:\s*(https?:\/\/[^}]+)\}\}/g, (_, rawUrl) => {
         const url = rawUrl.trim();
         if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url))
-            return `<audio class="section-audio" controls data-blob-src="${url}"></audio>`;
+            return S(`<audio class="section-audio" controls data-blob-src="${url}"></audio>`);
         if (/\.pdf(\?.*)?$/i.test(url))
-            return `<iframe class="section-embed section-embed-pdf" src="${url}" loading="lazy"></iframe>`;
+            return S(`<iframe class="section-embed section-embed-pdf" src="${url}" loading="lazy"></iframe>`);
         if (url.includes('docs.google.com/document/'))
-            return `<iframe class="section-embed section-embed-gdoc" src="${url.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
+            return S(`<iframe class="section-embed section-embed-gdoc" src="${url.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`);
         if (url.includes('docs.google.com/spreadsheets/'))
-            return `<iframe class="section-embed section-embed-gsheet" src="${url.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
+            return S(`<iframe class="section-embed section-embed-gsheet" src="${url.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`);
         if (url.includes('docs.google.com/presentation/'))
-            return `<iframe class="section-embed section-embed-gslide" src="${url.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`;
-        return `<iframe class="section-embed" src="${url}" loading="lazy" allowfullscreen></iframe>`;
+            return S(`<iframe class="section-embed section-embed-gslide" src="${url.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`);
+        return S(`<iframe class="section-embed" src="${url}" loading="lazy" allowfullscreen></iframe>`);
     });
     // Media: ![alt]{type}(url) — type is img|doc|audio|embed (optional, defaults to img)
     html = html.replace(/!\[([^\]]*)\](?:\{(img|doc|audio|embed)\})?\((https?:\/\/[^)]+)\)/g, (_, alt, type, src) => {
         type = type || 'img';
         if (type === 'img') {
-            return alt
+            return S(alt
                 ? `<figure class="section-img-figure"><img class="section-img" src="${src}" alt="${alt}"><figcaption class="section-img-caption">${alt}</figcaption></figure>`
-                : `<img class="section-img" src="${src}" alt="">`;
+                : `<img class="section-img" src="${src}" alt="">`);
         }
         if (type === 'audio')
-            return `<audio class="section-audio" controls data-blob-src="${src}"></audio>`;
+            return S(`<audio class="section-audio" controls data-blob-src="${src}"></audio>`);
         if (type === 'doc') {
             const filename = alt || src.split('/').pop();
             const ext = filename.split('.').pop().toUpperCase();
-            return `<div class="doc-card">
+            return S(`<div class="doc-card">
               <div class="doc-card-icon">
                 <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M3 0h14l11 10v21a3 3 0 01-3 3H3a3 3 0 01-3-3V3a3 3 0 013-3z" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
@@ -771,18 +772,24 @@ function renderMarkdown(md) {
                 <a class="btn btn-sm btn-ghost doc-card-btn" href="${src}" download="${filename}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
                 <button class="btn btn-sm btn-ghost doc-card-btn" onclick="openAsBlob('${src}','${filename}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open</button>
               </div>
-            </div>`;
+            </div>`);
         }
         if (type === 'embed') {
             if (src.includes('docs.google.com/document/'))
-                return `<iframe class="section-embed section-embed-gdoc" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
+                return S(`<iframe class="section-embed section-embed-gdoc" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`);
             if (src.includes('docs.google.com/spreadsheets/'))
-                return `<iframe class="section-embed section-embed-gsheet" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
+                return S(`<iframe class="section-embed section-embed-gsheet" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`);
             if (src.includes('docs.google.com/presentation/'))
-                return `<iframe class="section-embed section-embed-gslide" src="${src.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`;
-            return `<iframe class="section-embed" src="${src}" loading="lazy" allowfullscreen></iframe>`;
+                return S(`<iframe class="section-embed section-embed-gslide" src="${src.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`);
+            return S(`<iframe class="section-embed" src="${src}" loading="lazy" allowfullscreen></iframe>`);
         }
     });
+
+    // Bold / italic / underline — runs after stashing, so media HTML is never touched
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    html = html.replace(/__(.+?)__/g, '<u>$1</u>');
+    html = html.replace(/_(.+?)_/g, '<em>$1</em>');
     // Links
     html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     // Inline code
@@ -810,13 +817,18 @@ function renderMarkdown(md) {
         }).filter(Boolean).join('');
         return `<ol class="decimal-list">${items}</ol>`;
     });
-    // Paragraphs
+    // Paragraphs — stash tokens that stand alone are treated as block-level
     html = html.split(/\n\n+/).map(para => {
         const t = para.trim();
         if (!t) return '';
         if (/^<(h[1-6]|ul|ol|table|blockquote|hr)/.test(t)) return t;
+        if (/^\x02\d+\x02$/.test(t)) return t;
         return `<p>${t.replace(/\n/g, '<br/>')}</p>`;
     }).join('\n');
+
+    // Restore stashed blocks
+    stash.forEach((block, i) => { html = html.replace(`\x02${i}\x02`, () => block); });
+
     return html;
 }
 
