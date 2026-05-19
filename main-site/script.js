@@ -1396,6 +1396,10 @@ function setupCopyDropdown() {
             });
             const savedTheme = document.body.dataset.theme;
             applyTheme('light');
+            // Expand all collapsibles for PDF capture, remember which were already open
+            const collapseEls = Array.from(contentEl.querySelectorAll('details.md-collapse'));
+            const collapseWasOpen = collapseEls.map(d => d.open);
+            collapseEls.forEach(d => { d.open = true; });
             Promise.all([loadHtml2pdf(), getIp(), loadLogo()])
                 .then(([h2p, ip, logoDataUrl]) =>
                     h2p().set(opt).from(contentEl).toPdf().get('pdf').then(pdf => {
@@ -1436,12 +1440,14 @@ function setupCopyDropdown() {
                 )
                 .then(url => {
                     document.getElementById('pdf-prep-style')?.remove();
+                    collapseEls.forEach((d, i) => { d.open = collapseWasOpen[i]; });
                     applyTheme(savedTheme);
                     window.open(url, '_blank');
                     showToast('PDF opened in new tab', 'success');
                 })
                 .catch(() => {
                     document.getElementById('pdf-prep-style')?.remove();
+                    collapseEls.forEach((d, i) => { d.open = collapseWasOpen[i]; });
                     applyTheme(savedTheme);
                     showToast('Failed to generate PDF', 'error');
                 });
