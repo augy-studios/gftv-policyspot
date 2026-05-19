@@ -697,6 +697,20 @@ function renderStandalonePage(section) {
 
 /* ─── Markdown Renderer ─── */
 function renderMarkdown(md) {
+    // Stash is declared first so collapsible blocks (which need recursive
+    // renderMarkdown calls on raw content) can be extracted before HTML escaping.
+    const stash = [];
+    const S = h => { const t = `\x02${stash.length}\x02`; stash.push(h); return t; };
+
+    // Collapsible sections: +++ Title\ncontent\n+++
+    md = md.replace(/^\+\+\+ (.+)\n([\s\S]*?)^\+\+\+[ \t]*$/gm, (_, title, content) => {
+        const safeTitle = title.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return S(`<details class="md-collapse">
+          <summary class="md-collapse-summary"><span class="md-collapse-title">${safeTitle}</span><span class="md-collapse-hash">#</span></summary>
+          <div class="md-collapse-body">${renderMarkdown(content.trim())}</div>
+        </details>`);
+    });
+
     let html = md
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -719,11 +733,6 @@ function renderMarkdown(md) {
     html = html.replace(/^---$/gm, '<hr/>');
     // Blockquote
     html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-
-    // Stash all block-level generated HTML before inline formatting runs.
-    // This prevents underscores in filenames/URLs being turned into <em> tags.
-    const stash = [];
-    const S = h => { const t = `\x02${stash.length}\x02`; stash.push(h); return t; };
 
     // Embeds: {{embed: url}}
     html = html.replace(/\{\{embed:\s*(https?:\/\/[^}]+)\}\}/g, (_, rawUrl) => {

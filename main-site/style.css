@@ -1148,6 +1148,61 @@ svg {
   background: var(--surface);
 }
 
+.section-body .md-collapse {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.md-collapse-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.md-collapse-summary::-webkit-details-marker { display: none; }
+
+.md-collapse-summary::before {
+  content: '';
+  display: inline-block;
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--brand-dark);
+  transform: rotate(-90deg);
+  transition: transform 0.2s ease;
+}
+details[open] > .md-collapse-summary::before {
+  transform: rotate(0deg);
+}
+
+.md-collapse-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-dark);
+}
+
+.md-collapse-hash {
+  margin-left: auto;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.md-collapse-body {
+  padding: 0.25rem 1.25rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
 .section-body .section-embed-pdf  { min-height: 520px; }
 .section-body .section-embed-gslide { min-height: 460px; aspect-ratio: 16/9; }
 
