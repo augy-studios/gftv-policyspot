@@ -2927,7 +2927,15 @@ async function apiFetch(url, options = {}) {
 
 /* ─── Event Listeners ─── */
 /* ─── Search ─── */
-function openSearch() {
+async function prefetchSections(docKey) {
+    if (docSectionsCache[docKey]) return;
+    try {
+        const res = await apiFetch(DOCS[docKey].apiSections);
+        if (res.ok) docSectionsCache[docKey] = res.sections || [];
+    } catch (e) { /* silent */ }
+}
+
+async function openSearch() {
     openModal('search-modal');
     const input = document.getElementById('search-input');
     if (input) {
@@ -2935,16 +2943,37 @@ function openSearch() {
         renderSearchResults('');
         input.focus();
     }
+    await Promise.all(Object.keys(DOCS).map(prefetchSections));
+    const currentQuery = document.getElementById('search-input')?.value || '';
+    renderSearchResults(currentQuery);
 }
 
 function closeSearch() {
     closeModal('search-modal');
 }
 
+function stripMarkdown(md) {
+    return md
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/#{1,6}\s/g, '')
+        .replace(/[*_~`>|]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function extractSnippet(text, query, maxLen = 140) {
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return text.slice(0, maxLen) + (text.length > maxLen ? '…' : '');
+    const start = Math.max(0, idx - 40);
+    const end = Math.min(text.length, idx + query.length + 100);
+    return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+}
+
 function getSearchIndex() {
     const items = [
-        { title: 'Home', sub: 'PolicySpot', href: '/', type: 'page' },
-        ...SITE_PAGES.map(p => ({ title: p.label, sub: 'Page', href: p.href, type: 'page' })),
+        { title: 'Home', sub: 'PolicySpot', href: '/', type: 'page', content: '' },
+        ...SITE_PAGES.map(p => ({ title: p.label, sub: 'Page', href: p.href, type: 'page', content: '' })),
     ];
     for (const [docKey, docSections] of Object.entries(docSectionsCache)) {
         const doc = DOCS[docKey];
@@ -2952,9 +2981,9 @@ function getSearchIndex() {
             if (s.type === 'subsection') {
                 const parent = docSections.find(p => p.id === s.parent_id);
                 const parentSlug = parent?.slug || '';
-                items.push({ title: s.title, sub: doc.label, href: `${doc.urlBase}/${parentSlug}#${s.slug || s.id}`, type: 'section' });
+                items.push({ title: s.title, sub: doc.label, href: `${doc.urlBase}/${parentSlug}#${s.slug || s.id}`, type: 'section', content: s.content || '' });
             } else {
-                items.push({ title: s.title, sub: doc.label, href: `${doc.urlBase}/${s.slug}`, type: 'section' });
+                items.push({ title: s.title, sub: doc.label, href: `${doc.urlBase}/${s.slug}`, type: 'section', content: s.content || '' });
             }
         });
     }
@@ -2964,15 +2993,23 @@ function getSearchIndex() {
 const PAGE_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>`;
 const SECTION_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><line x1="8" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="6" x2="3.01" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="12" x2="3.01" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="18" x2="3.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
 
-function buildResultItem(item, index) {
+function buildResultItem(item, index, query) {
     const btn = document.createElement('button');
     btn.className = 'search-result-item';
     btn.dataset.index = index;
+    let snippet = '';
+    if (query && item.content) {
+        const plain = stripMarkdown(item.content);
+        if (plain.toLowerCase().includes(query.toLowerCase())) {
+            snippet = extractSnippet(plain, query);
+        }
+    }
     btn.innerHTML = `
         <span class="search-result-icon">${item.type === 'page' ? PAGE_ICON : SECTION_ICON}</span>
         <span class="search-result-text">
             <span class="search-result-title">${item.title}</span>
             <span class="search-result-sub">${item.sub}</span>
+            ${snippet ? `<span class="search-result-snippet">${snippet}</span>` : ''}
         </span>`;
     btn.addEventListener('click', () => { closeSearch(); navigate(item.href); });
     return btn;
@@ -2981,18 +3018,21 @@ function buildResultItem(item, index) {
 function renderSearchResults(query) {
     const container = document.getElementById('search-results');
     if (!container) return;
-    const clearBtn = document.getElementById('search-clear');
-    if (clearBtn) clearBtn.hidden = !query;
+    const q = query.trim().toLowerCase();
     const index = getSearchIndex();
-    const results = query.trim()
-        ? index.filter(i => i.title.toLowerCase().includes(query.toLowerCase()) || i.sub.toLowerCase().includes(query.toLowerCase())).slice(0, 10)
+    const results = q
+        ? index.filter(i =>
+            i.title.toLowerCase().includes(q) ||
+            i.sub.toLowerCase().includes(q) ||
+            (i.content && stripMarkdown(i.content).toLowerCase().includes(q))
+          ).slice(0, 12)
         : index.filter(i => i.type === 'page');
     container.innerHTML = '';
-    if (query.trim() && !results.length) {
+    if (q && !results.length) {
         container.innerHTML = `<div class="search-empty">No results for "<strong>${query}</strong>"</div>`;
         return;
     }
-    results.forEach((item, i) => container.appendChild(buildResultItem(item, i)));
+    results.forEach((item, i) => container.appendChild(buildResultItem(item, i, query.trim())));
 }
 
 function setupEventListeners() {
@@ -3005,10 +3045,6 @@ function setupEventListeners() {
     document.getElementById('login-btn')?.addEventListener('click', () => openModal('auth-modal'));
 
     document.getElementById('search-input')?.addEventListener('input', e => renderSearchResults(e.target.value));
-    document.getElementById('search-clear')?.addEventListener('click', () => {
-        const input = document.getElementById('search-input');
-        if (input) { input.value = ''; input.focus(); renderSearchResults(''); }
-    });
     document.getElementById('search-input')?.addEventListener('keydown', e => {
         const items = document.querySelectorAll('.search-result-item');
         const focused = document.querySelector('.search-result-item.focused');
