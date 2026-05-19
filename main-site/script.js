@@ -2484,20 +2484,20 @@ document.querySelectorAll('.modal-overlay').forEach(overlay =>
         if (e.target === overlay) closeModal(overlay.id);
     }));
 
-/* ─── Image Lightbox Modal ─── */
-(function () {
-    const img = document.getElementById('lightbox-img');
-    if (!img) return;
-
-    document.addEventListener('click', e => {
-        const el = e.target.closest('.section-img, .section-img-figure img');
-        if (!el) return;
-        img.src = el.src;
-        img.alt = el.alt || '';
-        document.getElementById('lightbox-title').textContent = el.alt || '';
-        openModal('image-lightbox-modal');
-    });
-}());
+/* ─── Image click → open as blob in new tab (hides storage URL) ─── */
+document.addEventListener('click', async e => {
+    const el = e.target.closest('.section-img, .section-img-figure img');
+    if (!el) return;
+    try {
+        const res    = await fetch(el.src);
+        const blob   = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+    } catch {
+        window.open(el.src, '_blank');
+    }
+});
 
 /* ─── Toast ─── */
 function showToast(msg, type = '') {
