@@ -2221,6 +2221,118 @@ mark {
   }
 }
 
+/* ─── Search ─── */
+.search-modal-overlay {
+  align-items: flex-start;
+  padding-top: 80px;
+}
+
+.search-modal-box {
+  width: 100%;
+  max-width: 560px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.search-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.search-icon-inner {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: none;
+  font-family: var(--font);
+  font-size: 1rem;
+  color: var(--text);
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-results {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.search-empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.search-result-item:hover,
+.search-result-item.focused {
+  background: var(--surface-hover);
+}
+
+.search-result-icon {
+  flex-shrink: 0;
+  color: var(--brand-dark);
+  display: flex;
+  align-items: center;
+}
+
+.search-result-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-result-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-result-sub {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  #search-btn {
+    display: none;
+  }
+
+  .search-modal-overlay {
+    padding-top: 60px;
+  }
+}
+
 /* ─── Home Doc Cards ─── */
 .home-doc-card {
   padding: 1.5rem;

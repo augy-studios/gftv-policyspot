@@ -93,6 +93,7 @@ gftv-policyspot/
 ## Features
 
 - **SPA Router** — Hash-free client-side routing using History API
+- **Search** — Magnifying glass button in the header (desktop) and sidebar (mobile); live-filtering dropdown of pages and document sections with keyboard navigation (↑ ↓ Enter Escape)
 - **2 Themes** — Classic Light, HelloTheme; persisted via localStorage
 - **Glassmorphism UI** — No gradient blobs; clean surface-based glass effect with static background
 - **User Accounts** — Register/login via `gftvhello_users` + `gftvhello_sessions`

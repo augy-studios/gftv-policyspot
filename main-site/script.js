@@ -2926,12 +2926,108 @@ async function apiFetch(url, options = {}) {
 }
 
 /* ─── Event Listeners ─── */
+/* ─── Search ─── */
+function openSearch() {
+    openModal('search-modal');
+    const input = document.getElementById('search-input');
+    if (input) {
+        input.value = '';
+        renderSearchResults('');
+        input.focus();
+    }
+}
+
+function closeSearch() {
+    closeModal('search-modal');
+}
+
+function getSearchIndex() {
+    const items = [
+        { title: 'Home', sub: 'PolicySpot', href: '/', type: 'page' },
+        ...SITE_PAGES.map(p => ({ title: p.label, sub: 'Page', href: p.href, type: 'page' })),
+    ];
+    for (const [docKey, docSections] of Object.entries(docSectionsCache)) {
+        const doc = DOCS[docKey];
+        docSections.forEach(s => {
+            if (s.type === 'subsection') {
+                const parent = docSections.find(p => p.id === s.parent_id);
+                const parentSlug = parent?.slug || '';
+                items.push({ title: s.title, sub: doc.label, href: `${doc.urlBase}/${parentSlug}#${s.slug || s.id}`, type: 'section' });
+            } else {
+                items.push({ title: s.title, sub: doc.label, href: `${doc.urlBase}/${s.slug}`, type: 'section' });
+            }
+        });
+    }
+    return items;
+}
+
+const PAGE_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>`;
+const SECTION_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><line x1="8" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="6" x2="3.01" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="12" x2="3.01" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="18" x2="3.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+
+function buildResultItem(item, index) {
+    const btn = document.createElement('button');
+    btn.className = 'search-result-item';
+    btn.dataset.index = index;
+    btn.innerHTML = `
+        <span class="search-result-icon">${item.type === 'page' ? PAGE_ICON : SECTION_ICON}</span>
+        <span class="search-result-text">
+            <span class="search-result-title">${item.title}</span>
+            <span class="search-result-sub">${item.sub}</span>
+        </span>`;
+    btn.addEventListener('click', () => { closeSearch(); navigate(item.href); });
+    return btn;
+}
+
+function renderSearchResults(query) {
+    const container = document.getElementById('search-results');
+    if (!container) return;
+    const clearBtn = document.getElementById('search-clear');
+    if (clearBtn) clearBtn.hidden = !query;
+    const index = getSearchIndex();
+    const results = query.trim()
+        ? index.filter(i => i.title.toLowerCase().includes(query.toLowerCase()) || i.sub.toLowerCase().includes(query.toLowerCase())).slice(0, 10)
+        : index.filter(i => i.type === 'page');
+    container.innerHTML = '';
+    if (query.trim() && !results.length) {
+        container.innerHTML = `<div class="search-empty">No results for "<strong>${query}</strong>"</div>`;
+        return;
+    }
+    results.forEach((item, i) => container.appendChild(buildResultItem(item, i)));
+}
+
 function setupEventListeners() {
     document.getElementById('theme-btn')?.addEventListener('click', () => openModal('theme-modal'));
+    document.getElementById('search-btn')?.addEventListener('click', openSearch);
+    document.getElementById('sidebar-search-btn')?.addEventListener('click', () => { closeSidebar(); openSearch(); });
     document.getElementById('menu-btn')?.addEventListener('click', toggleSidebar);
     document.getElementById('sidebar-close')?.addEventListener('click', closeSidebar);
     document.getElementById('sidebar-overlay')?.addEventListener('click', closeSidebar);
     document.getElementById('login-btn')?.addEventListener('click', () => openModal('auth-modal'));
+
+    document.getElementById('search-input')?.addEventListener('input', e => renderSearchResults(e.target.value));
+    document.getElementById('search-clear')?.addEventListener('click', () => {
+        const input = document.getElementById('search-input');
+        if (input) { input.value = ''; input.focus(); renderSearchResults(''); }
+    });
+    document.getElementById('search-input')?.addEventListener('keydown', e => {
+        const items = document.querySelectorAll('.search-result-item');
+        const focused = document.querySelector('.search-result-item.focused');
+        let idx = focused ? parseInt(focused.dataset.index) : -1;
+        if (e.key === 'Escape') { closeSearch(); return; }
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            idx = Math.min(idx + 1, items.length - 1);
+            items.forEach((item, i) => item.classList.toggle('focused', i === idx));
+            items[idx]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            idx = Math.max(idx - 1, 0);
+            items.forEach((item, i) => item.classList.toggle('focused', i === idx));
+            items[idx]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'Enter') {
+            document.querySelector('.search-result-item.focused')?.click();
+        }
+    });
 
     document.querySelectorAll('.nav-link').forEach(l => {
         l.addEventListener('click', e => {
