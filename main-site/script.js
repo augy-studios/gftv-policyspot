@@ -722,6 +722,21 @@ function renderMarkdown(md) {
     html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
     html = html.replace(/__(.+?)__/g, '<u>$1</u>');
     html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+    // Embeds: {{embed: url}}
+    html = html.replace(/\{\{embed:\s*(https?:\/\/[^}]+)\}\}/g, (_, rawUrl) => {
+        const url = rawUrl.trim();
+        if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url))
+            return `<audio class="section-audio" controls src="${url}"></audio>`;
+        if (/\.pdf(\?.*)?$/i.test(url))
+            return `<iframe class="section-embed section-embed-pdf" src="${url}" loading="lazy"></iframe>`;
+        if (url.includes('docs.google.com/document/'))
+            return `<iframe class="section-embed section-embed-gdoc" src="${url.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
+        if (url.includes('docs.google.com/spreadsheets/'))
+            return `<iframe class="section-embed section-embed-gsheet" src="${url.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
+        if (url.includes('docs.google.com/presentation/'))
+            return `<iframe class="section-embed section-embed-gslide" src="${url.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`;
+        return `<iframe class="section-embed" src="${url}" loading="lazy" allowfullscreen></iframe>`;
+    });
     // Images (must come before links so ![alt](url) isn't partially matched)
     html = html.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, (_, alt, src) =>
         alt ? `<figure class="section-img-figure"><img class="section-img" src="${src}" alt="${alt}"><figcaption class="section-img-caption">${alt}</figcaption></figure>`
@@ -1531,15 +1546,7 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
         case 'i':
             e.preventDefault();
             if (e.shiftKey) {
-                editorSaveState(ta);
-                const start = ta.selectionStart;
-                const sel   = ta.value.substring(start, ta.selectionEnd);
-                const alt   = sel || 'img';
-                const md    = `![${alt}](url)`;
-                ta.value = ta.value.substring(0, start) + md + ta.value.substring(ta.selectionEnd);
-                ta.selectionStart = start + alt.length + 4;
-                ta.selectionEnd   = start + alt.length + 7;
-                ta.focus();
+                openImagePicker(ta);
             } else {
                 applyMarkdownFormat(ta, '*', '*');
             }
@@ -1576,7 +1583,12 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
 });
 
 /* ─── Image Picker (Ctrl+Shift+I) ─── */
-const imgPicker = { ta: null, cursorPos: 0, selectedUrl: null, compressed: null, originalFile: null };
+const imgPicker = {
+    ta: null, cursorPos: 0,
+    selectedUrl: null, compressed: null, originalFile: null,
+    docFile: null, selectedDocUrl: null, selectedDocName: null,
+    sndFile: null, selectedSndUrl: null, selectedSndName: null,
+};
 
 // Client-side compression via Canvas. Returns { base64, mime, width, height, size }.
 function compressImage(file, maxWidth = 1920, quality = 0.82) {
@@ -1615,11 +1627,23 @@ function openImagePicker(ta) {
     imgPicker.compressed   = null;
     imgPicker.originalFile = null;
 
+    imgPicker.docFile = null; imgPicker.selectedDocUrl = null; imgPicker.selectedDocName = null;
+    imgPicker.sndFile = null; imgPicker.selectedSndUrl = null; imgPicker.selectedSndName = null;
+
     // Reset upload pane
     document.getElementById('img-drop-zone').hidden    = false;
     document.getElementById('img-preview-wrap').hidden = true;
     document.getElementById('img-alt-upload').value    = '';
     document.getElementById('img-insert-btn').disabled = true;
+
+    // Reset doc/snd/embed panes
+    document.getElementById('doc-drop-zone').hidden  = false;
+    document.getElementById('doc-file-ready').hidden = true;
+    document.getElementById('snd-drop-zone').hidden  = false;
+    document.getElementById('snd-file-ready').hidden = true;
+    document.getElementById('embed-url-input').value = '';
+    document.getElementById('embed-type-badge').hidden = true;
+
     switchImgTab('upload');
     openModal('image-picker-modal');
 }
@@ -1627,7 +1651,9 @@ function openImagePicker(ta) {
 function switchImgTab(tab) {
     document.querySelectorAll('.img-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     document.querySelectorAll('.img-tab-pane').forEach(p => p.classList.toggle('hidden', p.id !== `img-pane-${tab}`));
-    if (tab === 'library') loadImageLibrary();
+    if (tab === 'library')   loadImageLibrary();
+    if (tab === 'documents') loadDocumentLibrary();
+    if (tab === 'sounds')    loadSoundLibrary();
 }
 
 let libraryLoaded = false;
@@ -1665,6 +1691,145 @@ async function loadImageLibrary() {
         });
         grid.appendChild(tile);
     });
+}
+
+let docsLoaded = false;
+async function loadDocumentLibrary() {
+    const list = document.getElementById('doc-library-list');
+    if (docsLoaded) return;
+    list.innerHTML = '<p class="media-library-empty">Loading&hellip;</p>';
+    const res = await apiFetch('/api/policy/documents');
+    docsLoaded = true;
+    if (!res.ok || !res.documents?.length) {
+        list.innerHTML = '<p class="media-library-empty">No documents uploaded yet.</p>';
+        return;
+    }
+    list.innerHTML = '';
+    res.documents.forEach(doc => {
+        const row = document.createElement('div');
+        row.className = 'media-file-row';
+        const kb  = Math.round(doc.file_size / 1024);
+        const ext = doc.filename.split('.').pop().toUpperCase();
+        row.innerHTML = `
+            <span class="media-file-ext">${ext}</span>
+            <span class="media-file-row-name" title="${doc.filename}">${doc.filename}</span>
+            <span class="media-file-row-size">${kb} KB</span>`;
+        row.addEventListener('click', () => {
+            document.querySelectorAll('#doc-library-list .media-file-row').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+            imgPicker.selectedDocUrl  = doc.public_url;
+            imgPicker.selectedDocName = doc.filename;
+            imgPicker.docFile = null;
+            document.getElementById('doc-drop-zone').hidden  = false;
+            document.getElementById('doc-file-ready').hidden = true;
+            document.getElementById('img-insert-btn').disabled = false;
+        });
+        list.appendChild(row);
+    });
+}
+
+let soundsLoaded = false;
+async function loadSoundLibrary() {
+    const list = document.getElementById('snd-library-list');
+    if (soundsLoaded) return;
+    list.innerHTML = '<p class="media-library-empty">Loading&hellip;</p>';
+    const res = await apiFetch('/api/policy/sounds');
+    soundsLoaded = true;
+    if (!res.ok || !res.sounds?.length) {
+        list.innerHTML = '<p class="media-library-empty">No audio files uploaded yet.</p>';
+        return;
+    }
+    list.innerHTML = '';
+    res.sounds.forEach(snd => {
+        const row = document.createElement('div');
+        row.className = 'media-file-row';
+        const kb  = Math.round(snd.file_size / 1024);
+        const ext = snd.filename.split('.').pop().toUpperCase();
+        row.innerHTML = `
+            <span class="media-file-ext">${ext}</span>
+            <span class="media-file-row-name" title="${snd.filename}">${snd.filename}</span>
+            <span class="media-file-row-size">${kb} KB</span>`;
+        row.addEventListener('click', () => {
+            document.querySelectorAll('#snd-library-list .media-file-row').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+            imgPicker.selectedSndUrl  = snd.public_url;
+            imgPicker.selectedSndName = snd.filename;
+            imgPicker.sndFile = null;
+            document.getElementById('snd-drop-zone').hidden  = false;
+            document.getElementById('snd-file-ready').hidden = true;
+            document.getElementById('img-insert-btn').disabled = false;
+        });
+        list.appendChild(row);
+    });
+}
+
+function handleDocFileSelected(file) {
+    if (!file) return;
+    imgPicker.docFile = file;
+    imgPicker.selectedDocUrl = null;
+    imgPicker.selectedDocName = null;
+    document.querySelectorAll('#doc-library-list .media-file-row').forEach(r => r.classList.remove('selected'));
+    document.getElementById('doc-drop-zone').hidden  = true;
+    document.getElementById('doc-file-ready').hidden = false;
+    document.getElementById('doc-file-name').textContent = file.name;
+    document.getElementById('doc-file-size').textContent = `${Math.round(file.size / 1024)} KB`;
+    document.getElementById('img-insert-btn').disabled = false;
+}
+
+function handleSndFileSelected(file) {
+    if (!file) return;
+    imgPicker.sndFile = file;
+    imgPicker.selectedSndUrl = null;
+    imgPicker.selectedSndName = null;
+    document.querySelectorAll('#snd-library-list .media-file-row').forEach(r => r.classList.remove('selected'));
+    document.getElementById('snd-drop-zone').hidden  = true;
+    document.getElementById('snd-file-ready').hidden = false;
+    document.getElementById('snd-file-name').textContent = file.name;
+    document.getElementById('snd-file-size').textContent = `${Math.round(file.size / 1024)} KB`;
+    document.getElementById('img-insert-btn').disabled = false;
+}
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload  = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function insertFileMarkdown(url, filename) {
+    const ta = imgPicker.ta;
+    if (!ta) return;
+    editorSaveState(ta);
+    const label = filename ? filename.replace(/\.[^.]+$/, '') : 'file';
+    const md    = `[${label}](${url})`;
+    const pos   = imgPicker.cursorPos;
+    ta.value          = ta.value.substring(0, pos) + md + ta.value.substring(pos);
+    ta.selectionStart = pos + md.length;
+    ta.selectionEnd   = pos + md.length;
+    ta.focus();
+}
+
+function insertEmbedMarkdown(url) {
+    const ta = imgPicker.ta;
+    if (!ta) return;
+    editorSaveState(ta);
+    const md  = `{{embed: ${url}}}`;
+    const pos = imgPicker.cursorPos;
+    ta.value          = ta.value.substring(0, pos) + md + ta.value.substring(pos);
+    ta.selectionStart = pos + md.length;
+    ta.selectionEnd   = pos + md.length;
+    ta.focus();
+}
+
+function getEmbedType(url) {
+    if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url))      return 'Audio Player';
+    if (/\.pdf(\?.*)?$/i.test(url))                          return 'PDF Viewer';
+    if (url.includes('docs.google.com/document/'))           return 'Google Doc';
+    if (url.includes('docs.google.com/spreadsheets/'))       return 'Google Sheet';
+    if (url.includes('docs.google.com/presentation/'))       return 'Google Slides';
+    return 'Embedded Frame';
 }
 
 async function handleImgFileSelected(file) {
@@ -1729,6 +1894,61 @@ dropZone?.addEventListener('drop', e => {
     if (file?.type.startsWith('image/')) handleImgFileSelected(file);
 });
 
+// Document browse, drop, clear
+document.getElementById('doc-browse-btn')?.addEventListener('click', () =>
+    document.getElementById('doc-file-input').click());
+document.getElementById('doc-file-input')?.addEventListener('change', e => {
+    handleDocFileSelected(e.target.files?.[0]);
+    e.target.value = '';
+});
+document.getElementById('doc-file-clear')?.addEventListener('click', () => {
+    imgPicker.docFile = null;
+    document.getElementById('doc-drop-zone').hidden  = false;
+    document.getElementById('doc-file-ready').hidden = true;
+    if (!imgPicker.selectedDocUrl) document.getElementById('img-insert-btn').disabled = true;
+});
+const docDropZone = document.getElementById('doc-drop-zone');
+docDropZone?.addEventListener('dragover', e => { e.preventDefault(); docDropZone.classList.add('drag-over'); });
+docDropZone?.addEventListener('dragleave', () => docDropZone.classList.remove('drag-over'));
+docDropZone?.addEventListener('drop', e => {
+    e.preventDefault();
+    docDropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleDocFileSelected(file);
+});
+
+// Embed URL input
+document.getElementById('embed-url-input')?.addEventListener('input', e => {
+    const url   = e.target.value.trim();
+    const badge = document.getElementById('embed-type-badge');
+    document.getElementById('img-insert-btn').disabled = !url;
+    if (url) { badge.hidden = false; badge.textContent = getEmbedType(url); }
+    else     { badge.hidden = true; }
+});
+
+// Sound browse, drop, clear
+document.getElementById('snd-browse-btn')?.addEventListener('click', () =>
+    document.getElementById('snd-file-input').click());
+document.getElementById('snd-file-input')?.addEventListener('change', e => {
+    handleSndFileSelected(e.target.files?.[0]);
+    e.target.value = '';
+});
+document.getElementById('snd-file-clear')?.addEventListener('click', () => {
+    imgPicker.sndFile = null;
+    document.getElementById('snd-drop-zone').hidden  = false;
+    document.getElementById('snd-file-ready').hidden = true;
+    if (!imgPicker.selectedSndUrl) document.getElementById('img-insert-btn').disabled = true;
+});
+const sndDropZone = document.getElementById('snd-drop-zone');
+sndDropZone?.addEventListener('dragover', e => { e.preventDefault(); sndDropZone.classList.add('drag-over'); });
+sndDropZone?.addEventListener('dragleave', () => sndDropZone.classList.remove('drag-over'));
+sndDropZone?.addEventListener('drop', e => {
+    e.preventDefault();
+    sndDropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleSndFileSelected(file);
+});
+
 // Insert button
 document.getElementById('img-insert-btn')?.addEventListener('click', async () => {
     const activeTab = document.querySelector('.img-tab-btn.active')?.dataset.tab;
@@ -1738,6 +1958,64 @@ document.getElementById('img-insert-btn')?.addEventListener('click', async () =>
         if (!imgPicker.selectedUrl) return;
         const alt = document.getElementById('img-alt-library').value.trim();
         insertImageMarkdown(imgPicker.selectedUrl, alt);
+        closeModal('image-picker-modal');
+        return;
+    }
+
+    if (activeTab === 'documents') {
+        if (imgPicker.selectedDocUrl) {
+            insertEmbedMarkdown(imgPicker.selectedDocUrl);
+            closeModal('image-picker-modal');
+            return;
+        }
+        if (!imgPicker.docFile) return;
+        btn.disabled = true; btn.textContent = 'Uploading…';
+        try {
+            const file   = imgPicker.docFile;
+            const data   = await fileToBase64(file);
+            const res    = await apiFetch('/api/policy/upload-document', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: file.name, mime_type: file.type, data }),
+            });
+            if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
+            docsLoaded = false;
+            insertEmbedMarkdown(res.url);
+            closeModal('image-picker-modal');
+            showToast('Document uploaded and inserted', 'success');
+        } catch (e) { showToast('Upload error: ' + (e?.message || 'Unknown'), 'error'); }
+        finally { btn.disabled = false; btn.textContent = 'Insert'; }
+        return;
+    }
+
+    if (activeTab === 'sounds') {
+        if (imgPicker.selectedSndUrl) {
+            insertEmbedMarkdown(imgPicker.selectedSndUrl);
+            closeModal('image-picker-modal');
+            return;
+        }
+        if (!imgPicker.sndFile) return;
+        btn.disabled = true; btn.textContent = 'Uploading…';
+        try {
+            const file   = imgPicker.sndFile;
+            const data   = await fileToBase64(file);
+            const res    = await apiFetch('/api/policy/upload-sound', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: file.name, mime_type: file.type, data }),
+            });
+            if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
+            soundsLoaded = false;
+            insertEmbedMarkdown(res.url);
+            closeModal('image-picker-modal');
+            showToast('Audio uploaded and inserted', 'success');
+        } catch (e) { showToast('Upload error: ' + (e?.message || 'Unknown'), 'error'); }
+        finally { btn.disabled = false; btn.textContent = 'Insert'; }
+        return;
+    }
+
+    if (activeTab === 'embeds') {
+        const url = document.getElementById('embed-url-input').value.trim();
+        if (!url) return;
+        insertEmbedMarkdown(url);
         closeModal('image-picker-modal');
         return;
     }
@@ -2205,6 +2483,36 @@ document.querySelectorAll('.modal-overlay').forEach(overlay =>
     overlay.addEventListener('click', e => {
         if (e.target === overlay) closeModal(overlay.id);
     }));
+
+/* ─── Image Lightbox ─── */
+(function () {
+    const overlay = document.getElementById('lightbox-overlay');
+    const img     = document.getElementById('lightbox-img');
+    if (!overlay || !img) return;
+
+    function openLightbox(src, alt) {
+        img.src = src;
+        img.alt = alt || '';
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+        overlay.hidden = true;
+        img.src = '';
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('lightbox-close')?.addEventListener('click', closeLightbox);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeLightbox(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) closeLightbox(); });
+
+    // Delegate: clicks on any .section-img or figure img
+    document.addEventListener('click', e => {
+        const el = e.target.closest('.section-img, .section-img-figure img');
+        if (!el) return;
+        openLightbox(el.src, el.alt);
+    });
+}());
 
 /* ─── Toast ─── */
 function showToast(msg, type = '') {

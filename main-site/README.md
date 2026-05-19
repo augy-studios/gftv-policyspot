@@ -22,26 +22,35 @@ gftv-policyspot/
 │   │   │   └── totp-verify.js    POST /api/auth/totp-verify
 │   │   ├── policy/
 │   │   │   ├── join/
-│   │   │   │   ├── section.js    GET  /api/policy/join/section?slug=...
-│   │   │   │   └── sections.js   GET  /api/policy/join/sections
+│   │   │   │   ├── section.js        GET  /api/policy/join/section?slug=...
+│   │   │   │   └── sections.js       GET  /api/policy/join/sections
 │   │   │   ├── news/
-│   │   │   │   ├── section.js    GET  /api/policy/news/section?slug=...
-│   │   │   │   └── sections.js   GET  /api/policy/news/sections
+│   │   │   │   ├── section.js        GET  /api/policy/news/section?slug=...
+│   │   │   │   └── sections.js       GET  /api/policy/news/sections
 │   │   │   ├── prs/
-│   │   │   │   ├── section.js    GET  /api/policy/prs/section?slug=...
-│   │   │   │   └── sections.js   GET  /api/policy/prs/sections
+│   │   │   │   ├── section.js        GET  /api/policy/prs/section?slug=...
+│   │   │   │   └── sections.js       GET  /api/policy/prs/sections
 │   │   │   ├── rules/
-│   │   │   │   ├── section.js    GET  /api/policy/rules/section?slug=...
-│   │   │   │   └── sections.js   GET  /api/policy/rules/sections
-│   │   │   ├── add-section.js    POST   /api/policy/add-section (admin/editor)
-│   │   │   ├── delete-section.js DELETE /api/policy/delete-section (admin/editor)
-│   │   │   ├── reorder-section.js PUT   /api/policy/reorder-section (admin/editor)
-│   │   │   ├── section.js        GET    /api/policy/section?slug=...
-│   │   │   ├── sections.js       GET    /api/policy/sections
-│   │   │   ├── update-section.js PUT    /api/policy/update-section (admin/editor)
-│   │   │   └── update-slug.js    PUT    /api/policy/update-slug (admin/editor)
+│   │   │   │   ├── section.js        GET  /api/policy/rules/section?slug=...
+│   │   │   │   └── sections.js       GET  /api/policy/rules/sections
+│   │   │   ├── add-section.js        POST   /api/policy/add-section (admin/editor)
+│   │   │   ├── delete-section.js     DELETE /api/policy/delete-section (admin/editor)
+│   │   │   ├── documents.js          GET    /api/policy/documents (admin)
+│   │   │   ├── images.js             GET    /api/policy/images (admin)
+│   │   │   ├── manage-image.js       DELETE/PATCH /api/policy/manage-image (admin)
+│   │   │   ├── reorder-section.js    PUT    /api/policy/reorder-section (admin/editor)
+│   │   │   ├── section.js            GET    /api/policy/section?slug=...
+│   │   │   ├── section-views.js      POST   /api/policy/section-views
+│   │   │   ├── sections.js           GET    /api/policy/sections
+│   │   │   ├── sounds.js             GET    /api/policy/sounds (admin)
+│   │   │   ├── track-visit.js        POST   /api/policy/track-visit
+│   │   │   ├── update-section.js     PUT    /api/policy/update-section (admin/editor)
+│   │   │   ├── update-slug.js        PUT    /api/policy/update-slug (admin/editor)
+│   │   │   ├── upload-document.js    POST   /api/policy/upload-document (admin)
+│   │   │   ├── upload-image.js       POST   /api/policy/upload-image (admin)
+│   │   │   └── upload-sound.js       POST   /api/policy/upload-sound (admin)
 │   │   └── admin/
-│   │       └── users.js          GET/PUT /api/admin/users (admin)
+│   │       └── users.js              GET/PUT /api/admin/users (admin)
 │   ├── images/
 │   │   ├── screenshot_1.png
 │   │   └── screenshot_2.png
@@ -86,9 +95,91 @@ gftv-policyspot/
   - `/the-charter/article-i#name` — Deep-link anchor to a specific subsection
 - **Slug Editing** — Admin/editor users can customise any page's URL slug in-app
 - **Copy Toolbar** — Copy as Markdown for LLMs, view as plain text, export as PDF (browser print), open in ChatGPT, open in Claude
+- **Media Library** — Upload and manage images (`policy-images`), documents/PDFs (`policy-documents`), and audio files (`policy-sounds`) from the "Insert Media" picker in the editor
+- **Rich Embeds** — `{{embed: url}}` markdown syntax renders inline audio players, PDF viewers, Google Docs/Sheets/Slides iframes, and generic iframes
+- **Image Lightbox** — Clicking any image in section content opens it full-screen in a lightbox overlay
 - **Admin Panel** — User approval, role management (admin/editor), database seeder
 - **PWA** — Installable, offline-capable via service worker
 - **Buy Augy a Coffee** — Coffee button in header linking to Stripe donation page
+
+---
+
+## Editor Keyboard Shortcuts
+
+These shortcuts work inside the content editor textarea (admin/editor role):
+
+| Shortcut | Action |
+| --- | --- |
+| `Ctrl+B` | Bold (`**text**`) |
+| `Ctrl+I` | Italic (`*text*`) |
+| `Ctrl+U` | Underline (`__text__`) |
+| `Ctrl+K` | Insert link (`[text](url)`) |
+| `Ctrl+Shift+I` | Open Insert Media modal (images, documents, audio, embeds) |
+| `Ctrl+`` ` `` ` | Inline code (`` `text` ``) |
+| `Ctrl+Z` | Undo |
+| `Ctrl+Y` | Redo |
+| `Ctrl+S` | Save section |
+
+### Insert Media modal tabs
+
+| Tab | Inserts | Formats |
+| --- | --- | --- |
+| Upload New | `![alt](url)` or caption figure | JPG, PNG, GIF, WebP — max 8 MB, auto-compressed |
+| Images | `![alt](url)` from library | — |
+| Documents | `{{embed: url}}` (PDF viewer) | PDF, DOCX — max 20 MB |
+| Sounds | `{{embed: url}}` (audio player) | MP3, AAC, M4A — max 20 MB |
+| Embeds | `{{embed: url}}` | Google Docs, Sheets, Slides, PDF, audio, any iframe URL |
+
+### Embed syntax
+
+Paste `{{embed: <url>}}` anywhere in markdown content. The renderer auto-detects:
+
+- `.mp3 / .aac / .m4a` → `<audio controls>`
+- `.pdf` → PDF `<iframe>`
+- `docs.google.com/document/` → Google Doc preview
+- `docs.google.com/spreadsheets/` → Google Sheet preview
+- `docs.google.com/presentation/` → Google Slides embed
+- Anything else → generic `<iframe>`
+
+---
+
+## Supabase Setup
+
+### Storage buckets (create as **public** buckets)
+
+| Bucket | Used for |
+| --- | --- |
+| `policy-images` | Uploaded images (JPG, PNG, GIF, WebP) |
+| `policy-documents` | Uploaded documents (PDF, DOCX) |
+| `policy-sounds` | Uploaded audio files (MP3, AAC, M4A) |
+
+### Database tables
+
+In addition to the existing policy tables, create:
+
+```sql
+-- Document catalogue
+create table gftvpolicy_documents (
+  id            uuid primary key default gen_random_uuid(),
+  filename      text not null,
+  storage_path  text not null,
+  public_url    text not null,
+  mime_type     text not null,
+  file_size     int  not null,
+  uploaded_at   timestamptz default now()
+);
+
+-- Sound catalogue
+create table gftvpolicy_sounds (
+  id            uuid primary key default gen_random_uuid(),
+  filename      text not null,
+  storage_path  text not null,
+  public_url    text not null,
+  mime_type     text not null,
+  file_size     int  not null,
+  uploaded_at   timestamptz default now()
+);
+```
 
 ---
 
