@@ -23,6 +23,11 @@ const DOCS = {
         contentEl:   'news-content',
         breadcrumbEl:'news-breadcrumb',
         navFooterEl: 'news-nav-footer',
+        hero: {
+            badge: 'Edition 2023',
+            title: 'News Standards // 新闻报道标准',
+            sub:   'The editorial and journalistic standards of Global Furry Television',
+        },
     },
     prs: {
         apiSections: '/api/policy/prs/sections',
@@ -34,6 +39,11 @@ const DOCS = {
         contentEl:   'prs-content',
         breadcrumbEl:'prs-breadcrumb',
         navFooterEl: 'prs-nav-footer',
+        hero: {
+            badge: 'Edition 2023',
+            title: 'Programme Rating System // 节目制度系统',
+            sub:   'The programme classification and content rating framework of Global Furry Television',
+        },
     },
     rules: {
         apiSections: '/api/policy/rules/sections',
@@ -45,6 +55,11 @@ const DOCS = {
         contentEl:   'rules-content',
         breadcrumbEl:'rules-breadcrumb',
         navFooterEl: 'rules-nav-footer',
+        hero: {
+            badge: 'Edition 2023',
+            title: 'Community Rules',
+            sub:   'The community conduct and participation standards of Global Furry Television',
+        },
     },
     join: {
         apiSections: '/api/policy/join/sections',
@@ -463,12 +478,40 @@ async function renderDocIndex() {
     const urlBase = doc.urlBase;
     const pages = topLevelPages();
 
+    const firstPage = pages[0];
+    const heroHtml = doc.hero ? `
+    <section class="hero glass-card">
+        <div class="hero-body">
+            <div class="hero-badge">${doc.hero.badge}</div>
+            <h1 class="hero-title">${doc.hero.title}</h1>
+            <p class="hero-sub">${doc.hero.sub}</p>
+            <div class="hero-actions">
+                <a href="${doc.urlBase}" class="btn btn-primary" data-navlink>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/>
+                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>
+                    Read the Document
+                </a>
+                ${firstPage ? `<a href="${doc.urlBase}/${firstPage.slug}" class="btn btn-ghost" data-navlink>Start Reading</a>` : ''}
+            </div>
+        </div>
+        <div class="hero-graphic">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="100" height="100" rx="16" fill="var(--brand)" opacity="0.15"/>
+                <rect x="24" y="24" width="72" height="72" rx="10" fill="var(--brand)" opacity="0.25"/>
+                <line x1="36" y1="46" x2="84" y2="46" stroke="var(--brand)" stroke-width="3" stroke-linecap="round"/>
+                <line x1="36" y1="60" x2="84" y2="60" stroke="var(--brand)" stroke-width="3" stroke-linecap="round"/>
+                <line x1="36" y1="74" x2="66" y2="74" stroke="var(--brand)" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+        </div>
+    </section>` : '';
+
     contentEl.innerHTML = `
     <div class="section-content-inner">
-      <div class="section-header">
+      ${doc.hero ? heroHtml : `<div class="section-header">
         ${currentUser && (currentUser.is_admin || currentUser.is_editor) ? '<div class="section-type-badge">Document</div>' : ''}
         <h1 class="section-heading">${doc.label}</h1>
-      </div>
+      </div>`}
       <section class="section-grid">
         <h2 class="section-title">Most Viewed Pages</h2>
         <div class="card-grid" id="doc-index-cards">
