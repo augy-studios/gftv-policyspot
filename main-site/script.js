@@ -637,6 +637,7 @@ function renderArticlePage(article, activeAnchor) {
 
     html += `</div>`;
     contentEl.innerHTML = html;
+    initBlobMedia(contentEl);
 
     if (canEditSlug) {
         contentEl.querySelectorAll('.edit-slug-btn').forEach(btn => {
@@ -684,6 +685,7 @@ function renderStandalonePage(section) {
       </div>
       <div class="section-body" id="section-body-content">${renderMarkdown(section.content || '')}</div>
     </div>`;
+    initBlobMedia(contentEl);
 
     if (canEditSlug) {
         contentEl.querySelector('.edit-slug-btn')?.addEventListener('click', () => openSlugModal(section));
@@ -726,7 +728,7 @@ function renderMarkdown(md) {
     html = html.replace(/\{\{embed:\s*(https?:\/\/[^}]+)\}\}/g, (_, rawUrl) => {
         const url = rawUrl.trim();
         if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url))
-            return `<audio class="section-audio" controls src="${url}"></audio>`;
+            return `<audio class="section-audio" controls data-blob-src="${url}"></audio>`;
         if (/\.pdf(\?.*)?$/i.test(url))
             return `<iframe class="section-embed section-embed-pdf" src="${url}" loading="lazy"></iframe>`;
         if (url.includes('docs.google.com/document/'))
@@ -746,7 +748,7 @@ function renderMarkdown(md) {
                 : `<img class="section-img" src="${src}" alt="">`;
         }
         if (type === 'audio')
-            return `<audio class="section-audio" controls src="${src}"></audio>`;
+            return `<audio class="section-audio" controls data-blob-src="${src}"></audio>`;
         if (type === 'doc') {
             const filename = alt || src.split('/').pop();
             const ext = filename.split('.').pop().toUpperCase();
@@ -767,7 +769,7 @@ function renderMarkdown(md) {
               </div>
               <div class="doc-card-actions">
                 <a class="btn btn-sm btn-ghost doc-card-btn" href="${src}" download="${filename}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</a>
-                <a class="btn btn-sm btn-ghost doc-card-btn" href="${src}" target="_blank" rel="noopener noreferrer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open</a>
+                <button class="btn btn-sm btn-ghost doc-card-btn" onclick="openAsBlob('${src}','${filename}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open</button>
               </div>
             </div>`;
         }
@@ -2292,6 +2294,30 @@ async function loadAdminImages(force = false) {
 window.copyImageUrl = function(url) {
     navigator.clipboard.writeText(url).then(() => showToast('URL copied to clipboard', 'success'));
 };
+
+window.openAsBlob = async function(url, filename) {
+    try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+    } catch {
+        window.open(url, '_blank');
+    }
+};
+
+function initBlobMedia(container) {
+    container.querySelectorAll('audio[data-blob-src]').forEach(async el => {
+        try {
+            const url = el.dataset.blobSrc;
+            const res = await fetch(url);
+            const blob = await res.blob();
+            el.src = URL.createObjectURL(blob);
+        } catch {
+            el.src = el.dataset.blobSrc;
+        }
+    });
+}
 
 /* ─── Delete Image Modal ─── */
 {
