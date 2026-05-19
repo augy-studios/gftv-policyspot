@@ -1195,6 +1195,11 @@ details[open] > .md-collapse-summary::before {
   border-top: 1px solid var(--border);
 }
 
+mark {
+  background: none;
+  padding: 0;
+}
+
 .section-body .section-embed-pdf  { min-height: 520px; }
 .section-body .section-embed-gslide { min-height: 460px; aspect-ratio: 16/9; }
 
