@@ -27,12 +27,18 @@ gftv-policyspot/
 │   │   │   ├── news/
 │   │   │   │   ├── section.js        GET  /api/policy/news/section?slug=...
 │   │   │   │   └── sections.js       GET  /api/policy/news/sections
+│   │   │   ├── privacy/
+│   │   │   │   ├── section.js        GET  /api/policy/privacy/section?slug=...
+│   │   │   │   └── sections.js       GET  /api/policy/privacy/sections
 │   │   │   ├── prs/
 │   │   │   │   ├── section.js        GET  /api/policy/prs/section?slug=...
 │   │   │   │   └── sections.js       GET  /api/policy/prs/sections
 │   │   │   ├── rules/
 │   │   │   │   ├── section.js        GET  /api/policy/rules/section?slug=...
 │   │   │   │   └── sections.js       GET  /api/policy/rules/sections
+│   │   │   ├── terms/
+│   │   │   │   ├── section.js        GET  /api/policy/terms/section?slug=...
+│   │   │   │   └── sections.js       GET  /api/policy/terms/sections
 │   │   │   ├── add-section.js        POST   /api/policy/add-section (admin/editor)
 │   │   │   ├── delete-section.js     DELETE /api/policy/delete-section (admin/editor)
 │   │   │   ├── documents.js          GET    /api/policy/documents (admin)
@@ -87,7 +93,7 @@ gftv-policyspot/
 ## Features
 
 - **SPA Router** — Hash-free client-side routing using History API
-- **7 Themes** — Classic mint, 5 non-green variants, and white; persisted via localStorage
+- **2 Themes** — Classic Light, HelloTheme; persisted via localStorage
 - **Glassmorphism UI** — No gradient blobs; clean surface-based glass effect with static background
 - **User Accounts** — Register/login via `gftvhello_users` + `gftvhello_sessions`
 - **Gitbook-matching URLs** — URL pattern mirrors the live Gitbook at `policy.globalfurry.tv`:
@@ -95,6 +101,7 @@ gftv-policyspot/
   - `/the-charter/citation` — Standalone page
   - `/the-charter/article-i` — Article I with all subsections rendered inline
   - `/the-charter/article-i#name` — Deep-link anchor to a specific subsection
+- **Legal pages** — `/terms` (Terms of Service) and `/privacy` (Privacy Policy), each backed by their own Supabase table (`gftvpolicy_terms`, `gftvpolicy_privacy`) and fully editable by admins via the same section system; linked from the About page
 - **Slug Editing** — Admin/editor users can customise any page's URL slug in-app
 - **Copy Toolbar** — Copy as Markdown for LLMs, view as plain text, export as PDF (browser print), open in ChatGPT, open in Claude
 - **Media Library** — Upload and manage images (`policy-images`), documents/PDFs (`policy-documents`), and audio files (`policy-sounds`) from the "Insert Media" picker in the editor
@@ -149,51 +156,11 @@ Documents inserted from the media library use `![filename]{doc}(url)` and render
 
 ---
 
-## Supabase Setup
-
-### Storage buckets (create as **public** buckets)
-
-| Bucket | Used for |
-| --- | --- |
-| `policy-images` | Uploaded images (JPG, PNG, GIF, WebP) |
-| `policy-documents` | Uploaded documents (PDF, DOCX) |
-| `policy-sounds` | Uploaded audio files (MP3, AAC, M4A) |
-
-### Database tables
-
-In addition to the existing policy tables, create:
-
-```sql
--- Document catalogue
-create table gftvpolicy_documents (
-  id            uuid primary key default gen_random_uuid(),
-  filename      text not null,
-  storage_path  text not null,
-  public_url    text not null,
-  mime_type     text not null,
-  file_size     int  not null,
-  uploaded_at   timestamptz default now()
-);
-
--- Sound catalogue
-create table gftvpolicy_sounds (
-  id            uuid primary key default gen_random_uuid(),
-  filename      text not null,
-  storage_path  text not null,
-  public_url    text not null,
-  mime_type     text not null,
-  file_size     int  not null,
-  uploaded_at   timestamptz default now()
-);
-```
-
----
-
 ## Notes
 
 - Sessions are stored in `gftvhello_sessions` and persist across page refreshes via `localStorage` token.
 - No Supabase Auth is used — custom session management only.
-- Policy tables use the `gftvpolicy_` prefix: `gftvpolicy_charter`, `gftvpolicy_news`, `gftvpolicy_prs`, `gftvpolicy_rules`, `gftvpolicy_join`.
+- Policy tables use the `gftvpolicy_` prefix: `gftvpolicy_charter`, `gftvpolicy_news`, `gftvpolicy_prs`, `gftvpolicy_rules`, `gftvpolicy_join`, `gftvpolicy_terms`, `gftvpolicy_privacy`.
 - The table includes an `anchor` column (text, nullable) — this stores the `#fragment` id for subsection rows so they can be deep-linked within their parent article page (e.g. `anchor = 'name'` → `/the-charter/article-i#name`).
 - Article-type rows render all their subsections inline on one page; subsection rows have no standalone URL of their own.
 - PDF export uses the browser's native `window.print()` — no server-side PDF generation needed.

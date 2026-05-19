@@ -9,6 +9,8 @@ const TABLE_MAP = {
     prs:     'gftvpolicy_prs',
     rules:   'gftvpolicy_rules',
     join:    'gftvpolicy_join',
+    terms:   'gftvpolicy_terms',
+    privacy: 'gftvpolicy_privacy',
 };
 
 module.exports = async (req, res) => {
