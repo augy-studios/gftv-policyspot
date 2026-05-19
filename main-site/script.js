@@ -737,10 +737,28 @@ function renderMarkdown(md) {
             return `<iframe class="section-embed section-embed-gslide" src="${url.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`;
         return `<iframe class="section-embed" src="${url}" loading="lazy" allowfullscreen></iframe>`;
     });
-    // Images (must come before links so ![alt](url) isn't partially matched)
-    html = html.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, (_, alt, src) =>
-        alt ? `<figure class="section-img-figure"><img class="section-img" src="${src}" alt="${alt}"><figcaption class="section-img-caption">${alt}</figcaption></figure>`
-            : `<img class="section-img" src="${src}" alt="">`);
+    // Media: ![alt]{type}(url) — type is img|doc|audio|embed (optional, defaults to img)
+    html = html.replace(/!\[([^\]]*)\](?:\{(img|doc|audio|embed)\})?\((https?:\/\/[^)]+)\)/g, (_, alt, type, src) => {
+        type = type || 'img';
+        if (type === 'img') {
+            return alt
+                ? `<figure class="section-img-figure"><img class="section-img" src="${src}" alt="${alt}"><figcaption class="section-img-caption">${alt}</figcaption></figure>`
+                : `<img class="section-img" src="${src}" alt="">`;
+        }
+        if (type === 'audio')
+            return `<audio class="section-audio" controls src="${src}"></audio>`;
+        if (type === 'doc')
+            return `<iframe class="section-embed section-embed-pdf" src="${src}" loading="lazy"></iframe>`;
+        if (type === 'embed') {
+            if (src.includes('docs.google.com/document/'))
+                return `<iframe class="section-embed section-embed-gdoc" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
+            if (src.includes('docs.google.com/spreadsheets/'))
+                return `<iframe class="section-embed section-embed-gsheet" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`;
+            if (src.includes('docs.google.com/presentation/'))
+                return `<iframe class="section-embed section-embed-gslide" src="${src.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`;
+            return `<iframe class="section-embed" src="${src}" loading="lazy" allowfullscreen></iframe>`;
+        }
+    });
     // Links
     html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     // Inline code
@@ -1546,7 +1564,16 @@ document.getElementById('content-edit-content')?.addEventListener('keydown', e =
         case 'i':
             e.preventDefault();
             if (e.shiftKey) {
-                openImagePicker(ta);
+                editorSaveState(ta);
+                const _start = ta.selectionStart;
+                const _sel   = ta.value.substring(_start, ta.selectionEnd);
+                const _alt   = _sel || 'alt';
+                const _md    = `![${_alt}]{img}(url)`;
+                ta.value = ta.value.substring(0, _start) + _md + ta.value.substring(ta.selectionEnd);
+                const _urlStart = _start + `![${_alt}]{img}(`.length;
+                ta.selectionStart = _urlStart;
+                ta.selectionEnd   = _urlStart + 3;
+                ta.focus();
             } else {
                 applyMarkdownFormat(ta, '*', '*');
             }
@@ -1804,31 +1831,6 @@ function fileToBase64(file) {
     });
 }
 
-function insertFileMarkdown(url, filename) {
-    const ta = imgPicker.ta;
-    if (!ta) return;
-    editorSaveState(ta);
-    const label = filename ? filename.replace(/\.[^.]+$/, '') : 'file';
-    const md    = `[${label}](${url})`;
-    const pos   = imgPicker.cursorPos;
-    ta.value          = ta.value.substring(0, pos) + md + ta.value.substring(pos);
-    ta.selectionStart = pos + md.length;
-    ta.selectionEnd   = pos + md.length;
-    ta.focus();
-}
-
-function insertEmbedMarkdown(url) {
-    const ta = imgPicker.ta;
-    if (!ta) return;
-    editorSaveState(ta);
-    const md  = `{{embed: ${url}}}`;
-    const pos = imgPicker.cursorPos;
-    ta.value          = ta.value.substring(0, pos) + md + ta.value.substring(pos);
-    ta.selectionStart = pos + md.length;
-    ta.selectionEnd   = pos + md.length;
-    ta.focus();
-}
-
 function getEmbedType(url) {
     if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url))      return 'Audio Player';
     if (/\.pdf(\?.*)?$/i.test(url))                          return 'PDF Viewer';
@@ -1864,11 +1866,11 @@ async function handleImgFileSelected(file) {
     }
 }
 
-function insertImageMarkdown(url, alt) {
+function insertMediaMarkdown(url, alt, type) {
     const ta = imgPicker.ta;
     if (!ta) return;
     editorSaveState(ta);
-    const md  = `![${alt}](${url})`;
+    const md  = `![${alt || ''}]{${type}}(${url})`;
     const pos = imgPicker.cursorPos;
     ta.value          = ta.value.substring(0, pos) + md + ta.value.substring(pos);
     ta.selectionStart = pos + md.length;
@@ -1963,14 +1965,14 @@ document.getElementById('img-insert-btn')?.addEventListener('click', async () =>
     if (activeTab === 'library') {
         if (!imgPicker.selectedUrl) return;
         const alt = document.getElementById('img-alt-library').value.trim();
-        insertImageMarkdown(imgPicker.selectedUrl, alt);
+        insertMediaMarkdown(imgPicker.selectedUrl, alt, 'img');
         closeModal('image-picker-modal');
         return;
     }
 
     if (activeTab === 'documents') {
         if (imgPicker.selectedDocUrl) {
-            insertEmbedMarkdown(imgPicker.selectedDocUrl);
+            insertMediaMarkdown(imgPicker.selectedDocUrl, imgPicker.selectedDocName, 'doc');
             closeModal('image-picker-modal');
             return;
         }
@@ -1985,7 +1987,7 @@ document.getElementById('img-insert-btn')?.addEventListener('click', async () =>
             });
             if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
             docsLoaded = false;
-            insertEmbedMarkdown(res.url);
+            insertMediaMarkdown(res.url, file.name, 'doc');
             closeModal('image-picker-modal');
             showToast('Document uploaded and inserted', 'success');
         } catch (e) { showToast('Upload error: ' + (e?.message || 'Unknown'), 'error'); }
@@ -1995,7 +1997,7 @@ document.getElementById('img-insert-btn')?.addEventListener('click', async () =>
 
     if (activeTab === 'sounds') {
         if (imgPicker.selectedSndUrl) {
-            insertEmbedMarkdown(imgPicker.selectedSndUrl);
+            insertMediaMarkdown(imgPicker.selectedSndUrl, imgPicker.selectedSndName, 'audio');
             closeModal('image-picker-modal');
             return;
         }
@@ -2010,7 +2012,7 @@ document.getElementById('img-insert-btn')?.addEventListener('click', async () =>
             });
             if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
             soundsLoaded = false;
-            insertEmbedMarkdown(res.url);
+            insertMediaMarkdown(res.url, file.name, 'audio');
             closeModal('image-picker-modal');
             showToast('Audio uploaded and inserted', 'success');
         } catch (e) { showToast('Upload error: ' + (e?.message || 'Unknown'), 'error'); }
@@ -2021,7 +2023,7 @@ document.getElementById('img-insert-btn')?.addEventListener('click', async () =>
     if (activeTab === 'embeds') {
         const url = document.getElementById('embed-url-input').value.trim();
         if (!url) return;
-        insertEmbedMarkdown(url);
+        insertMediaMarkdown(url, '', 'embed');
         closeModal('image-picker-modal');
         return;
     }
@@ -2056,7 +2058,7 @@ document.getElementById('img-insert-btn')?.addEventListener('click', async () =>
 
         const alt = document.getElementById('img-alt-upload').value.trim()
                  || baseName.replace(/[_-]/g, ' ');
-        insertImageMarkdown(res.url, alt);
+        insertMediaMarkdown(res.url, alt, 'img');
         closeModal('image-picker-modal');
         showToast('Image uploaded and inserted', 'success');
     } catch (e) {
