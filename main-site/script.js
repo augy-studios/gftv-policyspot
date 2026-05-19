@@ -1310,12 +1310,19 @@ function setupCopyDropdown() {
             e.stopPropagation();
             const dd = btn.closest('.doc-actions').querySelector('.copy-dropdown');
             const isOpen = !dd.hidden;
-            document.querySelectorAll('.copy-dropdown').forEach(d => { d.hidden = true; });
-            dd.hidden = isOpen;
+            document.querySelectorAll('.copy-dropdown').forEach(d => { d.hidden = true; d.style.right = ''; d.style.left = ''; });
+            if (!isOpen) {
+                dd.hidden = false;
+                const rect = dd.getBoundingClientRect();
+                if (rect.left < 8) {
+                    dd.style.right = 'auto';
+                    dd.style.left = '0';
+                }
+            }
             return;
         }
         if (!e.target.closest('.copy-dropdown')) {
-            document.querySelectorAll('.copy-dropdown').forEach(d => { d.hidden = true; });
+            document.querySelectorAll('.copy-dropdown').forEach(d => { d.hidden = true; d.style.right = ''; d.style.left = ''; });
         }
     });
 
