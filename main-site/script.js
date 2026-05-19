@@ -2484,33 +2484,18 @@ document.querySelectorAll('.modal-overlay').forEach(overlay =>
         if (e.target === overlay) closeModal(overlay.id);
     }));
 
-/* ─── Image Lightbox ─── */
+/* ─── Image Lightbox Modal ─── */
 (function () {
-    const overlay = document.getElementById('lightbox-overlay');
-    const img     = document.getElementById('lightbox-img');
-    if (!overlay || !img) return;
+    const img = document.getElementById('lightbox-img');
+    if (!img) return;
 
-    function openLightbox(src, alt) {
-        img.src = src;
-        img.alt = alt || '';
-        overlay.hidden = false;
-        document.body.style.overflow = 'hidden';
-    }
-    function closeLightbox() {
-        overlay.hidden = true;
-        img.src = '';
-        document.body.style.overflow = '';
-    }
-
-    document.getElementById('lightbox-close')?.addEventListener('click', closeLightbox);
-    overlay.addEventListener('click', e => { if (e.target === overlay) closeLightbox(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) closeLightbox(); });
-
-    // Delegate: clicks on any .section-img or figure img
     document.addEventListener('click', e => {
         const el = e.target.closest('.section-img, .section-img-figure img');
         if (!el) return;
-        openLightbox(el.src, el.alt);
+        img.src = el.src;
+        img.alt = el.alt || '';
+        document.getElementById('lightbox-title').textContent = el.alt || '';
+        openModal('image-lightbox-modal');
     });
 }());
 
