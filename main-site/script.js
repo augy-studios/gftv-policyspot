@@ -517,19 +517,17 @@ async function renderDocIndex() {
           ${pages.map(() => '<div class="glass-card article-card skeleton"></div>').join('')}
         </div>
       </section>
-      <div class="section-content-inner">
-        <div class="section-body">
-          <h2>Table of Contents</h2>
-          <div class="toc-card-list">
-            ${pages.map(p => {
-              const children = subsectionsOf(p.id);
-              return `
-                <a href="${urlBase}/${p.slug}" class="toc-card-btn" data-href="${urlBase}/${p.slug}">
-                  <div class="toc-card-title">${p.number ? `<span class="card-num">${p.number} — </span>` : ''}${p.title}</div>
-                  ${children.length ? `<div class="toc-card-subs">${children.map(c => `<span class="toc-sub-item">${c.title}</span>`).join('')}</div>` : ''}
-                </a>`;
-            }).join('')}
-          </div>
+      <div class="section-body">
+        <h2>Table of Contents</h2>
+        <div class="toc-card-list">
+          ${pages.map(p => {
+            const children = subsectionsOf(p.id);
+            return `
+              <a href="${urlBase}/${p.slug}" class="toc-card-btn" data-href="${urlBase}/${p.slug}">
+                <div class="toc-card-title">${p.number ? `<span class="card-num">${p.number} — </span>` : ''}${p.title}</div>
+                ${children.length ? `<div class="toc-card-subs">${children.map(c => `<span class="toc-sub-item">${c.title}</span>`).join('')}</div>` : ''}
+              </a>`;
+          }).join('')}
         </div>
       </div>`;
 
