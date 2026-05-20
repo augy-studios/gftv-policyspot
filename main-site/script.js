@@ -507,31 +507,31 @@ async function renderDocIndex() {
     </section>` : '';
 
     contentEl.innerHTML = `
-    <div class="section-content-inner">
-      ${doc.hero ? heroHtml : `<div class="section-header">
+      ${doc.hero ? heroHtml : `<div class="section-content-inner"><div class="section-header">
         ${currentUser && (currentUser.is_admin || currentUser.is_editor) ? '<div class="section-type-badge">Document</div>' : ''}
         <h1 class="section-heading">${doc.label}</h1>
-      </div>`}
+      </div></div>`}
       <section class="section-grid">
         <h2 class="section-title">Most Viewed Pages</h2>
         <div class="card-grid" id="doc-index-cards">
           ${pages.map(() => '<div class="glass-card article-card skeleton"></div>').join('')}
         </div>
       </section>
-      <div class="section-body">
-        <h2>Table of Contents</h2>
-        <div class="toc-card-list">
-          ${pages.map(p => {
-            const children = subsectionsOf(p.id);
-            return `
-              <a href="${urlBase}/${p.slug}" class="toc-card-btn" data-href="${urlBase}/${p.slug}">
-                <div class="toc-card-title">${p.number ? `<span class="card-num">${p.number} — </span>` : ''}${p.title}</div>
-                ${children.length ? `<div class="toc-card-subs">${children.map(c => `<span class="toc-sub-item">${c.title}</span>`).join('')}</div>` : ''}
-              </a>`;
-          }).join('')}
+      <div class="section-content-inner">
+        <div class="section-body">
+          <h2>Table of Contents</h2>
+          <div class="toc-card-list">
+            ${pages.map(p => {
+              const children = subsectionsOf(p.id);
+              return `
+                <a href="${urlBase}/${p.slug}" class="toc-card-btn" data-href="${urlBase}/${p.slug}">
+                  <div class="toc-card-title">${p.number ? `<span class="card-num">${p.number} — </span>` : ''}${p.title}</div>
+                  ${children.length ? `<div class="toc-card-subs">${children.map(c => `<span class="toc-sub-item">${c.title}</span>`).join('')}</div>` : ''}
+                </a>`;
+            }).join('')}
+          </div>
         </div>
-      </div>
-    </div>`;
+      </div>`;
 
     contentEl.querySelectorAll('.toc-card-btn').forEach(a => {
         a.addEventListener('click', e => {
