@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Optional
 
 import discord
@@ -14,7 +15,7 @@ from utils.embeds import (
     build_section_embed,
     build_toc_embed,
     build_top_embed,
-    get_content_chunks,
+    get_content_chunks_and_image,
     section_label,
 )
 
@@ -30,6 +31,32 @@ DOC_CHOICES = [
 ]
 
 TOC_PER_PAGE = 10
+
+_EN_TITLE_RE = re.compile(r'^english$', re.IGNORECASE)
+_ZH_TITLE_RE = re.compile(r'^中文$|^chinese$', re.IGNORECASE)
+
+
+def _find_lang_siblings(sections: list[dict], idx: int) -> dict[str, int] | None:
+    """Return {'en': idx, 'zh': idx} if the section is a language variant with a sibling."""
+    sec = sections[idx]
+    title = (sec.get('title') or '').strip()
+    parent_id = sec.get('parent_id')
+    if parent_id is None:
+        return None
+    if not (_EN_TITLE_RE.search(title) or _ZH_TITLE_RE.search(title)):
+        return None
+    siblings: dict[str, int | None] = {'en': None, 'zh': None}
+    for i, s in enumerate(sections):
+        if s.get('parent_id') != parent_id:
+            continue
+        t = (s.get('title') or '').strip()
+        if _EN_TITLE_RE.search(t):
+            siblings['en'] = i
+        elif _ZH_TITLE_RE.search(t):
+            siblings['zh'] = i
+    if siblings['en'] is not None and siblings['zh'] is not None:
+        return siblings  # type: ignore[return-value]
+    return None
 
 
 async def _slug_autocomplete(
@@ -68,6 +95,8 @@ class PolicyBrowser(discord.ui.View):
         self.section_idx = 0
         self.content_page = 0
         self._chunks: list[str] = []
+        self._image_url: str | None = None
+        self._lang_siblings: dict[str, int] | None = None
         self.message: discord.Message | None = None
         self._rebuild()
 
@@ -81,7 +110,8 @@ class PolicyBrowser(discord.ui.View):
             )
         section = self.sections[self.section_idx]
         return build_section_embed(
-            section, self.doc, self.content_page + 1, len(self._chunks), self._chunks
+            section, self.doc, self.content_page + 1, len(self._chunks), self._chunks,
+            image_url=self._image_url,
         )
 
     # ── item builder ─────────────────────────────────────────────────────────
@@ -91,7 +121,10 @@ class PolicyBrowser(discord.ui.View):
         if self.mode == self.MODE_TOC:
             self._build_toc_items()
         else:
-            self._chunks = get_content_chunks(self.sections[self.section_idx])
+            self._chunks, self._image_url = get_content_chunks_and_image(
+                self.sections[self.section_idx]
+            )
+            self._lang_siblings = _find_lang_siblings(self.sections, self.section_idx)
             self._build_section_items()
 
     def _build_toc_items(self) -> None:
@@ -142,6 +175,28 @@ class PolicyBrowser(discord.ui.View):
         )
         toc_btn.callback = self._on_back_to_toc
         self.add_item(toc_btn)
+
+        # Language toggle buttons for bilingual sections (English / 中文 subsections)
+        if self._lang_siblings:
+            en_idx = self._lang_siblings.get('en')
+            zh_idx = self._lang_siblings.get('zh')
+            is_en = (self.section_idx == en_idx)
+
+            en_btn = discord.ui.Button(
+                label='🇬🇧 English',
+                style=discord.ButtonStyle.primary if is_en else discord.ButtonStyle.secondary,
+                row=0,
+            )
+            en_btn.callback = self._on_lang_en
+            self.add_item(en_btn)
+
+            zh_btn = discord.ui.Button(
+                label='🇨🇳 中文',
+                style=discord.ButtonStyle.primary if not is_en else discord.ButtonStyle.secondary,
+                row=0,
+            )
+            zh_btn.callback = self._on_lang_zh
+            self.add_item(zh_btn)
 
         if n_chunks > 1:
             cp_prev = discord.ui.Button(
@@ -235,6 +290,24 @@ class PolicyBrowser(discord.ui.View):
         await db.record_view(s['id'], self.doc, s['slug'])
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
 
+    async def _on_lang_en(self, interaction: discord.Interaction) -> None:
+        if self._lang_siblings and self._lang_siblings.get('en') is not None:
+            self.section_idx = self._lang_siblings['en']
+            self.content_page = 0
+            self._rebuild()
+            s = self.sections[self.section_idx]
+            await db.record_view(s['id'], self.doc, s['slug'])
+        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+
+    async def _on_lang_zh(self, interaction: discord.Interaction) -> None:
+        if self._lang_siblings and self._lang_siblings.get('zh') is not None:
+            self.section_idx = self._lang_siblings['zh']
+            self.content_page = 0
+            self._rebuild()
+            s = self.sections[self.section_idx]
+            await db.record_view(s['id'], self.doc, s['slug'])
+        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+
     async def on_timeout(self) -> None:
         for item in self.children:
             item.disabled = True
@@ -253,13 +326,14 @@ class SectionContentView(discord.ui.View):
         self.section = section
         self.doc = doc
         self.page = 0
-        self.chunks = get_content_chunks(section)
+        self.chunks, self.image_url = get_content_chunks_and_image(section)
         self.message: discord.Message | None = None
         self._rebuild()
 
     def get_embed(self) -> discord.Embed:
         return build_section_embed(
-            self.section, self.doc, self.page + 1, len(self.chunks), self.chunks
+            self.section, self.doc, self.page + 1, len(self.chunks), self.chunks,
+            image_url=self.image_url,
         )
 
     def _rebuild(self) -> None:

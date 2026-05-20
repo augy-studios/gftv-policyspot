@@ -25,6 +25,7 @@ from utils import (
     CATEGORIES,
     PAGE_SIZE,
     format_article_pages,
+    has_lang_subsections,
     kb_article,
     kb_articles,
     kb_cancel_home,
@@ -257,24 +258,31 @@ async def _show_articles(event, cat_code: str, page: int, sort: str) -> None:
     )
 
 
-async def _show_article(event, cat_code: str, slug: str, page: int) -> None:
+async def _show_article(event, cat_code: str, slug: str, page: int, lang: str = "all") -> None:
     article, subsections = await _fetch_article(cat_code, slug)
     if article is None:
         await event.answer("Article not found.", alert=True)
         return
 
-    pages = format_article_pages(article, subsections)
+    _has_lang = has_lang_subsections(subsections)
+    pages, image_urls = format_article_pages(article, subsections, lang)
     total = len(pages)
     page = max(0, min(page, total - 1))
 
     await event.edit(
         pages[page],
-        buttons=kb_article(cat_code, slug, page, total),
+        buttons=kb_article(cat_code, slug, page, total, has_lang=_has_lang, lang=lang),
         parse_mode="html",
     )
 
-    # Track views for article + all subsections on first open
+    # On first open: send image attachments and track views
     if page == 0:
+        for img_url in image_urls[:3]:
+            try:
+                await client.send_file(event.sender_id, img_url)
+            except Exception as exc:
+                logger.warning("Failed to send image %s: %s", img_url, exc)
+
         all_ids = [article["id"]] + [s["id"] for s in subsections]
         asyncio.create_task(_track_views(all_ids, CATEGORIES[cat_code]["doc"], slug))
 
@@ -372,10 +380,11 @@ async def on_callback(event: events.CallbackQuery.Event) -> None:
             await _show_articles(event, cat_code, int(page_s), sort)
 
         elif data.startswith("A|"):
-            # Split on first 3 pipes only (slug could theoretically contain |)
-            parts = data.split("|", 3)
-            _, cat_code, slug, page_s = parts
-            await _show_article(event, cat_code, slug, int(page_s))
+            # Format: A|cat|slug|page|lang  (lang defaults to "all" if absent)
+            parts = data.split("|", 4)
+            _, cat_code, slug, page_s = parts[:4]
+            lang = parts[4] if len(parts) > 4 else "all"
+            await _show_article(event, cat_code, slug, int(page_s), lang)
 
         elif data.startswith("SR|"):
             page = int(data.split("|")[1])
