@@ -1,5 +1,5 @@
 // Bump CACHE_VERSION on every deploy so stale caches are purged immediately.
-const CACHE_VERSION = 'v14';
+const CACHE_VERSION = 'v15';
 const CACHE = `gftv-policyspot-${CACHE_VERSION}`;
 
 const ASSETS = [

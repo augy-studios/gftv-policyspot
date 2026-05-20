@@ -56,9 +56,9 @@ const DOCS = {
         breadcrumbEl:'rules-breadcrumb',
         navFooterEl: 'rules-nav-footer',
         hero: {
-            badge: 'Edition 2023',
-            title: 'Community Rules',
-            sub:   'The community conduct and participation standards of Global Furry Television',
+            badge: 'Edition 2026',
+            title: 'Community Rules (CR) // 社区规则与条例',
+            sub:   'This document will serve as the reference for the rules and regulations that shall govern all communities under Global Furry Television.',
         },
     },
     join: {
