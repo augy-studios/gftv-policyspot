@@ -34,9 +34,10 @@ class PolicySpotBot(commands.Bot):
         assert self.user is not None
         log.info('Logged in as %s (ID: %s)', self.user, self.user.id)
         await self.change_presence(
+            status=discord.Status.online,
             activity=discord.Activity(
                 type=discord.ActivityType.watching,
-                name='GFTV policies',
+                name='GFTV communities',
             )
         )
 
