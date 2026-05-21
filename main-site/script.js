@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ─── Language & Translation ─── */
 let currentLang = 'en';
 
-const LANG_API_CODES = { zh: 'zh-CN', ms: 'ms', ta: 'ta' };
+const LANG_API_CODES = { zh: 'zh-SG', ms: 'ms', ta: 'ta' };
 const _txCache = {};
 
 function initLang() {
