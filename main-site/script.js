@@ -97,12 +97,104 @@ let currentSlug = null;
 /* ─── Init ─── */
 document.addEventListener('DOMContentLoaded', async () => {
     initTheme();
+    initLang();
     initRouter();
     await restoreSession();
     await loadSections('charter');
     setupEventListeners();
     handleRoute(location.pathname + location.hash);
 });
+
+/* ─── Language & Translation ─── */
+let currentLang = 'en';
+
+const LANG_LABELS    = { en: 'EN', zh: '中文', ms: 'BM', ta: 'தமிழ்' };
+const LANG_API_CODES = { zh: 'zh-CN', ms: 'ms', ta: 'ta' };
+const _txCache = {};
+
+function initLang() {
+    const saved = localStorage.getItem('gftv-lang');
+    applyLang(Object.keys(LANG_LABELS).includes(saved) ? saved : 'en', false);
+}
+
+function applyLang(lang, reload = true) {
+    currentLang = lang;
+    localStorage.setItem('gftv-lang', lang);
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+    const label = document.getElementById('lang-btn-label');
+    if (label) label.textContent = LANG_LABELS[lang] || lang.toUpperCase();
+    document.querySelectorAll('.lang-option').forEach(b =>
+        b.classList.toggle('active', b.dataset.lang === lang));
+    if (reload && currentSlug) loadPage(currentSlug, null);
+}
+
+document.getElementById('lang-btn')?.addEventListener('click', e => {
+    e.stopPropagation();
+    const dd = document.getElementById('lang-dropdown');
+    if (dd) dd.hidden = !dd.hidden;
+});
+document.querySelectorAll('.lang-option').forEach(b =>
+    b.addEventListener('click', () => {
+        applyLang(b.dataset.lang);
+        const dd = document.getElementById('lang-dropdown');
+        if (dd) dd.hidden = true;
+    }));
+document.addEventListener('click', () => {
+    const dd = document.getElementById('lang-dropdown');
+    if (dd) dd.hidden = true;
+});
+
+function splitIntoChunks(text, maxLen) {
+    const paragraphs = text.split(/\n\n+/);
+    const chunks = [];
+    let current = '';
+    for (const para of paragraphs) {
+        const joined = current ? current + '\n\n' + para : para;
+        if (joined.length > maxLen && current) {
+            chunks.push(current.trim());
+            current = para;
+        } else {
+            current = joined;
+        }
+    }
+    if (current.trim()) chunks.push(current.trim());
+    return chunks;
+}
+
+async function translateText(text, targetLang) {
+    if (!text?.trim() || targetLang === 'en') return text;
+    const apiCode = LANG_API_CODES[targetLang] || targetLang;
+    const cacheKey = `${targetLang}:${text}`;
+    if (_txCache[cacheKey]) return _txCache[cacheKey];
+    const stored = sessionStorage.getItem(cacheKey);
+    if (stored) { _txCache[cacheKey] = stored; return stored; }
+
+    const chunks = splitIntoChunks(text, 400);
+    const translated = await Promise.all(chunks.map(async chunk => {
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=en|${apiCode}&de=augybiz@gmail.com`;
+            const res = await fetch(url);
+            const data = await res.json();
+            return (data.responseStatus === 200 && data.responseData?.translatedText)
+                ? data.responseData.translatedText
+                : chunk;
+        } catch {
+            return chunk;
+        }
+    }));
+    const result = translated.join('\n\n');
+    _txCache[cacheKey] = result;
+    try { sessionStorage.setItem(cacheKey, result); } catch { /* quota exceeded, ignore */ }
+    return result;
+}
+
+async function translateSection(section) {
+    const [title, content] = await Promise.all([
+        translateText(section.title || '', currentLang),
+        translateText(section.content || '', currentLang),
+    ]);
+    return { ...section, title, content };
+}
 
 /* ─── Theme ─── */
 function initTheme() {
@@ -619,8 +711,12 @@ async function loadPage(slug, anchor) {
     currentSection = section;
     currentSlug = slug;
 
+    if (currentLang !== 'en') {
+        section = await translateSection(section);
+    }
+
     if (section.type === 'article') {
-        renderArticlePage(section, anchor);
+        await renderArticlePage(section, anchor);
     } else {
         renderStandalonePage(section);
     }
@@ -641,11 +737,14 @@ async function loadPage(slug, anchor) {
 }
 
 /* Renders an article page: intro block + all subsections inline with anchor ids */
-function renderArticlePage(article, activeAnchor) {
+async function renderArticlePage(article, activeAnchor) {
     const doc = DOCS[currentDoc];
     const contentEl = document.getElementById(doc.contentEl);
     if (!contentEl) return;
-    const subs = subsectionsOf(article.id);
+    let subs = subsectionsOf(article.id);
+    if (currentLang !== 'en') {
+        subs = await Promise.all(subs.map(s => translateSection(s)));
+    }
     const canEditSlug = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
     const canEditContent = currentUser && currentUser.is_admin;
     const urlBase = doc.urlBase;
