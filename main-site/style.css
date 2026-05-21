@@ -212,13 +212,6 @@ svg {
   position: relative;
 }
 
-.lang-btn {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  min-width: 2.25rem;
-}
-
 .lang-dropdown {
   position: absolute;
   top: calc(100% + 8px);

@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ─── Language & Translation ─── */
 let currentLang = 'en';
 
-const LANG_LABELS    = { en: 'EN', zh: '中文', ms: 'BM', ta: 'தமிழ்' };
 const LANG_API_CODES = { zh: 'zh-CN', ms: 'ms', ta: 'ta' };
 const _txCache = {};
 
@@ -121,8 +120,6 @@ function applyLang(lang, reload = true) {
     currentLang = lang;
     localStorage.setItem('gftv-lang', lang);
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
-    const label = document.getElementById('lang-btn-label');
-    if (label) label.textContent = LANG_LABELS[lang] || lang.toUpperCase();
     document.querySelectorAll('.lang-option').forEach(b =>
         b.classList.toggle('active', b.dataset.lang === lang));
     if (reload && currentSlug) loadPage(currentSlug, null);
