@@ -87,7 +87,7 @@ class PolicyBrowser(discord.ui.View):
     MODE_SECTION = 'section'
 
     def __init__(self, sections: list[dict], doc: str) -> None:
-        super().__init__(timeout=300)
+        super().__init__(timeout=180)
         self.sections = sections
         self.doc = doc
         self.mode = self.MODE_TOC
@@ -322,7 +322,7 @@ class SectionContentView(discord.ui.View):
     """Content-only pagination for the /section direct-lookup command."""
 
     def __init__(self, section: dict, doc: str) -> None:
-        super().__init__(timeout=300)
+        super().__init__(timeout=180)
         self.section = section
         self.doc = doc
         self.page = 0
