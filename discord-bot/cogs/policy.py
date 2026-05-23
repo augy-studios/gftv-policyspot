@@ -87,7 +87,7 @@ class PolicyBrowser(discord.ui.View):
     MODE_SECTION = 'section'
 
     def __init__(self, sections: list[dict], doc: str) -> None:
-        super().__init__(timeout=180)
+        super().__init__(timeout=None)
         self.sections = sections
         self.doc = doc
         self.mode = self.MODE_TOC
@@ -97,7 +97,6 @@ class PolicyBrowser(discord.ui.View):
         self._chunks: list[str] = []
         self._image_url: str | None = None
         self._lang_siblings: dict[str, int] | None = None
-        self.message: discord.Message | None = None
         self._rebuild()
 
     # ── embed ────────────────────────────────────────────────────────────────
@@ -308,26 +307,17 @@ class PolicyBrowser(discord.ui.View):
             await db.record_view(s['id'], self.doc, s['slug'])
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
 
-    async def on_timeout(self) -> None:
-        for item in self.children:
-            item.disabled = True
-        if self.message:
-            try:
-                await self.message.edit(view=self)
-            except discord.HTTPException:
-                pass
 
 
 class SectionContentView(discord.ui.View):
     """Content-only pagination for the /section direct-lookup command."""
 
     def __init__(self, section: dict, doc: str) -> None:
-        super().__init__(timeout=180)
+        super().__init__(timeout=None)
         self.section = section
         self.doc = doc
         self.page = 0
         self.chunks, self.image_url = get_content_chunks_and_image(section)
-        self.message: discord.Message | None = None
         self._rebuild()
 
     def get_embed(self) -> discord.Embed:
@@ -366,24 +356,15 @@ class SectionContentView(discord.ui.View):
         self._rebuild()
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
 
-    async def on_timeout(self) -> None:
-        for item in self.children:
-            item.disabled = True
-        if self.message:
-            try:
-                await self.message.edit(view=self)
-            except discord.HTTPException:
-                pass
 
 
 class SearchResultsView(discord.ui.View):
     """Select-menu view presented after a /search command."""
 
     def __init__(self, results: list[tuple[str, dict]], query: str) -> None:
-        super().__init__(timeout=180)
+        super().__init__(timeout=None)
         self.results = results[:25]  # Discord select menu max
         self.query = query
-        self.message: discord.Message | None = None
 
         if self.results:
             options = []
@@ -410,17 +391,7 @@ class SearchResultsView(discord.ui.View):
         await db.record_view(displayed['id'], doc, displayed['slug'])
 
         view = SectionContentView(displayed, doc)
-        view.message = interaction.message
         await interaction.response.edit_message(embed=view.get_embed(), view=view)
-
-    async def on_timeout(self) -> None:
-        for item in self.children:
-            item.disabled = True
-        if self.message:
-            try:
-                await self.message.edit(view=self)
-            except discord.HTTPException:
-                pass
 
 
 # ── Cog ──────────────────────────────────────────────────────────────────────
@@ -445,8 +416,7 @@ class PolicyCog(commands.Cog):
             )
             return
         view = PolicyBrowser(sections, document)
-        msg = await interaction.followup.send(embed=view.get_embed(), view=view)
-        view.message = msg
+        await interaction.followup.send(embed=view.get_embed(), view=view)
 
     @app_commands.command(
         name='search',
@@ -470,8 +440,7 @@ class PolicyCog(commands.Cog):
             return
         embed = build_search_embed(results, query)
         view = SearchResultsView(results, query)
-        msg = await interaction.followup.send(embed=embed, view=view)
-        view.message = msg
+        await interaction.followup.send(embed=embed, view=view)
 
     @app_commands.command(
         name='top',
@@ -537,8 +506,7 @@ class PolicyCog(commands.Cog):
             return
         await db.record_view(sec['id'], document, slug)
         view = SectionContentView(sec, document)
-        msg = await interaction.followup.send(embed=view.get_embed(), view=view)
-        view.message = msg
+        await interaction.followup.send(embed=view.get_embed(), view=view)
 
 
 async def setup(bot: commands.Bot) -> None:
