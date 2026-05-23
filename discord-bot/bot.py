@@ -4,6 +4,8 @@ import discord
 from discord.ext import commands
 
 import config
+import utils.db as db
+import utils.view_store as view_store
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,8 +21,10 @@ class PolicySpotBot(commands.Bot):
         super().__init__(command_prefix=commands.when_mentioned, intents=intents)
 
     async def setup_hook(self) -> None:
+        await view_store.init_db()
         await self.load_extension('cogs.policy')
         await self.load_extension('cogs.help_cog')
+        await self._restore_views()
         if config.GUILD_ID:
             guild = discord.Object(id=config.GUILD_ID)
             self.tree.copy_global_to(guild=guild)
@@ -28,6 +32,50 @@ class PolicySpotBot(commands.Bot):
             log.info('Slash commands synced to guild %s', config.GUILD_ID)
         await self.tree.sync()
         log.info('Slash commands synced globally (may take up to 1 hour)')
+
+    async def _restore_views(self) -> None:
+        from cogs.policy import PolicyBrowser, SearchResultsView, SectionContentView
+
+        entries = await view_store.load_all()
+        restored = 0
+        stale: list[int] = []
+
+        for message_id, view_type, state in entries:
+            try:
+                view: discord.ui.View | None = None
+
+                if view_type == 'PolicyBrowser':
+                    sections = await db.fetch_sections(state['doc'])
+                    if sections:
+                        view = PolicyBrowser.from_state(state, sections)
+
+                elif view_type == 'SectionContentView':
+                    section = await db.fetch_section_by_slug(state['doc'], state['slug'])
+                    if section:
+                        view = SectionContentView.from_state(state, section)
+
+                elif view_type == 'SearchResultsView':
+                    results: list[tuple[str, dict]] = []
+                    for doc, slug in state['results']:
+                        sec = await db.fetch_section_by_slug(doc, slug)
+                        if sec:
+                            results.append((doc, sec))
+                    if results:
+                        view = SearchResultsView.from_state(state, results)
+
+                if view is not None:
+                    self.add_view(view, message_id=message_id)
+                    restored += 1
+                else:
+                    stale.append(message_id)
+            except Exception:
+                log.exception('Failed to restore view for message %s', message_id)
+                stale.append(message_id)
+
+        for message_id in stale:
+            await view_store.delete(message_id)
+
+        log.info('Restored %d persistent view(s); pruned %d stale.', restored, len(stale))
 
     async def on_ready(self) -> None:
         assert self.user is not None

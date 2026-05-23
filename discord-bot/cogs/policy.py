@@ -9,6 +9,7 @@ from discord import app_commands
 from discord.ext import commands
 
 import utils.db as db
+import utils.view_store as view_store
 from utils.embeds import (
     build_no_results_embed,
     build_search_embed,
@@ -97,6 +98,7 @@ class PolicyBrowser(discord.ui.View):
         self._chunks: list[str] = []
         self._image_url: str | None = None
         self._lang_siblings: dict[str, int] | None = None
+        self.message_id: int | None = None
         self._rebuild()
 
     # ── embed ────────────────────────────────────────────────────────────────
@@ -143,7 +145,8 @@ class PolicyBrowser(discord.ui.View):
                     )
                 )
             sel = discord.ui.Select(
-                placeholder='Select a section to read…', options=options, row=0
+                placeholder='Select a section to read…', options=options,
+                row=0, custom_id='pb:toc_sel',
             )
             sel.callback = self._on_select
             self.add_item(sel)
@@ -153,6 +156,7 @@ class PolicyBrowser(discord.ui.View):
             style=discord.ButtonStyle.secondary,
             disabled=(self.toc_page == 0),
             row=1,
+            custom_id='pb:toc_prev',
         )
         prev_btn.callback = self._on_toc_prev
         self.add_item(prev_btn)
@@ -162,6 +166,7 @@ class PolicyBrowser(discord.ui.View):
             style=discord.ButtonStyle.secondary,
             disabled=(self.toc_page >= total_toc - 1),
             row=1,
+            custom_id='pb:toc_next',
         )
         next_btn.callback = self._on_toc_next
         self.add_item(next_btn)
@@ -170,7 +175,8 @@ class PolicyBrowser(discord.ui.View):
         n_chunks = len(self._chunks)
 
         toc_btn = discord.ui.Button(
-            label='📋 Table of Contents', style=discord.ButtonStyle.secondary, row=0
+            label='📋 Table of Contents', style=discord.ButtonStyle.secondary,
+            row=0, custom_id='pb:back',
         )
         toc_btn.callback = self._on_back_to_toc
         self.add_item(toc_btn)
@@ -185,6 +191,7 @@ class PolicyBrowser(discord.ui.View):
                 label='🇬🇧 English',
                 style=discord.ButtonStyle.primary if is_en else discord.ButtonStyle.secondary,
                 row=0,
+                custom_id='pb:lang_en',
             )
             en_btn.callback = self._on_lang_en
             self.add_item(en_btn)
@@ -193,6 +200,7 @@ class PolicyBrowser(discord.ui.View):
                 label='🇨🇳 中文',
                 style=discord.ButtonStyle.primary if not is_en else discord.ButtonStyle.secondary,
                 row=0,
+                custom_id='pb:lang_zh',
             )
             zh_btn.callback = self._on_lang_zh
             self.add_item(zh_btn)
@@ -203,6 +211,7 @@ class PolicyBrowser(discord.ui.View):
                 style=discord.ButtonStyle.secondary,
                 disabled=(self.content_page == 0),
                 row=1,
+                custom_id='pb:cp_prev',
             )
             cp_prev.callback = self._on_content_prev
             self.add_item(cp_prev)
@@ -212,6 +221,7 @@ class PolicyBrowser(discord.ui.View):
                 style=discord.ButtonStyle.secondary,
                 disabled=(self.content_page >= n_chunks - 1),
                 row=1,
+                custom_id='pb:cp_next',
             )
             cp_next.callback = self._on_content_next
             self.add_item(cp_next)
@@ -221,6 +231,7 @@ class PolicyBrowser(discord.ui.View):
             style=discord.ButtonStyle.primary,
             disabled=(self.section_idx == 0),
             row=2,
+            custom_id='pb:sec_prev',
         )
         sp_prev.callback = self._on_section_prev
         self.add_item(sp_prev)
@@ -230,6 +241,7 @@ class PolicyBrowser(discord.ui.View):
             style=discord.ButtonStyle.primary,
             disabled=(self.section_idx >= len(self.sections) - 1),
             row=2,
+            custom_id='pb:sec_next',
         )
         sp_next.callback = self._on_section_next
         self.add_item(sp_next)
@@ -245,31 +257,37 @@ class PolicyBrowser(discord.ui.View):
         s = self.sections[idx]
         await db.record_view(s['id'], self.doc, s['slug'])
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_toc_prev(self, interaction: discord.Interaction) -> None:
         self.toc_page -= 1
         self._rebuild()
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_toc_next(self, interaction: discord.Interaction) -> None:
         self.toc_page += 1
         self._rebuild()
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_back_to_toc(self, interaction: discord.Interaction) -> None:
         self.mode = self.MODE_TOC
         self._rebuild()
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_content_prev(self, interaction: discord.Interaction) -> None:
         self.content_page -= 1
         self._rebuild()
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_content_next(self, interaction: discord.Interaction) -> None:
         self.content_page += 1
         self._rebuild()
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_section_prev(self, interaction: discord.Interaction) -> None:
         self.section_idx -= 1
@@ -279,6 +297,7 @@ class PolicyBrowser(discord.ui.View):
         s = self.sections[self.section_idx]
         await db.record_view(s['id'], self.doc, s['slug'])
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_section_next(self, interaction: discord.Interaction) -> None:
         self.section_idx += 1
@@ -288,6 +307,7 @@ class PolicyBrowser(discord.ui.View):
         s = self.sections[self.section_idx]
         await db.record_view(s['id'], self.doc, s['slug'])
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_lang_en(self, interaction: discord.Interaction) -> None:
         if self._lang_siblings and self._lang_siblings.get('en') is not None:
@@ -297,6 +317,7 @@ class PolicyBrowser(discord.ui.View):
             s = self.sections[self.section_idx]
             await db.record_view(s['id'], self.doc, s['slug'])
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_lang_zh(self, interaction: discord.Interaction) -> None:
         if self._lang_siblings and self._lang_siblings.get('zh') is not None:
@@ -306,7 +327,32 @@ class PolicyBrowser(discord.ui.View):
             s = self.sections[self.section_idx]
             await db.record_view(s['id'], self.doc, s['slug'])
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
+    # ── persistence ──────────────────────────────────────────────────────────
+
+    def _state(self) -> dict:
+        return {
+            'doc': self.doc,
+            'mode': self.mode,
+            'toc_page': self.toc_page,
+            'section_idx': self.section_idx,
+            'content_page': self.content_page,
+        }
+
+    async def _save_state(self) -> None:
+        if self.message_id is not None:
+            await view_store.save(self.message_id, 'PolicyBrowser', self._state())
+
+    @classmethod
+    def from_state(cls, state: dict, sections: list[dict]) -> 'PolicyBrowser':
+        obj = cls(sections, state['doc'])
+        obj.mode = state['mode']
+        obj.toc_page = state['toc_page']
+        obj.section_idx = state['section_idx']
+        obj.content_page = state['content_page']
+        obj._rebuild()
+        return obj
 
 
 class SectionContentView(discord.ui.View):
@@ -318,6 +364,7 @@ class SectionContentView(discord.ui.View):
         self.doc = doc
         self.page = 0
         self.chunks, self.image_url = get_content_chunks_and_image(section)
+        self.message_id: int | None = None
         self._rebuild()
 
     def get_embed(self) -> discord.Embed:
@@ -334,6 +381,7 @@ class SectionContentView(discord.ui.View):
                 label='◀ Prev Page',
                 style=discord.ButtonStyle.secondary,
                 disabled=(self.page == 0),
+                custom_id='scv:prev',
             )
             prev_btn.callback = self._on_prev
             self.add_item(prev_btn)
@@ -342,6 +390,7 @@ class SectionContentView(discord.ui.View):
                 label='Next Page ▶',
                 style=discord.ButtonStyle.secondary,
                 disabled=(self.page >= n - 1),
+                custom_id='scv:next',
             )
             next_btn.callback = self._on_next
             self.add_item(next_btn)
@@ -350,12 +399,33 @@ class SectionContentView(discord.ui.View):
         self.page -= 1
         self._rebuild()
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
     async def _on_next(self, interaction: discord.Interaction) -> None:
         self.page += 1
         self._rebuild()
         await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await self._save_state()
 
+    # ── persistence ──────────────────────────────────────────────────────────
+
+    def _state(self) -> dict:
+        return {
+            'doc': self.doc,
+            'slug': self.section['slug'],
+            'page': self.page,
+        }
+
+    async def _save_state(self) -> None:
+        if self.message_id is not None:
+            await view_store.save(self.message_id, 'SectionContentView', self._state())
+
+    @classmethod
+    def from_state(cls, state: dict, section: dict) -> 'SectionContentView':
+        obj = cls(section, state['doc'])
+        obj.page = state['page']
+        obj._rebuild()
+        return obj
 
 
 class SearchResultsView(discord.ui.View):
@@ -365,6 +435,7 @@ class SearchResultsView(discord.ui.View):
         super().__init__(timeout=None)
         self.results = results[:25]  # Discord select menu max
         self.query = query
+        self.message_id: int | None = None
 
         if self.results:
             options = []
@@ -378,7 +449,8 @@ class SearchResultsView(discord.ui.View):
                     )
                 )
             sel = discord.ui.Select(
-                placeholder='Select a result to read…', options=options
+                placeholder='Select a result to read…', options=options,
+                custom_id='srv:sel',
             )
             sel.callback = self._on_select
             self.add_item(sel)
@@ -391,7 +463,26 @@ class SearchResultsView(discord.ui.View):
         await db.record_view(displayed['id'], doc, displayed['slug'])
 
         view = SectionContentView(displayed, doc)
+        # Inherit this message's ID so the new view state overwrites ours in the DB
+        view.message_id = interaction.message.id
         await interaction.response.edit_message(embed=view.get_embed(), view=view)
+        await view._save_state()
+
+    # ── persistence ──────────────────────────────────────────────────────────
+
+    def _state(self) -> dict:
+        return {
+            'query': self.query,
+            'results': [(doc, s['slug']) for doc, s in self.results],
+        }
+
+    async def _save_state(self) -> None:
+        if self.message_id is not None:
+            await view_store.save(self.message_id, 'SearchResultsView', self._state())
+
+    @classmethod
+    def from_state(cls, state: dict, results: list[tuple[str, dict]]) -> 'SearchResultsView':
+        return cls(results, state['query'])
 
 
 # ── Cog ──────────────────────────────────────────────────────────────────────
@@ -416,7 +507,9 @@ class PolicyCog(commands.Cog):
             )
             return
         view = PolicyBrowser(sections, document)
-        await interaction.followup.send(embed=view.get_embed(), view=view)
+        msg = await interaction.followup.send(embed=view.get_embed(), view=view)
+        view.message_id = msg.id
+        await view._save_state()
 
     @app_commands.command(
         name='search',
@@ -440,7 +533,9 @@ class PolicyCog(commands.Cog):
             return
         embed = build_search_embed(results, query)
         view = SearchResultsView(results, query)
-        await interaction.followup.send(embed=embed, view=view)
+        msg = await interaction.followup.send(embed=embed, view=view)
+        view.message_id = msg.id
+        await view._save_state()
 
     @app_commands.command(
         name='top',
@@ -506,7 +601,9 @@ class PolicyCog(commands.Cog):
             return
         await db.record_view(sec['id'], document, slug)
         view = SectionContentView(sec, document)
-        await interaction.followup.send(embed=view.get_embed(), view=view)
+        msg = await interaction.followup.send(embed=view.get_embed(), view=view)
+        view.message_id = msg.id
+        await view._save_state()
 
 
 async def setup(bot: commands.Bot) -> None:
