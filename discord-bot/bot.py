@@ -26,9 +26,8 @@ class PolicySpotBot(commands.Bot):
             self.tree.copy_global_to(guild=guild)
             await self.tree.sync(guild=guild)
             log.info('Slash commands synced to guild %s', config.GUILD_ID)
-        else:
-            await self.tree.sync()
-            log.info('Slash commands synced globally (may take up to 1 hour)')
+        await self.tree.sync()
+        log.info('Slash commands synced globally (may take up to 1 hour)')
 
     async def on_ready(self) -> None:
         assert self.user is not None
