@@ -441,7 +441,7 @@ class PolicyCog(commands.Cog):
         sections = await db.fetch_sections(document)
         if not sections:
             await interaction.followup.send(
-                'No published sections found for that document.', ephemeral=True
+                'No published sections found for that document.'
             )
             return
         view = PolicyBrowser(sections, document)
@@ -488,7 +488,7 @@ class PolicyCog(commands.Cog):
         view_counts = await db.fetch_view_counts(document)
         if not view_counts:
             await interaction.followup.send(
-                'No section views have been recorded yet.', ephemeral=True
+                'No section views have been recorded yet.'
             )
             return
 
@@ -506,7 +506,7 @@ class PolicyCog(commands.Cog):
 
         if not entries:
             await interaction.followup.send(
-                'No views found for the selected document.', ephemeral=True
+                'No views found for the selected document.'
             )
             return
 
@@ -533,7 +533,6 @@ class PolicyCog(commands.Cog):
         if not sec:
             await interaction.followup.send(
                 f'No published section found with slug `{slug}` in that document.',
-                ephemeral=True,
             )
             return
         await db.record_view(sec['id'], document, slug)

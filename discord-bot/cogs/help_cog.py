@@ -53,7 +53,7 @@ class HelpCog(commands.Cog):
         for name, desc in COMMANDS_INFO:
             embed.add_field(name=name, value=desc, inline=False)
         embed.set_footer(text='GFTV PolicySpot · Only published sections are visible')
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
