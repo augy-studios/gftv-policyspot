@@ -21,7 +21,7 @@ _EN_TITLE_RE = re.compile(r'^english$', re.IGNORECASE)
 _ZH_TITLE_RE = re.compile(r'^中文$|^chinese$', re.IGNORECASE)
 _IMG_RE = re.compile(r'!\[([^\]]*)\](?:\{[^}]+\})?\((https?://[^)]+)\)')
 _TABLE_RE = re.compile(
-    r'^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)+)',
+    r'^\|(.+)\|[ \t]*\n\|[-| :]+\|[ \t]*\n((?:\|.+\|[ \t]*\n?)+)',
     re.MULTILINE,
 )
 
@@ -37,9 +37,24 @@ def _convert_table(match: re.Match) -> str:
     ]
     if not headers:
         return match.group(0)
+
+    # Two-column tables (e.g. bilingual lyrics/oath lines) read better as
+    # stacked couplets than as one long pipe-joined line per row.
+    if len(headers) == 2:
+        parts = [f'<i>{" / ".join(headers)}</i>', ""]
+        for row in rows:
+            if len(row) < 2:
+                continue
+            parts.append(row[0])
+            parts.append(f'<i>{row[1]}</i>')
+            parts.append("")
+        return '\n'.join(parts).rstrip()
+
+    # Content here is already HTML-escaped upstream (md_to_html step 2) —
+    # re-escaping would double-encode entities like &amp;.
     sep = '─' * min(48, len(' | '.join(headers)))
-    parts = [f'<b>{html.escape(" | ".join(headers))}</b>', sep]
-    parts += [html.escape(' | '.join(row)) for row in rows if row]
+    parts = [f'<b>{" | ".join(headers)}</b>', sep]
+    parts += [' | '.join(row) for row in rows if row]
     return '\n'.join(parts)
 
 
@@ -71,8 +86,11 @@ def md_to_html(text: str) -> str:
     text = _IMG_RE.sub(_save_image, text)
     text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", _save_link, text)
 
-    # 2. Escape HTML in the remaining text
-    text = html.escape(text)
+    # 2. Escape HTML in the remaining text. quote=False: Telegram's HTML
+    #    parser only requires &, <, > to be escaped — it doesn't decode
+    #    &quot;/&#x27; back to " / ', so escaping them just shows the raw
+    #    entity text to the user.
+    text = html.escape(text, quote=False)
 
     # 3. Block-level elements (process before inline)
     # Tables (must come before heading/list processing)
@@ -102,7 +120,7 @@ def md_to_html(text: str) -> str:
 
     # 5. Restore saved links, embeds, and images
     for i, (label, url) in enumerate(links):
-        replacement = f'<a href="{html.escape(url)}">{html.escape(label)}</a>'
+        replacement = f'<a href="{html.escape(url)}">{html.escape(label, quote=False)}</a>'
         text = text.replace(f"\x00L{i}\x00", replacement)
 
     for i, url in enumerate(embeds):
