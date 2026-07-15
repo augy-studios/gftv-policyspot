@@ -188,6 +188,45 @@ def _split_pages(text: str, max_len: int = CONTENT_MAX) -> list[str]:
     return pages
 
 
+def _normalize_markdown(text: str) -> str:
+    """Rewrite this CMS's custom markdown ({{embed:}}, ![alt]{img}(url)) into
+    standard Markdown that telegramify-markdown's richify() understands."""
+    text = re.sub(
+        r"\{\{embed:\s*([^}]+)\}\}",
+        lambda m: f"[\U0001F4CE View Embedded Content]({m.group(1).strip()})",
+        text,
+    )
+    text = _IMG_RE.sub(r"![\1](\2)", text)
+    return text
+
+
+def format_article_markdown(
+    article: dict,
+    subsections: list[dict],
+    lang: str = "all",
+) -> list[str]:
+    """Render article + subsections into raw Markdown pages for Telegram
+    Rich Messages (sendRichMessage). Images stay inline as Markdown image
+    syntax — rich messages embed media directly, unlike the HTML path where
+    they had to be stripped and sent as separate attachments."""
+    parts: list[str] = []
+
+    number = f"{article['number']} — " if article.get("number") else ""
+    parts.append(f"# {number}{article['title']}")
+
+    if article.get("content"):
+        parts.append("")
+        parts.append(_normalize_markdown(article["content"]))
+
+    for sub in _lang_filter_subs(subsections, lang):
+        parts.append("")
+        parts.append(f"## {sub['title']}")
+        if sub.get("content"):
+            parts.append(_normalize_markdown(sub["content"]))
+
+    return _split_pages("\n".join(parts).strip())
+
+
 def format_article_pages(
     article: dict,
     subsections: list[dict],

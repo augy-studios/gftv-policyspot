@@ -6,6 +6,7 @@ import html
 import logging
 from pathlib import Path
 
+import rich_api
 import supabase_client
 from config import CACHE_TTL, TELEGRAM_API_HASH, TELEGRAM_API_ID, TELEGRAM_BOT_TOKEN
 from database import (
@@ -24,6 +25,7 @@ from telethon.tl.custom import Button
 from utils import (
     CATEGORIES,
     PAGE_SIZE,
+    format_article_markdown,
     format_article_pages,
     has_lang_subsections,
     kb_article,
@@ -265,24 +267,32 @@ async def _show_article(event, cat_code: str, slug: str, page: int, lang: str = 
         return
 
     _has_lang = has_lang_subsections(subsections)
-    pages, image_urls = format_article_pages(article, subsections, lang)
-    total = len(pages)
+    md_pages = format_article_markdown(article, subsections, lang)
+    total = len(md_pages)
     page = max(0, min(page, total - 1))
+    buttons = kb_article(cat_code, slug, page, total, has_lang=_has_lang, lang=lang)
 
-    await event.edit(
-        pages[page],
-        buttons=kb_article(cat_code, slug, page, total, has_lang=_has_lang, lang=lang),
-        parse_mode="html",
-    )
+    # Rich Messages (Bot API 10.1+) render the article's own Markdown
+    # directly — tables/headings/images included inline, no HTML conversion
+    # or separate image attachments needed. Telethon can't send these
+    # itself, so this goes straight to the HTTP Bot API. Telethon has no
+    # track record yet with this brand-new endpoint, so fall back to the
+    # proven HTML path on any failure rather than leaving the user stuck.
+    try:
+        await rich_api.edit_rich_article(event.chat_id, event.message_id, md_pages[page], buttons)
+    except Exception as exc:
+        logger.warning("Rich message edit failed for %s/%s, falling back to HTML: %s", cat_code, slug, exc)
+        html_pages, image_urls = format_article_pages(article, subsections, lang)
+        html_page = min(page, len(html_pages) - 1)
+        await event.edit(html_pages[html_page], buttons=buttons, parse_mode="html")
+        if page == 0:
+            for img_url in image_urls[:3]:
+                try:
+                    await client.send_file(event.sender_id, img_url)
+                except Exception as img_exc:
+                    logger.warning("Failed to send image %s: %s", img_url, img_exc)
 
-    # On first open: send image attachments and track views
     if page == 0:
-        for img_url in image_urls[:3]:
-            try:
-                await client.send_file(event.sender_id, img_url)
-            except Exception as exc:
-                logger.warning("Failed to send image %s: %s", img_url, exc)
-
         all_ids = [article["id"]] + [s["id"] for s in subsections]
         asyncio.create_task(_track_views(all_ids, CATEGORIES[cat_code]["doc"], slug))
 
