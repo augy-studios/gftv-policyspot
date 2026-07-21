@@ -1,5 +1,5 @@
 // Bump CACHE_VERSION on every deploy so stale caches are purged immediately.
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE = `gftv-policyspot-${CACHE_VERSION}`;
 
 const ASSETS = [
@@ -9,7 +9,8 @@ const ASSETS = [
   "/script.js",
   "/GHS-main.png",
   "/favicon.ico",
-  "/manifest.json"
+  "/manifest.json",
+  "/llms.txt"
 ];
 
 // All doc types and their API endpoints
