@@ -1,0 +1,23 @@
+# GFTV PolicySpot
+
+> The official policy documentation site for Global Furry Television (GFTV), covering the organization's charter, news standards, programme rating system, community rules, and legal policies.
+
+PolicySpot is a documentation hub, not a general-purpose community site — it exists so members, moderators, and partners can look up authoritative GFTV policy text. Every document page exposes a "Copy as Markdown" action, so any URL below can be fetched and read directly as clean markdown by appending nothing extra — the HTML already contains the full article content server-rendered into the page body.
+
+## Documents
+
+- [Charter of Global Furry Television](https://policy.globalfurry.tv/the-charter): The foundational charter — organization structure, articles, and citations. Deep-linkable to individual articles (`/the-charter/article-i`) and subsections (`#name` anchors).
+- [News Standards](https://policy.globalfurry.tv/news): Editorial standards and guidelines for news content on GFTV.
+- [Programme Rating System](https://policy.globalfurry.tv/prs): The rating system used to classify GFTV programming.
+- [Community Rules](https://policy.globalfurry.tv/rules): Rules of conduct for the GFTV community.
+- [Legal](https://policy.globalfurry.tv/legal): Terms of Service, Privacy Policy, and other legal documents.
+
+## Pages
+
+- [Join Us](https://policy.globalfurry.tv/join-us): How to join the GFTV community.
+- [About PolicySpot](https://policy.globalfurry.tv/about): About this site and the organization.
+
+## Notes
+
+- Content is dynamic and admin-editable; treat these pages as the live source of truth rather than caching indefinitely.
+- The site also mirrors a Gitbook at the same paths, so URLs here are stable and citable.
