@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-color-theme="classic" data-mode="light">
 
 <head>
     <!-- Google tag (gtag.js) -->
@@ -31,6 +31,35 @@
         content="The official policy documentation site for Global Furry Television (GFTV)." />
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jua">
+
+    <!-- Pre-paint theme, lands both axes before first paint -->
+    <script>
+        (function () {
+            try {
+                var THEMES = ['classic', 'hello'];
+                var MODES = ['light', 'dark'];
+                var ct = localStorage.getItem('gftv-policyspot.colorTheme');
+                var md = localStorage.getItem('gftv-policyspot.mode');
+                var old = localStorage.getItem('gftv-theme');
+                if (old !== null) {
+                    // migrate the old single key, light means the classic colour theme
+                    if (ct === null) ct = old === 'hello' ? 'hello' : 'classic';
+                    if (md === null) md = 'light';
+                    localStorage.setItem('gftv-policyspot.colorTheme', ct);
+                    localStorage.setItem('gftv-policyspot.mode', md);
+                    localStorage.removeItem('gftv-theme');
+                }
+                if (THEMES.indexOf(ct) < 0) ct = 'classic';
+                if (MODES.indexOf(md) < 0) md = 'light';
+                document.documentElement.setAttribute('data-color-theme', ct);
+                document.documentElement.setAttribute('data-mode', md);
+            } catch (e) {
+                document.documentElement.setAttribute('data-color-theme', 'classic');
+                document.documentElement.setAttribute('data-mode', 'light');
+            }
+        })();
+    </script>
+
     <link rel="stylesheet" href="/style.css">
     <meta name="theme-color" content="#fedc00" />
 
@@ -46,7 +75,7 @@
     <script defer="" src="https://use.fontawesome.com/releases/v6.5.2/js/all.js"></script>
 </head>
 
-<body data-theme="light">
+<body>
     <!-- Header -->
     <header class="site-header" id="site-header">
         <div class="header-inner">
@@ -917,25 +946,18 @@
     <div class="modal-overlay" id="theme-modal" hidden>
         <div class="modal glass-card">
             <div class="modal-header">
-                <h2 class="modal-title">Choose Theme</h2>
+                <h2 class="modal-title">Appearance</h2>
                 <button class="icon-btn modal-close" data-close="theme-modal">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                         <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                         </svg>
                 </button>
             </div>
-            <div class="theme-grid">
-                <button class="theme-swatch active" data-theme="light" style="--swatch:#ffffff">
-                    <span class="swatch-dot" style="background:#ffffff;border:1px solid #ccc"></span>
-                    <span>Light</span>
-                    <span class="swatch-hex">#ffffff</span>
-                </button>
-<button class="theme-swatch" data-theme="hello" style="--swatch:#fedc00">
-                    <span class="swatch-dot" style="background:#fedc00"></span>
-                    <span>HelloTheme</span>
-                    <span class="swatch-hex">#fedc00</span>
-                </button>
+            <div class="mode-toggle" id="mode-toggle">
+                <button class="mode-btn" data-mode="light" type="button">Light</button>
+                <button class="mode-btn" data-mode="dark" type="button">Dark</button>
             </div>
+            <div class="theme-grid" id="theme-grid"></div>
         </div>
     </div>
 

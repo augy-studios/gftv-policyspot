@@ -105,23 +105,96 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /* ─── Theme ─── */
-function initTheme() {
-    const saved = localStorage.getItem('gftv-theme');
-    const valid = ['light', 'hello'];
-    applyTheme(valid.includes(saved) ? saved : 'light');
+const COLOR_THEMES = [
+    { id: 'classic', label: 'Classic',    dot: '#ffffff', hex: '#ffffff' },
+    { id: 'hello',   label: 'HelloTheme', dot: '#fedc00', hex: '#fedc00' },
+];
+const MODES = ['light', 'dark'];
+const LS_COLOR_THEME = 'gftv-policyspot.colorTheme';
+const LS_MODE = 'gftv-policyspot.mode';
+const DEFAULT_COLOR_THEME = 'classic';
+const DEFAULT_MODE = 'light';
+
+// Move the old single key onto the two new ones, then drop it.
+function migrateLegacyTheme() {
+    try {
+        const old = localStorage.getItem('gftv-theme');
+        if (old === null) return;
+        if (localStorage.getItem(LS_COLOR_THEME) === null)
+            localStorage.setItem(LS_COLOR_THEME, old === 'hello' ? 'hello' : DEFAULT_COLOR_THEME);
+        if (localStorage.getItem(LS_MODE) === null)
+            localStorage.setItem(LS_MODE, DEFAULT_MODE);
+        localStorage.removeItem('gftv-theme');
+    } catch (e) {
+        // storage blocked, defaults apply
+    }
 }
 
-function applyTheme(theme) {
-    document.body.dataset.theme = theme;
-    localStorage.setItem('gftv-theme', theme);
+function applyColorTheme(id) {
+    const theme = COLOR_THEMES.find(t => t.id === id)
+        || COLOR_THEMES.find(t => t.id === DEFAULT_COLOR_THEME);
+    document.documentElement.setAttribute('data-color-theme', theme.id);
+    try { localStorage.setItem(LS_COLOR_THEME, theme.id); } catch (e) { }
     document.querySelectorAll('.theme-swatch').forEach(s =>
-        s.classList.toggle('active', s.dataset.theme === theme));
+        s.classList.toggle('active', s.dataset.colorTheme === theme.id));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme.hex);
 }
-document.querySelectorAll('.theme-swatch').forEach(s =>
-    s.addEventListener('click', () => {
-        applyTheme(s.dataset.theme);
-        closeModal('theme-modal');
-    }));
+
+function applyMode(mode) {
+    const m = MODES.includes(mode) ? mode : DEFAULT_MODE;
+    document.documentElement.setAttribute('data-mode', m);
+    try { localStorage.setItem(LS_MODE, m); } catch (e) { }
+    document.querySelectorAll('.mode-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.mode === m));
+}
+
+function renderThemeSwatches() {
+    const grid = document.getElementById('theme-grid');
+    if (!grid) return;
+    grid.innerHTML = COLOR_THEMES.map(t => `
+        <button class="theme-swatch" data-color-theme="${t.id}" type="button">
+            <span class="swatch-dot" style="background:${t.dot}"></span>
+            <span>${t.label}</span>
+            <span class="swatch-hex">${t.hex}</span>
+        </button>`).join('');
+}
+
+function initTheme() {
+    migrateLegacyTheme();
+    let ct = DEFAULT_COLOR_THEME;
+    let md = DEFAULT_MODE;
+    try {
+        ct = localStorage.getItem(LS_COLOR_THEME);
+        md = localStorage.getItem(LS_MODE);
+    } catch (e) {
+        // storage blocked, defaults apply
+    }
+    if (!COLOR_THEMES.some(t => t.id === ct)) ct = DEFAULT_COLOR_THEME;
+    if (!MODES.includes(md)) md = DEFAULT_MODE;
+    renderThemeSwatches();
+    applyColorTheme(ct);
+    applyMode(md);
+}
+
+// Export helpers: set attributes directly so a mid-export tab close
+// cannot persist the forced theme over the user's pick.
+function snapshotTheme() {
+    return {
+        ct: document.documentElement.getAttribute('data-color-theme'),
+        md: document.documentElement.getAttribute('data-mode'),
+    };
+}
+
+function forceExportTheme() {
+    document.documentElement.setAttribute('data-color-theme', DEFAULT_COLOR_THEME);
+    document.documentElement.setAttribute('data-mode', DEFAULT_MODE);
+}
+
+function restoreTheme(s) {
+    document.documentElement.setAttribute('data-color-theme', s.ct);
+    document.documentElement.setAttribute('data-mode', s.md);
+}
 
 /* ─── Router ─── */
 function initRouter() {
@@ -1447,8 +1520,8 @@ function setupCopyDropdown() {
                 img.onerror = () => resolve(null);
                 img.src = '/GHS-main.png';
             });
-            const savedTheme = document.body.dataset.theme;
-            applyTheme('light');
+            const savedTheme = snapshotTheme();
+            forceExportTheme();
             // Expand all collapsibles for PDF capture, remember which were already open
             const collapseEls = Array.from(contentEl.querySelectorAll('details.md-collapse'));
             const collapseWasOpen = collapseEls.map(d => d.open);
@@ -1494,14 +1567,14 @@ function setupCopyDropdown() {
                 .then(url => {
                     document.getElementById('pdf-prep-style')?.remove();
                     collapseEls.forEach((d, i) => { d.open = collapseWasOpen[i]; });
-                    applyTheme(savedTheme);
+                    restoreTheme(savedTheme);
                     window.open(url, '_blank');
                     showToast('PDF opened in new tab', 'success');
                 })
                 .catch(() => {
                     document.getElementById('pdf-prep-style')?.remove();
                     collapseEls.forEach((d, i) => { d.open = collapseWasOpen[i]; });
-                    applyTheme(savedTheme);
+                    restoreTheme(savedTheme);
                     showToast('Failed to generate PDF', 'error');
                 });
         } else if (action === 'chatgpt' || action === 'claude') {
@@ -3083,6 +3156,17 @@ function renderSearchResults(query) {
 
 function setupEventListeners() {
     document.getElementById('theme-btn')?.addEventListener('click', () => openModal('theme-modal'));
+
+    // Delegated theme pickers, modal stays open so combinations can be tried
+    document.getElementById('theme-grid')?.addEventListener('click', e => {
+        const swatch = e.target.closest('.theme-swatch');
+        if (swatch) applyColorTheme(swatch.dataset.colorTheme);
+    });
+    document.getElementById('mode-toggle')?.addEventListener('click', e => {
+        const btn = e.target.closest('.mode-btn');
+        if (btn) applyMode(btn.dataset.mode);
+    });
+
     document.getElementById('search-btn')?.addEventListener('click', openSearch);
     document.getElementById('sidebar-search-btn')?.addEventListener('click', () => { closeSidebar(); openSearch(); });
     document.getElementById('menu-btn')?.addEventListener('click', toggleSidebar);
