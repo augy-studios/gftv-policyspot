@@ -2,7 +2,7 @@
 // serves. The browser compares this file byte for byte: if nothing here
 // changes, no reader is ever told a new version exists. Treat a forgotten
 // bump as a build error, not a habit. See update-bar-spec.md.
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const CACHE = `gftv-policyspot-${CACHE_VERSION}`;
 
 // The app shell. Served cache-first, so a reader keeps the version they

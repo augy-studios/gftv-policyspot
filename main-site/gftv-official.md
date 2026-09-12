@@ -100,6 +100,7 @@ header is worse than either alone.
             single slash. A site ending in anything else is not GFTV, even if
             the name appears earlier in the address.
           </p>
+          <p><a href="https://gftv.asia/trusted-sites">The full list of official GFTV sites</a></p>
         </div>
       </div>
       <div class="gov-bar-point">
@@ -169,6 +170,7 @@ interface string, through their own dictionary.
 | Toggle | How to identify | 如何辨识 |
 | Domain heading | Official GFTV sites end with globalfurry.tv or gftv.asia | 国际兽视官方网站的网址以 globalfurry.tv 或 gftv.asia 结尾 |
 | Domain body | Read the address from the end, at the last dot before the first single slash. A site ending in anything else is not GFTV, even if the name appears earlier in the address. | 请从网址末尾开始看，也就是第一个单斜线之前的最后一个点。结尾不是这两者的网站都不是国际兽视，即使网址前面出现了相同的名称。 |
+| Trusted link | The full list of official GFTV sites | 国际兽视官方网站的完整清单 |
 | Secure heading | Secure sites use HTTPS | 安全网站使用 HTTPS |
 | Secure body | Look for a padlock, or https:// at the start of the address. Only share personal details on an official site over a secure connection. | 请留意地址栏的锁形图标，或网址开头的 https://。只在安全连接下的官方网站上填写个人资料。 |
 
@@ -177,16 +179,27 @@ speaker. Treat it as a draft until it has.
 
 ## The trusted sites page
 
-The Singapore masthead links to a list of trusted sites. GFTV does not have one
-yet.
+The Singapore masthead links to a list of trusted sites. GFTV's is at:
+
+```text
+https://gftv.asia/trusted-sites
+```
+
+Given on 12 September 2026. The domain point links to it as a plain link,
+after the body copy, with the "Trusted link" wording from the copy table. Keep
+the address in one constant beside the domain list, so the two things a site
+has to know about officialness live together.
 
 **Do not ship the link before the page exists.** A trust banner whose "see the
-full list" link 404s does more harm than no link at all. When the page exists,
-add it to the domain point as a plain link, at whatever address it lives.
+full list" link 404s does more harm than no link at all. The rule stays in
+force: if the page ever moves or comes down, take the link out of the bar in
+the same change, and put it back when the new address answers.
 
-When it is built, the page should list every official GFTV domain and
-subdomain, say plainly when it was last updated, and be reachable at a short
-address a person can type from memory after reading it off the bar.
+The page lists every official GFTV domain and subdomain, says plainly when it
+was last updated, and sits at a short address a person can type from memory
+after reading it off the bar. When a domain is added to the list a site
+renders the bar from, add it to the page in the same change: the bar says
+"the full list", so the list has to be full.
 
 ## Acceptance checklist
 
@@ -199,5 +212,5 @@ address a person can type from memory after reading it off the bar.
 - [ ] Animates 150 to 220ms, honours `prefers-reduced-motion`
 - [ ] Every colour from a theme token, no hardcoded values
 - [ ] Copy claims no trustworthiness, only states the domains and how to read one
-- [ ] No link to a trusted sites page until that page exists
+- [ ] The domain point links `https://gftv.asia/trusted-sites` as a plain link, and the link comes out if that page ever stops answering
 - [ ] Inline SVG icons, the flag image as the mark, no emoji, no em dashes

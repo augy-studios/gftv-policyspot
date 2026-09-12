@@ -104,7 +104,7 @@ gftv-policyspot/
 - **Search** — Magnifying glass button in the header (desktop) and sidebar (mobile); live-filtering dropdown of pages and document sections with keyboard navigation (↑ ↓ Enter Escape)
 - **Themes** — Two colour themes (Classic, HelloTheme) × light/dark mode, plus a time-based mode that follows the device clock (light 09:00 to 18:00, dark otherwise). Defaults to Classic + light; never reads the OS preference. Persisted via `gftv-policyspot.colorTheme` and `gftv-policyspot.mode` in localStorage. Spec: `gftv-theme.md`
 - **Proxima Nova** — GFTV brand font, self-hosted under `assets/fonts/` so it is precached and works offline. Only the Regular weight is shipped; heavier weights are synthesised
-- **Official site bar** — Permanent, non-dismissible bar above the header stating the site is official and teaching how to read a domain. Expansion is remembered per site. Spec: `gftv-official.md`
+- **Official site bar** — Permanent, non-dismissible bar above the header stating the site is official and teaching how to read a domain. Expansion is remembered per site. The domain point links `https://gftv.asia/trusted-sites`; the bar markup lives in both `index.html` and `404.html`, so a domain or link change is made in both. Spec: `gftv-official.md`
 - **Update notice** — When a new version is downloaded and waiting, a bar under the official bar offers **Reload** / **Not now**. Nothing reloads until the reader asks. Bump `CACHE_VERSION` in `sw.js` on every deploy or readers never see it. Spec: `update-bar-spec.md`
 - **Glassmorphism UI** — No gradient blobs; clean surface-based glass effect with static background
 - **User Accounts** — Register/login via `gftvhello_users` + `gftvhello_sessions`

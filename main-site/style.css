@@ -387,6 +387,18 @@ svg {
   line-height: 1.5;
 }
 
+/* The trusted sites link: a plain link after the body copy, in the same
+   token as the toggle so the two things that lead somewhere match. */
+.gov-bar-point p + p {
+  margin-top: 0.35rem;
+}
+
+.gov-bar-point a {
+  color: var(--brand-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* ─── Update notice ───
    Appears under the official bar when a new service worker is installed and
    waiting. Nothing reloads until the reader presses Reload. See
