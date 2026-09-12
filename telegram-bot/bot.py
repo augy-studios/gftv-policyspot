@@ -13,18 +13,16 @@ from database import (
     cache_get,
     cache_set,
     cache_purge_expired,
-    clear_user_state,
     get_search,
-    get_user_state,
     init_db,
     save_search,
-    set_user_state,
 )
 from telethon import TelegramClient, events
 from telethon.tl.custom import Button
 from utils import (
     CATEGORIES,
     PAGE_SIZE,
+    find_subsection_page,
     format_article_markdown,
     format_article_pages,
     has_lang_subsections,
@@ -204,8 +202,9 @@ def _txt_help() -> str:
         "<b>Sorting</b>\n"
         "In any article list tap <b>↕ Sort: Views</b> or <b>↕ Sort: Order</b> to toggle.\n\n"
         "<b>Search</b>\n"
-        "Tap 🔍 Search and type your query, or use <code>/search query</code>. "
-        "Matching subsections open their parent article."
+        "Just send me any message and I'll search all policies for it. "
+        "You can also use <code>/search query</code>. "
+        "Matching subsections open their parent article on the page they appear on."
     )
 
 
@@ -225,7 +224,7 @@ def _txt_articles(cat_code: str, page: int, total_pages: int, sort: str) -> str:
 def _txt_search_prompt() -> str:
     return (
         "🔍 <b>Search Policies</b>\n\n"
-        "Send your search query as a message.\n"
+        "Just send your search query as a message — any text you send me is searched.\n"
         "Or type: <code>/search your query</code>"
     )
 
@@ -297,6 +296,17 @@ async def _show_article(event, cat_code: str, slug: str, page: int, lang: str = 
         asyncio.create_task(_track_views(all_ids, CATEGORIES[cat_code]["doc"], slug))
 
 
+async def _show_article_at_subsection(event, cat_code: str, slug: str, sub_id) -> None:
+    """Open article `slug` on whichever paginated page holds subsection `sub_id`."""
+    article, subsections = await _fetch_article(cat_code, slug)
+    if article is None:
+        await event.answer("Article not found.", alert=True)
+        return
+    md_pages = format_article_markdown(article, subsections, "all")
+    page = find_subsection_page(md_pages, subsections, sub_id, "all")
+    await _show_article(event, cat_code, slug, page, "all")
+
+
 async def _run_search(event, query: str, is_new: bool) -> None:
     if not query:
         await (event.respond if is_new else event.edit)(
@@ -321,11 +331,12 @@ async def _run_search(event, query: str, is_new: bool) -> None:
 async def on_message(event: events.NewMessage.Event) -> None:
     text: str = event.raw_text or ""
 
-    # Non-command text: check if user is in awaiting_search state
+    # Any non-command text is treated as a search query — no need to tap
+    # 🔍 Search or use /search first. Stickers/media with no caption are ignored.
     if not text.startswith("/"):
-        if get_user_state(event.sender_id) == "awaiting_search":
-            clear_user_state(event.sender_id)
-            await _run_search(event, text.strip(), is_new=True)
+        query = text.strip()
+        if query:
+            await _run_search(event, query, is_new=True)
         return
 
     cmd = text.split()[0].lstrip("/").split("@")[0].lower()
@@ -379,7 +390,6 @@ async def on_callback(event: events.CallbackQuery.Event) -> None:
             )
 
         elif data == "SEARCH":
-            set_user_state(uid, "awaiting_search")
             await event.edit(_txt_search_prompt(), buttons=kb_cancel_home(), parse_mode="html")
 
         elif data == "NOOP":
@@ -395,6 +405,18 @@ async def on_callback(event: events.CallbackQuery.Event) -> None:
             _, cat_code, slug, page_s = parts[:4]
             lang = parts[4] if len(parts) > 4 else "all"
             await _show_article(event, cat_code, slug, int(page_s), lang)
+
+        elif data.startswith("AS|"):
+            # Subsection search hit: open the parent article on the page
+            # that subsection lands on. Resolved from the saved search.
+            idx = int(data.split("|")[1])
+            query, results = get_search(uid)
+            if not query or idx >= len(results):
+                await event.answer("Search expired — please search again.", alert=True)
+                return
+            r = results[idx]
+            target = r["parent_slug"] if r.get("parent_slug") else r["slug"]
+            await _show_article_at_subsection(event, r["cat_code"], target, r["id"])
 
         elif data.startswith("SR|"):
             page = int(data.split("|")[1])

@@ -26,12 +26,6 @@ def init_db() -> None:
                 results    TEXT    NOT NULL,
                 updated_at INTEGER NOT NULL
             );
-
-            CREATE TABLE IF NOT EXISTS user_state (
-                user_id    INTEGER PRIMARY KEY,
-                state      TEXT    NOT NULL,
-                updated_at INTEGER NOT NULL
-            );
         """)
 
 
@@ -79,26 +73,3 @@ def get_search(user_id: int) -> tuple[str | None, list]:
     if row:
         return row[0], json.loads(row[1])
     return None, []
-
-
-# ── User state ────────────────────────────────────────────────────────────────
-
-def set_user_state(user_id: int, state: str) -> None:
-    with _conn() as con:
-        con.execute(
-            "INSERT OR REPLACE INTO user_state (user_id, state, updated_at) VALUES (?, ?, ?)",
-            (user_id, state, int(time.time())),
-        )
-
-
-def get_user_state(user_id: int) -> str | None:
-    with _conn() as con:
-        row = con.execute(
-            "SELECT state FROM user_state WHERE user_id = ?", (user_id,)
-        ).fetchone()
-    return row[0] if row else None
-
-
-def clear_user_state(user_id: int) -> None:
-    with _conn() as con:
-        con.execute("DELETE FROM user_state WHERE user_id = ?", (user_id,))

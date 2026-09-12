@@ -227,6 +227,38 @@ def format_article_markdown(
     return _split_pages("\n".join(parts).strip())
 
 
+def find_subsection_page(
+    md_pages: list[str],
+    subsections: list[dict],
+    sub_id,
+    lang: str = "all",
+) -> int:
+    """Return the index of the page (from format_article_markdown) whose
+    text contains the heading of subsection `sub_id`. Falls back to 0 when
+    the subsection isn't rendered (filtered out by lang, or unknown id).
+
+    Headings are matched by title, so if several subsections share a title
+    the Nth such subsection is mapped to the Nth heading occurrence."""
+    subs = _lang_filter_subs(subsections, lang)
+    target = next((s for s in subs if s.get("id") == sub_id), None)
+    if target is None:
+        return 0
+
+    title = target.get("title") or ""
+    ordinal = sum(
+        1 for s in subs[: subs.index(target)] if (s.get("title") or "") == title
+    )
+    heading_re = re.compile(rf"^## {re.escape(title)}[ \t]*$", re.MULTILINE)
+
+    seen = 0
+    for idx, page in enumerate(md_pages):
+        hits = len(heading_re.findall(page))
+        if seen + hits > ordinal:
+            return idx
+        seen += hits
+    return 0
+
+
 def format_article_pages(
     article: dict,
     subsections: list[dict],
@@ -342,10 +374,16 @@ def kb_article(
 def kb_search_results(results: list, page: int, total_pages: int) -> list:
     rows = []
     start = (page - 1) * PAGE_SIZE
-    for r in results[start : start + PAGE_SIZE]:
+    for idx in range(start, min(start + PAGE_SIZE, len(results))):
+        r = results[idx]
         label = r["title"][:40] + ("…" if len(r["title"]) > 40 else "")
-        target = r["parent_slug"] if r.get("parent_id") and r.get("parent_slug") else r["slug"]
-        rows.append([Button.inline(f"{r['cat_emoji']} {label}", f"A|{r['cat_code']}|{target}|0|all".encode())])
+        if r.get("parent_id") and r.get("parent_slug"):
+            # Subsection hit: resolved via the saved search (AS|index) so the
+            # bot can open the parent article on the page that subsection is on.
+            data = f"AS|{idx}"
+        else:
+            data = f"A|{r['cat_code']}|{r['slug']}|0|all"
+        rows.append([Button.inline(f"{r['cat_emoji']} {label}", data.encode())])
 
     nav = []
     if page > 1:
