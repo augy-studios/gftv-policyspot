@@ -1,13 +1,7 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-color-theme="classic" data-mode="light">
 
 <head>
-    <link rel="manifest" href="../manifest.json" />
-
-    <meta charset="utf-8">
-    <title>Page Not Found | Global Furry Television</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-FMCYFTFPEL"></script>
     <script>
@@ -23,59 +17,188 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9715826188316382"
         crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="404.css" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <meta charset="utf-8">
+    <title>Page Not Found | GFTV PolicySpot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
 
     <meta property="og:type" content="website">
-    <meta property="og:title" content="404" />
-    <meta property="og:site_name" content="GFTV PolicySpot | Global Furry Television" />
+    <meta property="og:title" content="Page Not Found | GFTV PolicySpot" />
+    <meta property="og:site_name" content="Global Furry Television" />
 
-    <!-- Embed Image -->
-    <link rel="apple-touch-icon" href="/templateicon1.png">
+    <!-- Proxima Nova is self hosted (licensed, not on Google Fonts) so the
+         service worker can precache it and the installed app loads styled. -->
+    <link rel="preload" href="/assets/fonts/ProximaNova-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Pre-paint theme, lands both axes before first paint. Same script as index.html. -->
+    <script>
+        (function () {
+            try {
+                var THEMES = ['classic', 'hello'];
+                var MODES = ['light', 'dark'];
+                var ct = localStorage.getItem('gftv-policyspot.colorTheme');
+                var md = localStorage.getItem('gftv-policyspot.mode');
+                var old = localStorage.getItem('gftv-theme');
+                if (old !== null) {
+                    // migrate the old single key, light means the classic colour theme
+                    if (ct === null) ct = old === 'hello' ? 'hello' : 'classic';
+                    if (md === null) md = 'light';
+                    localStorage.setItem('gftv-policyspot.colorTheme', ct);
+                    localStorage.setItem('gftv-policyspot.mode', md);
+                    localStorage.removeItem('gftv-theme');
+                }
+                // Time based mode. Resolved here rather than in script.js
+                // because that runs after first paint, and an evening reader
+                // would otherwise watch a white page turn dark. Keep the two
+                // hours in step with LIGHT_FROM_HOUR and LIGHT_UNTIL_HOUR in
+                // script.js.
+                if (md === 'time') {
+                    var h = new Date().getHours();
+                    md = h >= 9 && h < 18 ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-mode-preference', 'time');
+                }
+                if (THEMES.indexOf(ct) < 0) ct = 'classic';
+                if (MODES.indexOf(md) < 0) md = 'light';
+                document.documentElement.setAttribute('data-color-theme', ct);
+                document.documentElement.setAttribute('data-mode', md);
+            } catch (e) {
+                document.documentElement.setAttribute('data-color-theme', 'classic');
+                document.documentElement.setAttribute('data-mode', 'light');
+            }
+        })();
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="apple-touch-icon" href="/GHS-main.png">
     <link rel="icon" href="/favicon.ico">
     <link rel="shortcut icon" href="/favicon.ico">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:image:src" content="/templateicon1.png">
-    <meta property="og:image" content="/templateicon1.png"/>
+    <meta name="twitter:image:src" content="/GHS-main.png">
+    <meta property="og:image" content="/GHS-main.png" />
+
+    <script defer src="/official-bar.js"></script>
 </head>
 
 <body>
-    <h1 class="title-text">Page Not Found uwu</h1>
-    <div class="submarine">
-        <div class="top">
-            <div class="pipe">
-                <div class="light"></div>
+    <!-- Official site bar. Permanent, above everything else. See gftv-official.md. -->
+    <div class="gov-bar" id="officialBar">
+        <div class="gov-bar-inner">
+            <img class="gov-bar-mark" src="/gftv-flag.png" alt="" width="24" height="16">
+            <p class="gov-bar-line">
+                <span class="gov-bar-line-long">An official Global Furry Television website</span>
+                <span class="gov-bar-line-short">An official GFTV website</span>
+            </p>
+            <button type="button" class="gov-bar-toggle" id="officialBarToggle"
+                    aria-expanded="false" aria-controls="officialBarPanel">
+                How to identify
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="gov-bar-panel" id="officialBarPanel" hidden>
+            <div class="gov-bar-panel-clip">
+            <div class="gov-bar-panel-inner">
+                <div class="gov-bar-point">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    <div>
+                        <h2>Official GFTV sites end with globalfurry.tv or gftv.asia</h2>
+                        <p>
+                            Read the address from the end, at the last dot before the first
+                            single slash. A site ending in anything else is not GFTV, even if
+                            the name appears earlier in the address.
+                        </p>
+                    </div>
+                </div>
+                <div class="gov-bar-point">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <div>
+                        <h2>Secure sites use HTTPS</h2>
+                        <p>
+                            Look for a padlock, or https:// at the start of the address. Only
+                            share personal details on an official site over a secure
+                            connection.
+                        </p>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
-        <div class="window window-1">
-            <div class="shine"></div>
-        </div>
-        <div class="window window-2">
-            <div class="shine"></div>
-        </div>
-        <div class="shadow"></div>
-        <div class="propeller">
-            <div class="back"></div>
-            <div class="wing"></div>
-            <div class="bubble bubble-1"></div>
-            <div class="bubble bubble-2"></div>
-            <div class="bubble bubble-3"></div>
-        </div>
     </div>
-    <div class="wave">
-        <div class="wave1"></div>
-        <div class="wave2"></div>
-    </div>
-    <footer style="position:fixed;bottom:0;left:0;right:0;text-align:center;padding:0.75rem 1rem;font-size:0.75rem;color:#888;background:rgba(255,255,255,0.7);backdrop-filter:blur(4px);font-family:'Jua',sans-serif;line-height:1.6;">
-        A Project of the Technology and Infrastructure Development Sub-Committee (TIDSC)<br>
-        Made with <svg style="display:inline;vertical-align:middle;" width="14" height="14" viewBox="0 0 24 24" fill="#22c55e" xmlns="http://www.w3.org/2000/svg" aria-label="green heart"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> by Augy &nbsp;&bull;&nbsp;
-        Global Furry Television Intl &copy; 2014 &ndash; <span id="footer-year-404"></span>
+
+    <!-- Header -->
+    <header class="site-header" id="site-header">
+        <div class="header-inner">
+            <a href="/" class="logo-link">
+                <span class="logo-icon">
+                    <img src="/GHS-main.png" width="28" height="28" alt="GFTV PolicySpot">
+                </span>
+                <span class="logo-text">PolicySpot</span>
+                <span class="logo-sub">GFTV</span>
+            </a>
+            <nav class="header-nav" id="header-nav">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/the-charter" class="nav-link">Charter</a>
+                <a href="/news" class="nav-link">News Standards</a>
+                <a href="/prs" class="nav-link">PRS</a>
+                <a href="/rules" class="nav-link">Community Rules</a>
+                <a href="/join-us" class="nav-link">Join Us</a>
+                <a href="/about" class="nav-link">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content sidebar-hidden">
+        <section class="hero glass-card">
+            <div class="hero-body">
+                <div class="hero-badge">Error 404</div>
+                <h1 class="hero-title">Page not found</h1>
+                <p class="hero-sub">
+                    There is nothing at this address. The page may have moved, the link may
+                    be out of date, or the address may have a typo in it.
+                </p>
+                <div class="hero-actions">
+                    <a href="/" class="btn btn-primary">Go to the home page</a>
+                    <a href="/the-charter" class="btn btn-ghost">Read the Charter</a>
+                </div>
+            </div>
+            <div class="hero-graphic">
+                <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="10" y="10" width="100" height="100" rx="16" fill="var(--brand)" opacity="0.15" />
+                    <rect x="24" y="24" width="72" height="72" rx="10" fill="var(--brand)" opacity="0.25" />
+                    <path d="M35 46h50M35 60h22M35 74h30" stroke="var(--brand-dark)" stroke-width="3" stroke-linecap="round" />
+                    <circle cx="76" cy="70" r="9" stroke="var(--brand-dark)" stroke-width="3" />
+                    <path d="M83 77l8 8" stroke="var(--brand-dark)" stroke-width="3" stroke-linecap="round" />
+                </svg>
+            </div>
+        </section>
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer-bar">
+        <div class="site-footer-inner">
+            <p class="site-footer-line">A Project of the Technology and Infrastructure Development Sub-Committee (TIDSC)</p>
+            <p class="site-footer-line">Made with
+                <svg class="footer-heart" width="16" height="16" viewBox="0 0 24 24" fill="#22c55e" xmlns="http://www.w3.org/2000/svg" aria-label="green heart">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                by Augy</p>
+            <p class="site-footer-line">Global Furry Television Intl &copy; 2014 &ndash; <span id="footer-year"></span></p>
+        </div>
     </footer>
-    <script>
-        if (typeof navigator.serviceWorker !== 'undefined') {
-            navigator.serviceWorker.register('sw.js')
-        }
-        document.getElementById('footer-year-404').textContent = new Date().getFullYear();
-    </script>
+    <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
 </body>
 
 </html>

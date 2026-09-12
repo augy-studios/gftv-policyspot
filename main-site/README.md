@@ -13,6 +13,9 @@ gftv-policyspot/
 ├── main-site/
 │   ├── .well-known/
 │   │   └── assetlinks.json
+│   ├── assets/
+│   │   └── fonts/
+│   │       └── ProximaNova-Regular.woff2   Self-hosted brand font (licensed, not on Google Fonts)
 │   ├── api/
 │   │   ├── auth/
 │   │   │   ├── login.js          POST /api/auth/login
@@ -67,22 +70,27 @@ gftv-policyspot/
 │   │   ├── response.js           API response helpers
 │   │   ├── supabase.js           Supabase client helper
 │   │   └── totp.js               TOTP helper
-│   ├── 404.css
-│   ├── 404.html
+│   ├── 404.html                  Not-found page, same shell and theme as the SPA
 │   ├── CODE_OF_CONDUCT.md
 │   ├── GHS-192.png               App icon 192×192 (PWA manifest)
 │   ├── GHS-512.png               App icon 512×512 (PWA manifest)
-│   ├── GHS-main.png              App icon used in header logo
-│   ├── GHS-main.png              App icon used for social/OG embeds
+│   ├── GHS-main.png              App icon used in header logo and social/OG embeds
 │   ├── browserconfig.xml
 │   ├── favicon.ico
+│   ├── gftv-flag.png             72×48 GFTV flag, the mark on the official site bar
+│   ├── gftv-official.md          Spec: official site bar (portable, shared across GFTV sites)
+│   ├── gftv-theme.md             Spec: theme tokens, modes, Proxima Nova (portable)
+│   ├── gftv-retrofit-proxima.md  Retrofit prompt used for the font swap
+│   ├── gftv-retrofit-time-mode.md Retrofit prompt used for time-based mode
+│   ├── update-bar-spec.md        Spec: service worker update notice (portable)
 │   ├── index.html                Main SPA shell
 │   ├── manifest.json             PWA manifest
+│   ├── official-bar.js           Official site bar expand/collapse (shared by index and 404)
 │   ├── package.json
 │   ├── robots.txt
-│   ├── script.js                 SPA logic, router, auth, content loading
-│   ├── style.css                 All styles (glassmorphism + 2 themes)
-│   ├── sw.js                     Service worker (offline cache)
+│   ├── script.js                 SPA logic, router, auth, content loading, theme, SW registration
+│   ├── style.css                 All styles (glassmorphism, 2 colour themes × light/dark)
+│   ├── sw.js                     Service worker (offline cache, waits for Reload before activating)
 │   └── vercel.json
 └── telegram-bot/
     └── bot.py                Telegram bot
@@ -94,7 +102,10 @@ gftv-policyspot/
 
 - **SPA Router** — Hash-free client-side routing using History API
 - **Search** — Magnifying glass button in the header (desktop) and sidebar (mobile); live-filtering dropdown of pages and document sections with keyboard navigation (↑ ↓ Enter Escape)
-- **2 Themes** — Classic Light, HelloTheme; persisted via localStorage
+- **Themes** — Two colour themes (Classic, HelloTheme) × light/dark mode, plus a time-based mode that follows the device clock (light 09:00 to 18:00, dark otherwise). Defaults to Classic + light; never reads the OS preference. Persisted via `gftv-policyspot.colorTheme` and `gftv-policyspot.mode` in localStorage. Spec: `gftv-theme.md`
+- **Proxima Nova** — GFTV brand font, self-hosted under `assets/fonts/` so it is precached and works offline. Only the Regular weight is shipped; heavier weights are synthesised
+- **Official site bar** — Permanent, non-dismissible bar above the header stating the site is official and teaching how to read a domain. Expansion is remembered per site. Spec: `gftv-official.md`
+- **Update notice** — When a new version is downloaded and waiting, a bar under the official bar offers **Reload** / **Not now**. Nothing reloads until the reader asks. Bump `CACHE_VERSION` in `sw.js` on every deploy or readers never see it. Spec: `update-bar-spec.md`
 - **Glassmorphism UI** — No gradient blobs; clean surface-based glass effect with static background
 - **User Accounts** — Register/login via `gftvhello_users` + `gftvhello_sessions`
 - **Gitbook-matching URLs** — URL pattern mirrors the live Gitbook at `policy.globalfurry.tv`:

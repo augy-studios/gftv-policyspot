@@ -1,12 +1,21 @@
-// Bump CACHE_VERSION on every deploy so stale caches are purged immediately.
-const CACHE_VERSION = 'v5';
+// Bump CACHE_VERSION on every deploy that changes anything this worker
+// serves. The browser compares this file byte for byte: if nothing here
+// changes, no reader is ever told a new version exists. Treat a forgotten
+// bump as a build error, not a habit. See update-bar-spec.md.
+const CACHE_VERSION = 'v6';
 const CACHE = `gftv-policyspot-${CACHE_VERSION}`;
 
+// The app shell. Served cache-first, so a reader keeps the version they
+// opened until they accept the update notice and the page reloads.
 const ASSETS = [
   "/",
   "/index.html",
+  "/404.html",
   "/style.css",
   "/script.js",
+  "/official-bar.js",
+  "/assets/fonts/ProximaNova-Regular.woff2",
+  "/gftv-flag.png",
   "/GHS-main.png",
   "/favicon.ico",
   "/manifest.json",
@@ -51,31 +60,45 @@ async function prefetchAllContent(cache) {
   }
 }
 
+// No skipWaiting() here. The new worker installs and then waits; the only
+// thing that promotes it is the message handler below, sent when a reader
+// presses Reload on the update notice.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE).then((cache) =>
+      // The shell is fetched fresh, so a stale HTTP cache cannot install an
+      // old copy under a new version.
+      cache.addAll(ASSETS.map((url) => new Request(url, { cache: "reload" })))
+    )
   );
-  self.skipWaiting();
 });
 
+// No clients.claim() here. Claiming on activation would take over open pages
+// mid-session, which is exactly what the update notice exists to ask about.
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) =>
         Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
       )
-      .then(() => self.clients.claim())
       .then(() => caches.open(CACHE))
       .then((cache) => prefetchAllContent(cache))
-      .then(() => self.clients.matchAll({ type: "window" }))
-      .then((clients) =>
-        clients.forEach((c) => c.postMessage({ type: "SW_UPDATED" }))
-      )
   );
 });
 
+self.addEventListener("message", (event) => {
+  const type = typeof event.data === "string" ? event.data : event.data?.type;
+
+  // The only place either of these is ever called.
+  if (type === "skip-waiting") {
+    event.waitUntil(self.skipWaiting().then(() => self.clients.claim()));
+  }
+});
+
 self.addEventListener("fetch", (e) => {
+  if (e.request.method !== "GET") return;
   const url = new URL(e.request.url);
+  if (url.origin !== self.location.origin) return;
 
   // API calls: network-first, fall back to cache, then offline response
   if (url.pathname.startsWith("/api/")) {
@@ -101,26 +124,27 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // App shell: network-first with cache bypass so deploys are always fresh
-  const isAppShell = ["/", "/index.html", "/style.css", "/script.js"].includes(
-    url.pathname
-  );
-  if (isAppShell) {
+  // SPA routes (/the-charter, /news/..., ...) are all served by index.html.
+  // Any navigation that is not a real file falls back to the cached shell.
+  if (e.request.mode === "navigate") {
     e.respondWith(
-      fetch(new Request(e.request, { cache: "reload" }))
-        .then((res) => {
-          if (res.ok) {
-            const clone = res.clone();
-            caches.open(CACHE).then((c) => c.put(e.request, clone));
-          }
-          return res;
-        })
-        .catch(() => caches.match(e.request))
+      caches.match(e.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(e.request)
+          .then((res) => {
+            if (res.ok) {
+              const clone = res.clone();
+              caches.open(CACHE).then((c) => c.put(e.request, clone));
+            }
+            return res;
+          })
+          .catch(() => caches.match("/index.html").then((shell) => shell || caches.match("/")));
+      })
     );
     return;
   }
 
-  // Everything else (images, fonts, etc.): cache-first
+  // Everything else (shell files, images, fonts): cache-first
   e.respondWith(
     caches.match(e.request).then((cached) => {
       if (cached) return cached;
@@ -132,7 +156,7 @@ self.addEventListener("fetch", (e) => {
           }
           return res;
         })
-        .catch(() => caches.match("/"));
+        .catch(() => Response.error());
     })
   );
 });

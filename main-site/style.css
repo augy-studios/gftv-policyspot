@@ -1,10 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+/* Proxima Nova is licensed and is not on Google Fonts, so it is self hosted
+   rather than imported. Only the Regular weight file is present; the browser
+   synthesises the heavier weights from it. Add a block per weight as the
+   files arrive, and only for files that are actually in assets/fonts/. */
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/assets/fonts/ProximaNova-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Inter", sans-serif;
+  font-family: var(--font);
 }
 
 :link {
@@ -20,7 +30,17 @@
   --glass-blur: 16px;
   --radius: 14px;
   --radius-sm: 8px;
-  --font: 'Inter', sans-serif;
+  --font: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
+  /* Where the sticky header ends on screen. The official bar and the update
+     notice sit above the header and scroll away, so script.js keeps this in
+     step and the fixed sidebar hangs from it rather than from 60px. */
+  --chrome-bottom: 60px;
+}
+
+:root {
+  /* Focus indicator. Border tokens are all under 3:1, brand-dark is not. */
+  --focus-ring: var(--brand-dark);
 }
 
 /* ─── Theme Variables: one block per colour theme x mode ─── */
@@ -210,6 +230,201 @@ svg {
 
 .glass-card:hover {
   border-color: var(--border-strong);
+}
+
+/* Focus indicator. Border tokens all sit under 3:1, so the ring is the accent
+   fill plus an outer containment ring that survives hello light. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--text) 45%, transparent);
+}
+
+/* ─── Official site bar ───
+   Permanent, not dismissible, collapsed by default. See gftv-official.md.
+   The quietest thing on the page: a fact, not an alert. */
+.gov-bar {
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.gov-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.35rem 1.5rem;
+  /* Topmost element on the page, so it sits under a notch. */
+  padding-top: max(0.35rem, env(safe-area-inset-top));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 30px;
+}
+
+.gov-bar-mark {
+  width: 24px;
+  height: 16px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.gov-bar-line {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* One row down to 320px: shorten the copy rather than wrap. */
+.gov-bar-line-short {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .gov-bar-line-long {
+    display: none;
+  }
+
+  .gov-bar-line-short {
+    display: inline;
+  }
+
+  .gov-bar-inner,
+  .gov-bar-panel-inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Reads as a link, not a button. */
+.gov-bar-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.3rem;
+  margin-right: -0.3rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--brand-text);
+  font-size: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gov-bar-toggle svg {
+  transition: transform 0.18s ease;
+}
+
+.gov-bar-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+/* The panel is the same surface growing, not a new one appearing. It
+   animates through a grid row so the panel can still carry `hidden` while
+   collapsed and stay out of the accessibility tree. */
+.gov-bar-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease;
+}
+
+.gov-bar-panel[hidden] {
+  display: none;
+}
+
+.gov-bar-panel.open {
+  grid-template-rows: 1fr;
+}
+
+.gov-bar-panel-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.gov-bar-panel-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5rem 1.5rem 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 2rem;
+}
+
+@media (max-width: 640px) {
+  .gov-bar-panel-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gov-bar-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.gov-bar-point > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--text-muted);
+}
+
+.gov-bar-point h2 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+
+.gov-bar-point p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ─── Update notice ───
+   Appears under the official bar when a new service worker is installed and
+   waiting. Nothing reloads until the reader presses Reload. See
+   update-bar-spec.md. */
+.update-notice {
+  background: color-mix(in srgb, var(--brand-dark) 12%, transparent);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.update-notice-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5rem 1.5rem;
+}
+
+.update-notice p {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.update-notice .btn {
+  flex: none;
+}
+
+@media (max-width: 480px) {
+  .update-notice-inner {
+    flex-wrap: wrap;
+    padding: 0.5rem 1rem;
+  }
+
+  .update-notice p {
+    flex-basis: 100%;
+  }
 }
 
 /* ─── Header ─── */
@@ -404,7 +619,7 @@ svg {
 .sidebar {
   position: fixed;
   left: 0;
-  top: 60px;
+  top: var(--chrome-bottom);
   bottom: 0;
   width: 280px;
   z-index: 90;
@@ -1899,14 +2114,32 @@ mark {
   margin-top: 1.25rem;
 }
 
+/* Two columns, so the time based button can span the row beneath light and
+   dark: three equal columns put the longer label in a box too narrow to read
+   at 320px, and the full width row also says visually that this one is a
+   different kind of choice, a rule for picking a mode rather than a mode. */
 .mode-toggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
+.mode-btn-wide {
+  grid-column: 1 / -1;
+}
+
+.mode-note {
+  margin: -0.25rem 0 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
 .mode-btn {
-  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   padding: 0.65rem 0.75rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
@@ -1924,9 +2157,14 @@ mark {
   border-color: var(--border-strong);
 }
 
-.mode-btn.active {
+.mode-btn.active,
+.mode-btn[aria-pressed="true"] {
   border-color: var(--brand-dark);
   background: var(--surface-active);
+}
+
+.mode-btn svg {
+  flex-shrink: 0;
 }
 
 .theme-grid {
@@ -2315,9 +2553,9 @@ mark {
 @media (min-width: 900px) {
   .sidebar {
     position: fixed;
-    top: 60px;
+    top: var(--chrome-bottom);
     transform: none;
-    height: calc(100vh - 60px);
+    height: calc(100vh - var(--chrome-bottom));
     box-shadow: none;
   }
 

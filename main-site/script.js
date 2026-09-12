@@ -104,16 +104,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     handleRoute(location.pathname + location.hash);
 });
 
-/* ─── Theme ─── */
+/* ─── Theme ───
+   Two axes: colour theme and light/dark mode. Default is always classic +
+   light, regardless of OS preference. See gftv-theme.md.
+
+   Mode preference and mode are different things. The preference is what the
+   person chose and can be "time"; the mode is what the document is in and is
+   only ever light or dark. */
 const COLOR_THEMES = [
     { id: 'classic', label: 'Classic',    dot: '#ffffff', hex: '#ffffff' },
     { id: 'hello',   label: 'HelloTheme', dot: '#fedc00', hex: '#fedc00' },
 ];
-const MODES = ['light', 'dark'];
+const MODE_PREFERENCES = ['light', 'dark', 'time'];
 const LS_COLOR_THEME = 'gftv-policyspot.colorTheme';
 const LS_MODE = 'gftv-policyspot.mode';
 const DEFAULT_COLOR_THEME = 'classic';
 const DEFAULT_MODE = 'light';
+
+// Page background per combination, for meta[name=theme-color].
+const THEME_COLOR = {
+    'classic:light': '#ffffff',
+    'classic:dark':  '#0f1317',
+    'hello:light':   '#fffde0',
+    'hello:dark':    '#14120a',
+};
+
+/* The daylight window. Duplicated in the pre-paint script in index.html and
+   404.html, which have to resolve this before first paint and cannot import
+   anything. Change all of them together. */
+const LIGHT_FROM_HOUR = 9;
+const LIGHT_UNTIL_HOUR = 18;
 
 // Move the old single key onto the two new ones, then drop it.
 function migrateLegacyTheme() {
@@ -130,6 +150,64 @@ function migrateLegacyTheme() {
     }
 }
 
+function getStoredColorTheme() {
+    let v = null;
+    try { v = localStorage.getItem(LS_COLOR_THEME); } catch (e) { }
+    return COLOR_THEMES.some(t => t.id === v) ? v : DEFAULT_COLOR_THEME;
+}
+
+function getModePreference() {
+    let v = null;
+    try { v = localStorage.getItem(LS_MODE); } catch (e) { }
+    return MODE_PREFERENCES.includes(v) ? v : DEFAULT_MODE;
+}
+
+function isDaylightHours(now = new Date()) {
+    const hour = now.getHours();
+    return hour >= LIGHT_FROM_HOUR && hour < LIGHT_UNTIL_HOUR;
+}
+
+function resolveMode(preference) {
+    if (preference === 'time') return isDaylightHours() ? 'light' : 'dark';
+    return preference === 'dark' ? 'dark' : 'light';
+}
+
+// The mode the document is in right now, resolved. What syncThemeMeta and
+// the export helpers want.
+function getStoredMode() {
+    return resolveMode(getModePreference());
+}
+
+function syncThemeMeta() {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) return;
+    const key = `${getStoredColorTheme()}:${getStoredMode()}`;
+    meta.setAttribute('content', THEME_COLOR[key] || THEME_COLOR['classic:light']);
+}
+
+// Redraws the modal from the stored preference and the resolved mode, so the
+// pressed button says what was chosen and the note says what the clock did.
+function syncModeControls() {
+    const preference = getModePreference();
+    const resolved = document.documentElement.getAttribute('data-mode');
+    document.querySelectorAll('.mode-btn').forEach(b => {
+        const pressed = b.dataset.mode === preference;
+        b.classList.toggle('active', pressed);
+        b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    });
+    const note = document.getElementById('modeNote');
+    if (!note) return;
+    if (preference === 'time') {
+        const pad = h => String(h).padStart(2, '0') + ':00';
+        note.textContent = `Following the clock: ${resolved} mode now. `
+            + `Light from ${pad(LIGHT_FROM_HOUR)} to ${pad(LIGHT_UNTIL_HOUR)}, dark otherwise.`;
+        note.hidden = false;
+    } else {
+        note.textContent = '';
+        note.hidden = true;
+    }
+}
+
 function applyColorTheme(id) {
     const theme = COLOR_THEMES.find(t => t.id === id)
         || COLOR_THEMES.find(t => t.id === DEFAULT_COLOR_THEME);
@@ -137,16 +215,81 @@ function applyColorTheme(id) {
     try { localStorage.setItem(LS_COLOR_THEME, theme.id); } catch (e) { }
     document.querySelectorAll('.theme-swatch').forEach(s =>
         s.classList.toggle('active', s.dataset.colorTheme === theme.id));
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme.hex);
+    syncThemeMeta();
 }
 
-function applyMode(mode) {
-    const m = MODES.includes(mode) ? mode : DEFAULT_MODE;
-    document.documentElement.setAttribute('data-mode', m);
-    try { localStorage.setItem(LS_MODE, m); } catch (e) { }
-    document.querySelectorAll('.mode-btn').forEach(b =>
-        b.classList.toggle('active', b.dataset.mode === m));
+// Takes a preference, stores the preference, writes the resolved mode.
+// Storing the resolved value instead would silently end a "time" choice on
+// the first evening.
+function applyMode(preference) {
+    const chosen = MODE_PREFERENCES.includes(preference) ? preference : DEFAULT_MODE;
+    const resolved = resolveMode(chosen);
+    document.documentElement.setAttribute('data-mode', resolved);
+    document.documentElement.setAttribute('data-mode-preference', chosen);
+    try { localStorage.setItem(LS_MODE, chosen); } catch (e) { }
+    syncThemeMeta();
+    syncModeControls();
+    scheduleModeCheck();
+    return resolved;
+}
+
+/* Keeping the time based mode honest while the page stays open. One timer to
+   the next boundary rather than polling, plus a re-check when the tab comes
+   back into view, since a laptop that slept through 18:00 fires its timer
+   late. */
+let modeTimer = null;
+let watchingVisibility = false;
+
+// Milliseconds until the next 09:00 or 18:00, whichever comes first.
+function msUntilNextBoundary(now = new Date()) {
+    const next = new Date(now);
+    next.setMinutes(0, 0, 0);
+    const hour = now.getHours();
+    if (hour < LIGHT_FROM_HOUR) {
+        next.setHours(LIGHT_FROM_HOUR);
+    } else if (hour < LIGHT_UNTIL_HOUR) {
+        next.setHours(LIGHT_UNTIL_HOUR);
+    } else {
+        next.setDate(next.getDate() + 1);
+        next.setHours(LIGHT_FROM_HOUR);
+    }
+    // A second of slack, so a timer that fires a fraction early does not land
+    // back in the hour it just left and reschedule itself in a tight loop.
+    return Math.max(1000, next.getTime() - now.getTime() + 1000);
+}
+
+function scheduleModeCheck() {
+    if (modeTimer !== null) {
+        clearTimeout(modeTimer);
+        modeTimer = null;
+    }
+    if (getModePreference() !== 'time') return;
+
+    modeTimer = setTimeout(() => {
+        modeTimer = null;
+        refreshTimeMode();
+    }, msUntilNextBoundary());
+
+    if (!watchingVisibility) {
+        watchingVisibility = true;
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') refreshTimeMode();
+        });
+    }
+}
+
+function refreshTimeMode() {
+    if (getModePreference() !== 'time') return;
+    const resolved = resolveMode('time');
+    const current = document.documentElement.getAttribute('data-mode');
+    if (resolved !== current) {
+        document.documentElement.setAttribute('data-mode', resolved);
+        syncThemeMeta();
+        document.dispatchEvent(new CustomEvent('gftv:modechange', {
+            detail: { mode: resolved, preference: 'time' },
+        }));
+    }
+    scheduleModeCheck();
 }
 
 function renderThemeSwatches() {
@@ -162,19 +305,13 @@ function renderThemeSwatches() {
 
 function initTheme() {
     migrateLegacyTheme();
-    let ct = DEFAULT_COLOR_THEME;
-    let md = DEFAULT_MODE;
-    try {
-        ct = localStorage.getItem(LS_COLOR_THEME);
-        md = localStorage.getItem(LS_MODE);
-    } catch (e) {
-        // storage blocked, defaults apply
-    }
-    if (!COLOR_THEMES.some(t => t.id === ct)) ct = DEFAULT_COLOR_THEME;
-    if (!MODES.includes(md)) md = DEFAULT_MODE;
     renderThemeSwatches();
-    applyColorTheme(ct);
-    applyMode(md);
+    applyColorTheme(getStoredColorTheme());
+    // The preference, not the resolved mode. Passing the resolved one would
+    // quietly rewrite a stored "time" into "dark" the first evening.
+    applyMode(getModePreference());
+    // A tab left open across 09:00 or 18:00 redraws the modal by itself.
+    document.addEventListener('gftv:modechange', syncModeControls);
 }
 
 // Export helpers: set attributes directly so a mid-export tab close
@@ -3021,6 +3158,157 @@ function showToast(msg, type = '') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+
+/* ─── Top chrome offset ───
+   The official bar and the update notice sit above the sticky header and
+   scroll away with the page. The sidebar is fixed, so it hangs from wherever
+   the header currently ends rather than from a hardcoded 60px. */
+(function trackChromeBottom() {
+    const header = document.getElementById('site-header');
+    if (!header) return;
+    let ticking = false;
+    function update() {
+        ticking = false;
+        const bottom = Math.max(0, Math.round(header.getBoundingClientRect().bottom));
+        document.documentElement.style.setProperty('--chrome-bottom', bottom + 'px');
+    }
+    function request() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+    }
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    if ('ResizeObserver' in window) {
+        const ro = new ResizeObserver(request);
+        ro.observe(document.body);
+    }
+    update();
+})();
+
+/* ─── Service worker and the update notice ───
+   A new worker never activates on its own. It downloads, installs, and waits;
+   the only thing that promotes it is a person pressing Reload. See
+   update-bar-spec.md. */
+const SW_URL = '/sw.js';
+const SW_STRINGS = {
+    label:  'Update',
+    ready:  'A new version of GFTV PolicySpot is ready.',
+    reload: 'Reload',
+    later:  'Not now',
+};
+
+let swRegistration = null;
+let swWaiting = null;
+let swReloading = false;
+let swDismissed = false; // this page view only, never stored
+
+function renderUpdateNotice() {
+    const existing = document.querySelector('.update-notice');
+
+    if (!swWaiting || swDismissed) {
+        existing?.remove();
+        return;
+    }
+
+    const bar = existing ?? document.createElement('div');
+    bar.className = 'update-notice';
+    bar.setAttribute('role', 'status');
+    bar.setAttribute('aria-label', SW_STRINGS.label);
+    bar.textContent = '';
+
+    const inner = document.createElement('div');
+    inner.className = 'update-notice-inner';
+
+    const text = document.createElement('p');
+    text.textContent = SW_STRINGS.ready;
+
+    const reload = document.createElement('button');
+    reload.type = 'button';
+    reload.className = 'btn btn-primary btn-sm';
+    reload.setAttribute('data-sw-update', '');
+    reload.textContent = SW_STRINGS.reload;
+    reload.addEventListener('click', () => {
+        // The only place anything asks for skipWaiting. The reload happens on
+        // controllerchange, not here.
+        swWaiting?.postMessage('skip-waiting');
+    });
+
+    const later = document.createElement('button');
+    later.type = 'button';
+    later.className = 'btn btn-ghost btn-sm';
+    later.setAttribute('data-sw-later', '');
+    later.textContent = SW_STRINGS.later;
+    later.addEventListener('click', () => {
+        swDismissed = true;
+        renderUpdateNotice();
+    });
+
+    inner.append(text, reload, later);
+    bar.append(inner);
+
+    if (!existing) {
+        // Under the permanent official bar, above the header.
+        const officialBar = document.getElementById('officialBar');
+        if (officialBar) officialBar.after(bar);
+        else document.body.prepend(bar);
+    }
+}
+
+function watchForSwUpdate() {
+    if (!swRegistration) return;
+
+    // A worker already waiting when the page opened. This is the ordinary
+    // case on the second page view after a deploy.
+    if (swRegistration.waiting && navigator.serviceWorker.controller) {
+        swWaiting = swRegistration.waiting;
+        renderUpdateNotice();
+    }
+
+    swRegistration.addEventListener('updatefound', () => {
+        const installing = swRegistration.installing;
+        if (!installing) return;
+        installing.addEventListener('statechange', () => {
+            // `installed` with a controller present means an update.
+            // `installed` with no controller is a first install, which has
+            // nothing to prompt about.
+            if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+                swWaiting = swRegistration.waiting ?? installing;
+                renderUpdateNotice();
+            }
+        });
+    });
+}
+
+function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+
+    navigator.serviceWorker
+        .register(SW_URL)
+        .then(reg => {
+            swRegistration = reg;
+            watchForSwUpdate();
+        })
+        .catch(cause => {
+            // A refused registration is not a reason to break the page.
+            console.warn('service worker registration failed:', cause);
+        });
+
+    // The swap, once somebody has accepted it. The controller has changed by
+    // this point, so the reload is served by the new worker. The flag guards
+    // against a second controllerchange starting a reload loop.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (swReloading) return;
+        swReloading = true;
+        window.location.reload();
+    });
+}
+
+// Registration on `load`, not immediately: installing fetches everything the
+// worker precaches, and starting that while the page is still fetching its
+// own assets makes a first visit slower for no gain.
+if (document.readyState === 'complete') registerServiceWorker();
+else window.addEventListener('load', registerServiceWorker, { once: true });
 
 /* ─── API Helper ─── */
 async function apiFetch(url, options = {}) {
