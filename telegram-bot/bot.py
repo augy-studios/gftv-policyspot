@@ -22,7 +22,7 @@ from telethon.tl.custom import Button
 from utils import (
     CATEGORIES,
     PAGE_SIZE,
-    find_subsection_page,
+    find_search_hit_page,
     format_article_markdown,
     format_article_pages,
     has_lang_subsections,
@@ -204,7 +204,7 @@ def _txt_help() -> str:
         "<b>Search</b>\n"
         "Just send me any message and I'll search all policies for it. "
         "You can also use <code>/search query</code>. "
-        "Matching subsections open their parent article on the page they appear on."
+        "Tapping a result opens the article on the page where your search text appears."
     )
 
 
@@ -296,14 +296,22 @@ async def _show_article(event, cat_code: str, slug: str, page: int, lang: str = 
         asyncio.create_task(_track_views(all_ids, CATEGORIES[cat_code]["doc"], slug))
 
 
-async def _show_article_at_subsection(event, cat_code: str, slug: str, sub_id) -> None:
-    """Open article `slug` on whichever paginated page holds subsection `sub_id`."""
+async def _show_search_hit(event, hit: dict, query: str) -> None:
+    """Open the article for a search hit on the paginated page where the
+    query text appears (or, for a subsection hit, at least on the page
+    holding that subsection's heading)."""
+    cat_code = hit["cat_code"]
+    is_sub = bool(hit.get("parent_id") and hit.get("parent_slug"))
+    slug = hit["parent_slug"] if is_sub else hit["slug"]
+
     article, subsections = await _fetch_article(cat_code, slug)
     if article is None:
         await event.answer("Article not found.", alert=True)
         return
     md_pages = format_article_markdown(article, subsections, "all")
-    page = find_subsection_page(md_pages, subsections, sub_id, "all")
+    page = find_search_hit_page(
+        md_pages, subsections, query, sub_id=hit["id"] if is_sub else None, lang="all",
+    )
     await _show_article(event, cat_code, slug, page, "all")
 
 
@@ -407,16 +415,14 @@ async def on_callback(event: events.CallbackQuery.Event) -> None:
             await _show_article(event, cat_code, slug, int(page_s), lang)
 
         elif data.startswith("AS|"):
-            # Subsection search hit: open the parent article on the page
-            # that subsection lands on. Resolved from the saved search.
+            # Search hit: open its article on the page where the query text
+            # appears. Resolved from the saved search.
             idx = int(data.split("|")[1])
             query, results = get_search(uid)
             if not query or idx >= len(results):
                 await event.answer("Search expired — please search again.", alert=True)
                 return
-            r = results[idx]
-            target = r["parent_slug"] if r.get("parent_slug") else r["slug"]
-            await _show_article_at_subsection(event, r["cat_code"], target, r["id"])
+            await _show_search_hit(event, results[idx], query)
 
         elif data.startswith("SR|"):
             page = int(data.split("|")[1])

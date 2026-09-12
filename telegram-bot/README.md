@@ -56,13 +56,13 @@ Main Menu
  │              └── Article  (paginated pages)
  └── 🔍 Search  (or just send any message)
       └── Search Results  (paginated)
-           └── Article  (opens on the page containing the matched subsection)
+           └── Article  (opens on the page where the search text appears)
 ```
 
 ### Tips
 
 - In any article list, tap **↕ Sort: Views** to rank by most viewed, or **↕ Sort: Order** to return to editorial order. The view count is shown next to each title when sorting by views.
-- Search matches article titles and body text. A result marked with ↳ is a subsection; tapping it opens the parent article directly on the page where that subsection appears.
+- Search matches article titles and body text. Tapping a result opens its article directly on the page where your search text appears (e.g. page 3/7), not page 1. A result marked with ↳ is a subsection; it opens the parent article, scanning from that subsection's page onward.
 - The page indicator button (e.g. `2 / 5`) in an article is not interactive — it shows your current position.
 - Tap **◀◀ Back to List** from any article to return to that category's article list.
 

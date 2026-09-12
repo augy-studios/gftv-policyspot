@@ -259,6 +259,38 @@ def find_subsection_page(
     return 0
 
 
+_MD_NOISE_RE = re.compile(r"[*_`#>~\[\]()!|]")
+
+
+def _plain(text: str) -> str:
+    """Strip Markdown punctuation and collapse whitespace so a query typed
+    as plain words still matches text that is bold/italic/linked in the
+    rendered page."""
+    return re.sub(r"\s+", " ", _MD_NOISE_RE.sub("", text)).lower()
+
+
+def find_search_hit_page(
+    md_pages: list[str],
+    subsections: list[dict],
+    query: str,
+    sub_id=None,
+    lang: str = "all",
+) -> int:
+    """Return the index of the page where search `query` actually appears.
+
+    For a subsection hit (`sub_id` set) the scan starts on the page holding
+    that subsection's heading so a match in an earlier subsection isn't
+    picked by mistake. Falls back to the heading page (or 0) when the text
+    can't be located, e.g. the match was in the title only."""
+    start = find_subsection_page(md_pages, subsections, sub_id, lang) if sub_id else 0
+    q = _plain(query).strip()
+    if q:
+        for idx in range(start, len(md_pages)):
+            if q in _plain(md_pages[idx]):
+                return idx
+    return start
+
+
 def format_article_pages(
     article: dict,
     subsections: list[dict],
@@ -377,13 +409,9 @@ def kb_search_results(results: list, page: int, total_pages: int) -> list:
     for idx in range(start, min(start + PAGE_SIZE, len(results))):
         r = results[idx]
         label = r["title"][:40] + ("…" if len(r["title"]) > 40 else "")
-        if r.get("parent_id") and r.get("parent_slug"):
-            # Subsection hit: resolved via the saved search (AS|index) so the
-            # bot can open the parent article on the page that subsection is on.
-            data = f"AS|{idx}"
-        else:
-            data = f"A|{r['cat_code']}|{r['slug']}|0|all"
-        rows.append([Button.inline(f"{r['cat_emoji']} {label}", data.encode())])
+        # AS|index resolves the hit from the saved search, so the bot can
+        # open the article on the page where the query text appears.
+        rows.append([Button.inline(f"{r['cat_emoji']} {label}", f"AS|{idx}".encode())])
 
     nav = []
     if page > 1:
