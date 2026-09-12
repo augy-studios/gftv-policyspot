@@ -62,7 +62,7 @@ Main Menu
 ### Tips
 
 - In any article list, tap **↕ Sort: Views** to rank by most viewed, or **↕ Sort: Order** to return to editorial order. The view count is shown next to each title when sorting by views.
-- Search matches article titles and body text. Tapping a result opens its article directly on the page where your search text appears (e.g. page 3/7), not page 1. A result marked with ↳ is a subsection; it opens the parent article, scanning from that subsection's page onward.
+- Search matches article titles and the full body text of every section and subsection, ignoring Markdown formatting and line breaks (so "defined under Section 28" matches `defined under **Section 28**`). Exact-phrase matches are listed first, followed by sections containing all the words. Tapping a result opens its article directly on the page where your search text appears (e.g. page 3/7), not page 1. A result marked with ↳ is a subsection; it opens the parent article, scanning from that subsection's page onward.
 - The page indicator button (e.g. `2 / 5`) in an article is not interactive — it shows your current position.
 - Tap **◀◀ Back to List** from any article to return to that category's article list.
 

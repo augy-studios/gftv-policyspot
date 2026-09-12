@@ -32,6 +32,7 @@ from utils import (
     kb_categories,
     kb_home,
     kb_search_results,
+    match_query,
 )
 
 logging.basicConfig(
@@ -146,8 +147,13 @@ async def _track_views(section_ids: list, doc: str, slug: str) -> None:
 
 
 async def _search_all(query: str) -> list:
+    """Search titles and full body content of every published section.
+
+    Matching is done on Markdown-normalised text (see utils.plain_text), so
+    a query like "defined under Section 28" still hits content stored as
+    "defined under **Section 28**" or split across lines. Exact-phrase hits
+    are listed before all-words hits."""
     results: list = []
-    q = query.lower()
     for cat_code, cat in CATEGORIES.items():
         try:
             rows = await asyncio.to_thread(
@@ -161,7 +167,8 @@ async def _search_all(query: str) -> list:
             all_items = rows or []
             id_to_slug = {r["id"]: r["slug"] for r in all_items}
             for item in all_items:
-                if q in (item.get("title") or "").lower() or q in (item.get("content") or "").lower():
+                score = match_query(query, item.get("title") or "", item.get("content") or "")
+                if score:
                     pid = item.get("parent_id")
                     results.append({
                         "cat_code":    cat_code,
@@ -172,9 +179,12 @@ async def _search_all(query: str) -> list:
                         "title":       item["title"],
                         "parent_id":   pid,
                         "parent_slug": id_to_slug.get(pid) if pid else None,
+                        "_score":      score,
                     })
         except Exception as exc:
             logger.error("search error table=%s: %s", cat["table"], exc)
+    # Stable sort: phrase matches first, otherwise keep category/DB order.
+    results.sort(key=lambda r: -r["_score"])
     return results
 
 

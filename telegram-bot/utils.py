@@ -259,14 +259,41 @@ def find_subsection_page(
     return 0
 
 
+# ── Search matching ───────────────────────────────────────────────────────────
+
 _MD_NOISE_RE = re.compile(r"[*_`#>~\[\]()!|]")
+_MD_LINK_URL_RE = re.compile(r"\]\([^)]*\)")
+_EMBED_RE = re.compile(r"\{\{embed:[^}]*\}\}")
 
 
-def _plain(text: str) -> str:
-    """Strip Markdown punctuation and collapse whitespace so a query typed
-    as plain words still matches text that is bold/italic/linked in the
-    rendered page."""
-    return re.sub(r"\s+", " ", _MD_NOISE_RE.sub("", text)).lower()
+def plain_text(text: str) -> str:
+    """Reduce Markdown to searchable plain text: drop link URLs, embeds and
+    Markdown punctuation, collapse whitespace, lower-case. Used for both the
+    search itself and for locating the hit inside a paginated article, so a
+    query typed as plain words matches text that is bold/linked/wrapped."""
+    if not text:
+        return ""
+    text = _EMBED_RE.sub(" ", text)
+    text = _MD_LINK_URL_RE.sub("]", text)
+    return re.sub(r"\s+", " ", _MD_NOISE_RE.sub("", text)).lower().strip()
+
+
+def match_query(query: str, *fields: str) -> int:
+    """Score how `query` matches the given text fields (title, content, …).
+
+    2 — the whole phrase appears (after Markdown/whitespace normalisation)
+    1 — every word of the query appears somewhere, but not as one phrase
+    0 — no match"""
+    q = plain_text(query)
+    if not q:
+        return 0
+    haystack = " \n ".join(plain_text(f) for f in fields if f)
+    if q in haystack:
+        return 2
+    words = q.split()
+    if len(words) > 1 and all(w in haystack for w in words):
+        return 1
+    return 0
 
 
 def find_search_hit_page(
@@ -280,14 +307,22 @@ def find_search_hit_page(
 
     For a subsection hit (`sub_id` set) the scan starts on the page holding
     that subsection's heading so a match in an earlier subsection isn't
-    picked by mistake. Falls back to the heading page (or 0) when the text
-    can't be located, e.g. the match was in the title only."""
+    picked by mistake. Prefers the page containing the whole phrase, then the
+    first page containing every query word; falls back to the heading page
+    (or 0) when the text can't be located, e.g. the match was in the title."""
     start = find_subsection_page(md_pages, subsections, sub_id, lang) if sub_id else 0
-    q = _plain(query).strip()
-    if q:
-        for idx in range(start, len(md_pages)):
-            if q in _plain(md_pages[idx]):
-                return idx
+    q = plain_text(query)
+    if not q:
+        return start
+    plain_pages = [plain_text(p) for p in md_pages[start:]]
+    for offset, page in enumerate(plain_pages):
+        if q in page:
+            return start + offset
+    words = q.split()
+    if len(words) > 1:
+        for offset, page in enumerate(plain_pages):
+            if all(w in page for w in words):
+                return start + offset
     return start
 
 
