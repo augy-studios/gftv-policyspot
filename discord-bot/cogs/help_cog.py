@@ -4,6 +4,7 @@ from discord.ext import commands
 
 import config
 
+# (how to type the command, what it does) for every command shown by /help
 COMMANDS_INFO: list[tuple[str, str]] = [
     (
         '/browse <document>',
@@ -41,7 +42,8 @@ class HelpCog(commands.Cog):
         name='help',
         description='List all available GFTV PolicySpot commands.',
     )
-    async def help_cmd(self, interaction: discord.Interaction) -> None:
+    async def help_command(self, interaction: discord.Interaction) -> None:
+        """Reply with an embed listing every slash command and what it does."""
         embed = discord.Embed(
             title='GFTV PolicySpot — Commands',
             description=(
@@ -50,8 +52,8 @@ class HelpCog(commands.Cog):
             ),
             color=config.EMBED_COLOR,
         )
-        for name, desc in COMMANDS_INFO:
-            embed.add_field(name=name, value=desc, inline=False)
+        for command_usage, command_description in COMMANDS_INFO:
+            embed.add_field(name=command_usage, value=command_description, inline=False)
         embed.set_footer(text='GFTV PolicySpot · Only published sections are visible')
         await interaction.response.send_message(embed=embed)
 

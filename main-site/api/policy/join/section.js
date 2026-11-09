@@ -1,19 +1,27 @@
 // api/policy/join/section.js - Get a Join GFTV section by slug
 const { getSupabaseClient } = require('../../../lib/supabase');
-const { ok, err, handleOptions } = require('../../../lib/response');
+const { sendSuccess, sendError, handleOptions } = require('../../../lib/response');
 
-module.exports = async (req, res) => {
-    if (handleOptions(req, res)) return;
-    if (req.method !== 'GET') return err(res, 'Method not allowed', 405);
-    const { slug } = req.query;
-    if (!slug) return err(res, 'Slug required');
+module.exports = async (request, response) => {
+    if (handleOptions(request, response)) {
+        return;
+    }
+    if (request.method !== 'GET') {
+        return sendError(response, 'Method not allowed', 405);
+    }
+    const { slug } = request.query;
+    if (!slug) {
+        return sendError(response, 'Slug required');
+    }
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase
+    const { data: section, error } = await supabase
         .from('gftvpolicy_join')
         .select('*')
         .eq('slug', slug)
         .eq('is_published', true)
         .single();
-    if (error || !data) return err(res, 'Section not found', 404);
-    return ok(res, { section: data });
+    if (error || !section) {
+        return sendError(response, 'Section not found', 404);
+    }
+    return sendSuccess(response, { section: section });
 };

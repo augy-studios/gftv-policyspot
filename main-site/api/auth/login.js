@@ -1,24 +1,51 @@
-// api/auth/login.js
+// api/auth/login.js - Signs a user in with their username and password.
+// If the user has two-factor authentication turned on, a short-lived
+// "challenge token" is returned instead and the browser must then call
+// api/auth/totp-verify.js with the 6-digit code.
 const {
     getSupabaseClient
 } = require('../../lib/supabase');
 const {
-    ok,
-    err,
+    sendSuccess,
+    sendError,
     handleOptions
 } = require('../../lib/response');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-module.exports = async (req, res) => {
-    if (handleOptions(req, res)) return;
-    if (req.method !== 'POST') return err(res, 'Method not allowed', 405);
+const TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
+const THIRTY_DAYS_IN_MILLISECONDS = 30 * 24 * 60 * 60 * 1000;
+
+/**
+ * Stores a new two-factor challenge for the user and sends it back to the
+ * browser so it can ask the user for their authenticator code.
+ */
+async function sendTwoFactorChallenge(supabase, response, userId) {
+    const challengeToken = crypto.randomBytes(32).toString('hex');
+    const challengeExpiresAt = new Date(Date.now() + TEN_MINUTES_IN_MILLISECONDS).toISOString();
+    await supabase.from('gftvhello_totp_challenges').insert({
+        token: challengeToken,
+        user_id: userId,
+        expires_at: challengeExpiresAt,
+    });
+    return sendSuccess(response, { totp_required: true, challenge_token: challengeToken });
+}
+
+module.exports = async (request, response) => {
+    if (handleOptions(request, response)) {
+        return;
+    }
+    if (request.method !== 'POST') {
+        return sendError(response, 'Method not allowed', 405);
+    }
     const {
         username,
         password,
-        device_token,
-    } = req.body || {};
-    if (!username || !password) return err(res, 'Username and password required');
+        device_token: deviceToken,
+    } = request.body || {};
+    if (!username || !password) {
+        return sendError(response, 'Username and password required');
+    }
     const supabase = getSupabaseClient();
     const {
         data: user,
@@ -28,64 +55,57 @@ module.exports = async (req, res) => {
         .select('*')
         .eq('username', username.toLowerCase())
         .single();
-    if (error || !user) return err(res, 'Invalid credentials', 401);
-    if (!user.is_approved) return err(res, 'Account pending approval', 403);
-    const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) return err(res, 'Invalid credentials', 401);
+    if (error || !user) {
+        return sendError(response, 'Invalid credentials', 401);
+    }
+    if (!user.is_approved) {
+        return sendError(response, 'Account pending approval', 403);
+    }
+    const passwordIsCorrect = await bcrypt.compare(password, user.password_hash);
+    if (!passwordIsCorrect) {
+        return sendError(response, 'Invalid credentials', 401);
+    }
 
     // If 2FA is enabled, check for a trusted device before requiring the code
     if (user.totp_secret) {
-        if (device_token) {
-            const { data: trusted } = await supabase
-                .from('gftvhello_trusted_devices')
-                .select('id, expires_at')
-                .eq('device_token', device_token)
-                .eq('user_id', user.id)
-                .single();
-
-            if (trusted && new Date(trusted.expires_at) > new Date()) {
-                // Trusted device — fall through to create session below
-            } else {
-                // Stale/invalid token — clean it up and require 2FA
-                if (trusted) {
-                    await supabase.from('gftvhello_trusted_devices').delete().eq('id', trusted.id);
-                }
-                const challenge_token = crypto.randomBytes(32).toString('hex');
-                const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-                await supabase.from('gftvhello_totp_challenges').insert({
-                    token: challenge_token,
-                    user_id: user.id,
-                    expires_at,
-                });
-                return ok(res, { totp_required: true, challenge_token });
-            }
-        } else {
-            // No device token — require 2FA
-            const challenge_token = crypto.randomBytes(32).toString('hex');
-            const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-            await supabase.from('gftvhello_totp_challenges').insert({
-                token: challenge_token,
-                user_id: user.id,
-                expires_at,
-            });
-            return ok(res, { totp_required: true, challenge_token });
+        if (!deviceToken) {
+            // No device token was sent, so the code is always required
+            return sendTwoFactorChallenge(supabase, response, user.id);
         }
+
+        const { data: trustedDevice } = await supabase
+            .from('gftvhello_trusted_devices')
+            .select('id, expires_at')
+            .eq('device_token', deviceToken)
+            .eq('user_id', user.id)
+            .single();
+
+        const deviceIsStillTrusted = trustedDevice && new Date(trustedDevice.expires_at) > new Date();
+        if (!deviceIsStillTrusted) {
+            // Stale or invalid token: clean it up and require 2FA
+            if (trustedDevice) {
+                await supabase.from('gftvhello_trusted_devices').delete().eq('id', trustedDevice.id);
+            }
+            return sendTwoFactorChallenge(supabase, response, user.id);
+        }
+        // Trusted device: carry on and create the session below
     }
 
-    const token = crypto.randomBytes(48).toString('hex');
-    const expires_at = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const sessionToken = crypto.randomBytes(48).toString('hex');
+    const sessionExpiresAt = new Date(Date.now() + THIRTY_DAYS_IN_MILLISECONDS).toISOString();
     await supabase.from('gftvhello_sessions').insert({
         user_id: user.id,
-        token,
-        expires_at
+        token: sessionToken,
+        expires_at: sessionExpiresAt
     });
+    // Remove the secret fields so they are never sent to the browser
     const {
-        password_hash,
-        totp_secret,
+        password_hash: removedPasswordHash,
+        totp_secret: removedTotpSecret,
         ...safeUser
     } = user;
-    return ok(res, {
-        token,
+    return sendSuccess(response, {
+        token: sessionToken,
         user: safeUser
     });
 };

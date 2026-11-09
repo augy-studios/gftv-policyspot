@@ -6,48 +6,64 @@ const {
     validateSession
 } = require('../../lib/auth');
 const {
-    ok,
-    err,
+    sendSuccess,
+    sendError,
     handleOptions
 } = require('../../lib/response');
 
-module.exports = async (req, res) => {
-    if (handleOptions(req, res)) return;
-    if (req.method !== 'PUT') return err(res, 'Method not allowed', 405);
-    const user = await validateSession(req);
-    if (!user) return err(res, 'Unauthorized', 401);
-    if (!user.is_admin && !user.is_editor) return err(res, 'Forbidden', 403);
+module.exports = async (request, response) => {
+    if (handleOptions(request, response)) {
+        return;
+    }
+    if (request.method !== 'PUT') {
+        return sendError(response, 'Method not allowed', 405);
+    }
+    const user = await validateSession(request);
+    if (!user) {
+        return sendError(response, 'Unauthorized', 401);
+    }
+    if (!user.is_admin && !user.is_editor) {
+        return sendError(response, 'Forbidden', 403);
+    }
     const {
-        id,
+        id: sectionId,
         slug
-    } = req.body || {};
-    if (!id || !slug) return err(res, 'id and slug required');
-    if (!/^[a-z0-9-]+$/.test(slug)) return err(res, 'Slug must be lowercase alphanumeric with hyphens only');
+    } = request.body || {};
+    if (!sectionId || !slug) {
+        return sendError(response, 'id and slug required');
+    }
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+        return sendError(response, 'Slug must be lowercase alphanumeric with hyphens only');
+    }
     const supabase = getSupabaseClient();
     // Check uniqueness
     const {
-        data: existing
+        data: sectionUsingSlug
     } = await supabase
         .from('gftvpolicy_charter')
         .select('id')
         .eq('slug', slug)
-        .neq('id', id)
+        .neq('id', sectionId)
         .single();
-    if (existing) return err(res, 'Slug already in use', 409);
+    if (sectionUsingSlug) {
+        return sendError(response, 'Slug already in use', 409);
+    }
     const {
-        data,
+        data: updatedSection,
         error
     } = await supabase
         .from('gftvpolicy_charter')
         .update({
-            slug,
+            slug: slug,
             updated_at: new Date().toISOString()
         })
-        .eq('id', id)
+        .eq('id', sectionId)
         .select('id, slug, title')
         .single();
-    if (error) return err(res, 'Update failed');
-    return ok(res, {
-        section: data
+    if (error) {
+        return sendError(response, 'Update failed');
+    }
+    return sendSuccess(response, {
+        section: updatedSection
     });
 };

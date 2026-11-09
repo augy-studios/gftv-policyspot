@@ -1,3 +1,5 @@
+"""The shared Supabase database client used by the bot."""
+
 from supabase import Client, create_client
 
 from config import SUPABASE_SERVICE_KEY, SUPABASE_URL

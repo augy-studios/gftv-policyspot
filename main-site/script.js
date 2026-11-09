@@ -1,100 +1,108 @@
-const API = '';
+// Base URL for API calls. Empty means "the same website this page came from".
+const API_BASE_URL = '';
 
-/* ─── Doc config ─── */
-const DOCS = {
+/* ─── Document configuration ───
+   Every policy document on the site has one entry here describing where its
+   data comes from (API endpoints), where it lives on the site (URL base) and
+   which HTML elements it renders into. */
+const DOCUMENT_CONFIG = {
     charter: {
-        apiSections: '/api/policy/sections',
-        apiSection:  '/api/policy/section',
-        urlBase:     '/the-charter',
-        label:       'Charter of Global Furry Television',
-        navPage:     'charter',
-        sidebarTitle:'Charter',
-        contentEl:   'section-content',
-        breadcrumbEl:'doc-breadcrumb',
-        navFooterEl: 'doc-nav-footer',
+        apiSections:         '/api/policy/sections',
+        apiSection:          '/api/policy/section',
+        urlBase:             '/the-charter',
+        label:               'Charter of Global Furry Television',
+        navPage:             'charter',
+        sidebarTitle:        'Charter',
+        contentElementId:    'section-content',
+        breadcrumbElementId: 'doc-breadcrumb',
+        navFooterElementId:  'doc-nav-footer',
     },
     news: {
-        apiSections: '/api/policy/news/sections',
-        apiSection:  '/api/policy/news/section',
-        urlBase:     '/news',
-        label:       'News Standards',
-        navPage:     'news',
-        sidebarTitle:'News Standards',
-        contentEl:   'news-content',
-        breadcrumbEl:'news-breadcrumb',
-        navFooterEl: 'news-nav-footer',
+        apiSections:         '/api/policy/news/sections',
+        apiSection:          '/api/policy/news/section',
+        urlBase:             '/news',
+        label:               'News Standards',
+        navPage:             'news',
+        sidebarTitle:        'News Standards',
+        contentElementId:    'news-content',
+        breadcrumbElementId: 'news-breadcrumb',
+        navFooterElementId:  'news-nav-footer',
         hero: {
-            badge: 'Edition 2023',
-            title: 'News Standards // 新闻报道标准',
-            sub:   'The editorial and journalistic standards of Global Furry Television',
+            badge:    'Edition 2023',
+            title:    'News Standards // 新闻报道标准',
+            subtitle: 'The editorial and journalistic standards of Global Furry Television',
         },
     },
     prs: {
-        apiSections: '/api/policy/prs/sections',
-        apiSection:  '/api/policy/prs/section',
-        urlBase:     '/prs',
-        label:       'Programme Rating System',
-        navPage:     'prs',
-        sidebarTitle:'Programme Rating System',
-        contentEl:   'prs-content',
-        breadcrumbEl:'prs-breadcrumb',
-        navFooterEl: 'prs-nav-footer',
+        apiSections:         '/api/policy/prs/sections',
+        apiSection:          '/api/policy/prs/section',
+        urlBase:             '/prs',
+        label:               'Programme Rating System',
+        navPage:             'prs',
+        sidebarTitle:        'Programme Rating System',
+        contentElementId:    'prs-content',
+        breadcrumbElementId: 'prs-breadcrumb',
+        navFooterElementId:  'prs-nav-footer',
         hero: {
-            badge: 'Edition 2023',
-            title: 'Programme Rating System // 节目制度系统',
-            sub:   'The programme classification and content rating framework of Global Furry Television',
+            badge:    'Edition 2023',
+            title:    'Programme Rating System // 节目制度系统',
+            subtitle: 'The programme classification and content rating framework of Global Furry Television',
         },
     },
     rules: {
-        apiSections: '/api/policy/rules/sections',
-        apiSection:  '/api/policy/rules/section',
-        urlBase:     '/rules',
-        label:       'Community Rules',
-        navPage:     'rules',
-        sidebarTitle:'Community Rules',
-        contentEl:   'rules-content',
-        breadcrumbEl:'rules-breadcrumb',
-        navFooterEl: 'rules-nav-footer',
+        apiSections:         '/api/policy/rules/sections',
+        apiSection:          '/api/policy/rules/section',
+        urlBase:             '/rules',
+        label:               'Community Rules',
+        navPage:             'rules',
+        sidebarTitle:        'Community Rules',
+        contentElementId:    'rules-content',
+        breadcrumbElementId: 'rules-breadcrumb',
+        navFooterElementId:  'rules-nav-footer',
         hero: {
-            badge: 'Edition 2026',
-            title: 'Community Rules (CR) // 社区规则与条例',
-            sub:   'This document will serve as the reference for the rules and regulations that shall govern all communities under Global Furry Television.',
+            badge:    'Edition 2026',
+            title:    'Community Rules (CR) // 社区规则与条例',
+            subtitle: 'This document will serve as the reference for the rules and regulations that shall govern all communities under Global Furry Television.',
         },
     },
     join: {
-        apiSections: '/api/policy/join/sections',
-        apiSection:  '/api/policy/join/section',
-        urlBase:     '/join-us',
-        label:       'Join GFTV',
-        navPage:     'join',
-        sidebarTitle:'Join GFTV',
-        contentEl:   'join-content',
-        breadcrumbEl:'join-breadcrumb',
-        navFooterEl: 'join-nav-footer',
-        defaultSlug: 'home',
+        apiSections:         '/api/policy/join/sections',
+        apiSection:          '/api/policy/join/section',
+        urlBase:             '/join-us',
+        label:               'Join GFTV',
+        navPage:             'join',
+        sidebarTitle:        'Join GFTV',
+        contentElementId:    'join-content',
+        breadcrumbElementId: 'join-breadcrumb',
+        navFooterElementId:  'join-nav-footer',
+        defaultSlug:         'home',
     },
     legal: {
-        apiSections: '/api/policy/legal/sections',
-        apiSection:  '/api/policy/legal/section',
-        urlBase:     '/legal',
-        label:       'Legal',
-        navPage:     '',
-        sidebarTitle:'Legal',
-        contentEl:   'legal-content',
-        breadcrumbEl:'legal-breadcrumb',
-        navFooterEl: 'legal-nav-footer',
+        apiSections:         '/api/policy/legal/sections',
+        apiSection:          '/api/policy/legal/section',
+        urlBase:             '/legal',
+        label:               'Legal',
+        navPage:             '',
+        sidebarTitle:        'Legal',
+        contentElementId:    'legal-content',
+        breadcrumbElementId: 'legal-breadcrumb',
+        navFooterElementId:  'legal-nav-footer',
     },
 };
 
+// Screens narrower than this (in pixels) are treated as mobile: the sidebar
+// becomes an overlay that closes after a link is chosen.
+const MOBILE_BREAKPOINT_WIDTH = 900;
+
 /* ─── State ─── */
 let currentUser = null;
-let currentDoc = 'charter'; // active document key
-const docSectionsCache = {}; // { charter: [], news: [], ... }
-let sections = []; // alias for docSectionsCache[currentDoc]
+let currentDocumentKey = 'charter'; // active document key, one of the keys of DOCUMENT_CONFIG
+const documentSectionsCache = {}; // { charter: [], news: [], ... }
+let sections = []; // the same list as documentSectionsCache[currentDocumentKey]
 let currentSection = null; // currently displayed top-level page/article row
 let currentSlug = null;
 
-/* ─── Init ─── */
+/* ─── Start-up ─── */
 document.addEventListener('DOMContentLoaded', async () => {
     initTheme();
     initRouter();
@@ -112,12 +120,12 @@ document.addEventListener('DOMContentLoaded', async () => {
    person chose and can be "time"; the mode is what the document is in and is
    only ever light or dark. */
 const COLOR_THEMES = [
-    { id: 'classic', label: 'Classic',    dot: '#ffffff', hex: '#ffffff' },
-    { id: 'hello',   label: 'HelloTheme', dot: '#fedc00', hex: '#fedc00' },
+    { id: 'classic', label: 'Classic',    dotColor: '#ffffff', hexCode: '#ffffff' },
+    { id: 'hello',   label: 'HelloTheme', dotColor: '#fedc00', hexCode: '#fedc00' },
 ];
 const MODE_PREFERENCES = ['light', 'dark', 'time'];
-const LS_COLOR_THEME = 'gftv-policyspot.colorTheme';
-const LS_MODE = 'gftv-policyspot.mode';
+const STORAGE_KEY_COLOR_THEME = 'gftv-policyspot.colorTheme';
+const STORAGE_KEY_MODE = 'gftv-policyspot.mode';
 const DEFAULT_COLOR_THEME = 'classic';
 const DEFAULT_MODE = 'light';
 
@@ -138,28 +146,53 @@ const LIGHT_UNTIL_HOUR = 18;
 // Move the old single key onto the two new ones, then drop it.
 function migrateLegacyTheme() {
     try {
-        const old = localStorage.getItem('gftv-theme');
-        if (old === null) return;
-        if (localStorage.getItem(LS_COLOR_THEME) === null)
-            localStorage.setItem(LS_COLOR_THEME, old === 'hello' ? 'hello' : DEFAULT_COLOR_THEME);
-        if (localStorage.getItem(LS_MODE) === null)
-            localStorage.setItem(LS_MODE, DEFAULT_MODE);
+        const oldThemeSetting = localStorage.getItem('gftv-theme');
+        if (oldThemeSetting === null) {
+            return;
+        }
+        if (localStorage.getItem(STORAGE_KEY_COLOR_THEME) === null) {
+            let migratedColorTheme = DEFAULT_COLOR_THEME;
+            if (oldThemeSetting === 'hello') {
+                migratedColorTheme = 'hello';
+            }
+            localStorage.setItem(STORAGE_KEY_COLOR_THEME, migratedColorTheme);
+        }
+        if (localStorage.getItem(STORAGE_KEY_MODE) === null) {
+            localStorage.setItem(STORAGE_KEY_MODE, DEFAULT_MODE);
+        }
         localStorage.removeItem('gftv-theme');
-    } catch (e) {
+    } catch (storageError) {
         // storage blocked, defaults apply
     }
 }
 
+// Returns the saved colour theme id, or the default when nothing valid is saved.
 function getStoredColorTheme() {
-    let v = null;
-    try { v = localStorage.getItem(LS_COLOR_THEME); } catch (e) { }
-    return COLOR_THEMES.some(t => t.id === v) ? v : DEFAULT_COLOR_THEME;
+    let storedValue = null;
+    try {
+        storedValue = localStorage.getItem(STORAGE_KEY_COLOR_THEME);
+    } catch (storageError) {
+        // storage blocked, the default is used
+    }
+    const isKnownTheme = COLOR_THEMES.some(theme => theme.id === storedValue);
+    if (isKnownTheme) {
+        return storedValue;
+    }
+    return DEFAULT_COLOR_THEME;
 }
 
+// Returns the saved mode preference ("light", "dark" or "time").
 function getModePreference() {
-    let v = null;
-    try { v = localStorage.getItem(LS_MODE); } catch (e) { }
-    return MODE_PREFERENCES.includes(v) ? v : DEFAULT_MODE;
+    let storedValue = null;
+    try {
+        storedValue = localStorage.getItem(STORAGE_KEY_MODE);
+    } catch (storageError) {
+        // storage blocked, the default is used
+    }
+    if (MODE_PREFERENCES.includes(storedValue)) {
+        return storedValue;
+    }
+    return DEFAULT_MODE;
 }
 
 function isDaylightHours(now = new Date()) {
@@ -167,9 +200,19 @@ function isDaylightHours(now = new Date()) {
     return hour >= LIGHT_FROM_HOUR && hour < LIGHT_UNTIL_HOUR;
 }
 
+// Turns a preference into an actual mode: "time" becomes light or dark
+// depending on the clock, and anything other than "dark" becomes light.
 function resolveMode(preference) {
-    if (preference === 'time') return isDaylightHours() ? 'light' : 'dark';
-    return preference === 'dark' ? 'dark' : 'light';
+    if (preference === 'time') {
+        if (isDaylightHours()) {
+            return 'light';
+        }
+        return 'dark';
+    }
+    if (preference === 'dark') {
+        return 'dark';
+    }
+    return 'light';
 }
 
 // The mode the document is in right now, resolved. What syncThemeMeta and
@@ -178,43 +221,62 @@ function getStoredMode() {
     return resolveMode(getModePreference());
 }
 
+// Updates the browser's <meta name="theme-color"> so the browser toolbar
+// colour matches the page.
 function syncThemeMeta() {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) return;
-    const key = `${getStoredColorTheme()}:${getStoredMode()}`;
-    meta.setAttribute('content', THEME_COLOR[key] || THEME_COLOR['classic:light']);
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (!themeColorMeta) {
+        return;
+    }
+    const themeKey = `${getStoredColorTheme()}:${getStoredMode()}`;
+    const themeColor = THEME_COLOR[themeKey] || THEME_COLOR['classic:light'];
+    themeColorMeta.setAttribute('content', themeColor);
 }
 
 // Redraws the modal from the stored preference and the resolved mode, so the
 // pressed button says what was chosen and the note says what the clock did.
 function syncModeControls() {
     const preference = getModePreference();
-    const resolved = document.documentElement.getAttribute('data-mode');
-    document.querySelectorAll('.mode-btn').forEach(b => {
-        const pressed = b.dataset.mode === preference;
-        b.classList.toggle('active', pressed);
-        b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    const resolvedMode = document.documentElement.getAttribute('data-mode');
+    document.querySelectorAll('.mode-btn').forEach(modeButton => {
+        const isPressed = modeButton.dataset.mode === preference;
+        modeButton.classList.toggle('active', isPressed);
+        if (isPressed) {
+            modeButton.setAttribute('aria-pressed', 'true');
+        } else {
+            modeButton.setAttribute('aria-pressed', 'false');
+        }
     });
-    const note = document.getElementById('modeNote');
-    if (!note) return;
+    const modeNote = document.getElementById('modeNote');
+    if (!modeNote) {
+        return;
+    }
     if (preference === 'time') {
-        const pad = h => String(h).padStart(2, '0') + ':00';
-        note.textContent = `Following the clock: ${resolved} mode now. `
-            + `Light from ${pad(LIGHT_FROM_HOUR)} to ${pad(LIGHT_UNTIL_HOUR)}, dark otherwise.`;
-        note.hidden = false;
+        const formatHour = hour => String(hour).padStart(2, '0') + ':00';
+        modeNote.textContent = `Following the clock: ${resolvedMode} mode now. `
+            + `Light from ${formatHour(LIGHT_FROM_HOUR)} to ${formatHour(LIGHT_UNTIL_HOUR)}, dark otherwise.`;
+        modeNote.hidden = false;
     } else {
-        note.textContent = '';
-        note.hidden = true;
+        modeNote.textContent = '';
+        modeNote.hidden = true;
     }
 }
 
-function applyColorTheme(id) {
-    const theme = COLOR_THEMES.find(t => t.id === id)
-        || COLOR_THEMES.find(t => t.id === DEFAULT_COLOR_THEME);
+// Switches the colour theme, saves it, and highlights the matching swatch.
+function applyColorTheme(themeId) {
+    let theme = COLOR_THEMES.find(candidate => candidate.id === themeId);
+    if (!theme) {
+        theme = COLOR_THEMES.find(candidate => candidate.id === DEFAULT_COLOR_THEME);
+    }
     document.documentElement.setAttribute('data-color-theme', theme.id);
-    try { localStorage.setItem(LS_COLOR_THEME, theme.id); } catch (e) { }
-    document.querySelectorAll('.theme-swatch').forEach(s =>
-        s.classList.toggle('active', s.dataset.colorTheme === theme.id));
+    try {
+        localStorage.setItem(STORAGE_KEY_COLOR_THEME, theme.id);
+    } catch (storageError) {
+        // storage blocked, the theme still applies to this page view
+    }
+    document.querySelectorAll('.theme-swatch').forEach(swatch => {
+        swatch.classList.toggle('active', swatch.dataset.colorTheme === theme.id);
+    });
     syncThemeMeta();
 }
 
@@ -222,15 +284,22 @@ function applyColorTheme(id) {
 // Storing the resolved value instead would silently end a "time" choice on
 // the first evening.
 function applyMode(preference) {
-    const chosen = MODE_PREFERENCES.includes(preference) ? preference : DEFAULT_MODE;
-    const resolved = resolveMode(chosen);
-    document.documentElement.setAttribute('data-mode', resolved);
-    document.documentElement.setAttribute('data-mode-preference', chosen);
-    try { localStorage.setItem(LS_MODE, chosen); } catch (e) { }
+    let chosenPreference = DEFAULT_MODE;
+    if (MODE_PREFERENCES.includes(preference)) {
+        chosenPreference = preference;
+    }
+    const resolvedMode = resolveMode(chosenPreference);
+    document.documentElement.setAttribute('data-mode', resolvedMode);
+    document.documentElement.setAttribute('data-mode-preference', chosenPreference);
+    try {
+        localStorage.setItem(STORAGE_KEY_MODE, chosenPreference);
+    } catch (storageError) {
+        // storage blocked, the mode still applies to this page view
+    }
     syncThemeMeta();
     syncModeControls();
     scheduleModeCheck();
-    return resolved;
+    return resolvedMode;
 }
 
 /* Keeping the time based mode honest while the page stays open. One timer to
@@ -238,24 +307,24 @@ function applyMode(preference) {
    back into view, since a laptop that slept through 18:00 fires its timer
    late. */
 let modeTimer = null;
-let watchingVisibility = false;
+let isWatchingVisibility = false;
 
 // Milliseconds until the next 09:00 or 18:00, whichever comes first.
-function msUntilNextBoundary(now = new Date()) {
-    const next = new Date(now);
-    next.setMinutes(0, 0, 0);
+function millisecondsUntilNextBoundary(now = new Date()) {
+    const nextBoundary = new Date(now);
+    nextBoundary.setMinutes(0, 0, 0);
     const hour = now.getHours();
     if (hour < LIGHT_FROM_HOUR) {
-        next.setHours(LIGHT_FROM_HOUR);
+        nextBoundary.setHours(LIGHT_FROM_HOUR);
     } else if (hour < LIGHT_UNTIL_HOUR) {
-        next.setHours(LIGHT_UNTIL_HOUR);
+        nextBoundary.setHours(LIGHT_UNTIL_HOUR);
     } else {
-        next.setDate(next.getDate() + 1);
-        next.setHours(LIGHT_FROM_HOUR);
+        nextBoundary.setDate(nextBoundary.getDate() + 1);
+        nextBoundary.setHours(LIGHT_FROM_HOUR);
     }
     // A second of slack, so a timer that fires a fraction early does not land
     // back in the hour it just left and reschedule itself in a tight loop.
-    return Math.max(1000, next.getTime() - now.getTime() + 1000);
+    return Math.max(1000, nextBoundary.getTime() - now.getTime() + 1000);
 }
 
 function scheduleModeCheck() {
@@ -263,43 +332,53 @@ function scheduleModeCheck() {
         clearTimeout(modeTimer);
         modeTimer = null;
     }
-    if (getModePreference() !== 'time') return;
+    if (getModePreference() !== 'time') {
+        return;
+    }
 
     modeTimer = setTimeout(() => {
         modeTimer = null;
         refreshTimeMode();
-    }, msUntilNextBoundary());
+    }, millisecondsUntilNextBoundary());
 
-    if (!watchingVisibility) {
-        watchingVisibility = true;
+    if (!isWatchingVisibility) {
+        isWatchingVisibility = true;
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') refreshTimeMode();
+            if (document.visibilityState === 'visible') {
+                refreshTimeMode();
+            }
         });
     }
 }
 
+// Re-checks the clock while the "time" preference is active and switches
+// between light and dark if a boundary has been crossed.
 function refreshTimeMode() {
-    if (getModePreference() !== 'time') return;
-    const resolved = resolveMode('time');
-    const current = document.documentElement.getAttribute('data-mode');
-    if (resolved !== current) {
-        document.documentElement.setAttribute('data-mode', resolved);
+    if (getModePreference() !== 'time') {
+        return;
+    }
+    const resolvedMode = resolveMode('time');
+    const currentMode = document.documentElement.getAttribute('data-mode');
+    if (resolvedMode !== currentMode) {
+        document.documentElement.setAttribute('data-mode', resolvedMode);
         syncThemeMeta();
         document.dispatchEvent(new CustomEvent('gftv:modechange', {
-            detail: { mode: resolved, preference: 'time' },
+            detail: { mode: resolvedMode, preference: 'time' },
         }));
     }
     scheduleModeCheck();
 }
 
 function renderThemeSwatches() {
-    const grid = document.getElementById('theme-grid');
-    if (!grid) return;
-    grid.innerHTML = COLOR_THEMES.map(t => `
-        <button class="theme-swatch" data-color-theme="${t.id}" type="button">
-            <span class="swatch-dot" style="background:${t.dot}"></span>
-            <span>${t.label}</span>
-            <span class="swatch-hex">${t.hex}</span>
+    const themeGrid = document.getElementById('theme-grid');
+    if (!themeGrid) {
+        return;
+    }
+    themeGrid.innerHTML = COLOR_THEMES.map(theme => `
+        <button class="theme-swatch" data-color-theme="${theme.id}" type="button">
+            <span class="swatch-dot" style="background:${theme.dotColor}"></span>
+            <span>${theme.label}</span>
+            <span class="swatch-hex">${theme.hexCode}</span>
         </button>`).join('');
 }
 
@@ -318,8 +397,8 @@ function initTheme() {
 // cannot persist the forced theme over the user's pick.
 function snapshotTheme() {
     return {
-        ct: document.documentElement.getAttribute('data-color-theme'),
-        md: document.documentElement.getAttribute('data-mode'),
+        colorTheme: document.documentElement.getAttribute('data-color-theme'),
+        mode: document.documentElement.getAttribute('data-mode'),
     };
 }
 
@@ -328,24 +407,34 @@ function forceExportTheme() {
     document.documentElement.setAttribute('data-mode', DEFAULT_MODE);
 }
 
-function restoreTheme(s) {
-    document.documentElement.setAttribute('data-color-theme', s.ct);
-    document.documentElement.setAttribute('data-mode', s.md);
+function restoreTheme(themeSnapshot) {
+    document.documentElement.setAttribute('data-color-theme', themeSnapshot.colorTheme);
+    document.documentElement.setAttribute('data-mode', themeSnapshot.mode);
 }
 
-/* ─── Router ─── */
+/* ─── Router ───
+   The site is a single-page app: every URL is served by index.html and this
+   code decides which "page" element to show based on the address. */
 function initRouter() {
     window.addEventListener('popstate', () => handleRoute(location.pathname + location.hash));
 }
 
+// Changes the address bar to "path" without reloading, then shows that page.
 function navigate(path, {
     replace = false
 } = {}) {
-    if (replace) history.replaceState({}, '', path);
-    else history.pushState({}, '', path);
+    if (replace) {
+        history.replaceState({}, '', path);
+    } else {
+        history.pushState({}, '', path);
+    }
     handleRoute(path);
 }
 
+/**
+ * Reads a path such as "/news/some-article#part-2" and shows the matching page:
+ * the home, about or admin page, a document's index page, or a single article.
+ */
 async function handleRoute(fullPath) {
     const [path, hash] = fullPath.split('#');
     const cleanPath = path.replace(/\/$/, '') || '/';
@@ -367,26 +456,30 @@ async function handleRoute(fullPath) {
         return;
     }
 
-    // Check each doc's urlBase for a match
-    for (const [docKey, doc] of Object.entries(DOCS)) {
-        const base = doc.urlBase; // e.g. '/the-charter', '/news'
-        if (cleanPath === base) {
-            await switchDoc(docKey);
-            showPage(docKey === 'charter' ? 'charter' : docKey);
-            updateActiveNav(doc.navPage);
-            if (doc.defaultSlug) {
-                loadPage(doc.defaultSlug, null);
+    // Check each document's urlBase for a match
+    for (const [documentKey, documentConfig] of Object.entries(DOCUMENT_CONFIG)) {
+        const urlBase = documentConfig.urlBase; // e.g. '/the-charter', '/news'
+
+        // The address is the document's own index page, e.g. "/news"
+        if (cleanPath === urlBase) {
+            await switchDocument(documentKey);
+            showPage(documentKey);
+            updateActiveNav(documentConfig.navPage);
+            if (documentConfig.defaultSlug) {
+                loadPage(documentConfig.defaultSlug, null);
             } else {
-                await renderDocIndex();
+                await renderDocumentIndex();
             }
             ensureSidebarOpen();
             return;
         }
-        if (cleanPath.startsWith(base + '/')) {
-            const slug = cleanPath.slice(base.length + 1);
-            await switchDoc(docKey);
-            showPage(docKey === 'charter' ? 'charter' : docKey);
-            updateActiveNav(doc.navPage);
+
+        // The address is an article inside the document, e.g. "/news/some-article"
+        if (cleanPath.startsWith(urlBase + '/')) {
+            const slug = cleanPath.slice(urlBase.length + 1);
+            await switchDocument(documentKey);
+            showPage(documentKey);
+            updateActiveNav(documentConfig.navPage);
             loadPage(slug, hash || null);
             ensureSidebarOpen();
             return;
@@ -397,127 +490,188 @@ async function handleRoute(fullPath) {
     updateActiveNav('home');
 }
 
-/* Switch active doc context, loading sections if needed */
-async function switchDoc(docKey) {
-    if (currentDoc !== docKey) {
-        currentDoc = docKey;
-        sections = docSectionsCache[docKey] || [];
+/* Switch active document context, loading sections if needed */
+async function switchDocument(documentKey) {
+    if (currentDocumentKey !== documentKey) {
+        currentDocumentKey = documentKey;
+        sections = documentSectionsCache[documentKey] || [];
     }
-    if (!docSectionsCache[docKey]) {
-        await loadSections(docKey);
+    if (!documentSectionsCache[documentKey]) {
+        await loadSections(documentKey);
     } else {
-        sections = docSectionsCache[docKey];
+        sections = documentSectionsCache[documentKey];
         buildSidebar();
     }
 }
 
-function showPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const el = document.getElementById(`page-${name}`);
-    if (el) el.classList.add('active');
-    if (name !== 'charter') window.scrollTo(0, 0);
-
-    if (name === 'home' || name === 'join' || name === 'about' || name === 'admin') {
-        buildHomeSidebar();
-        if (window.innerWidth >= 900) {
-            document.getElementById('sidebar')?.classList.remove('collapsed');
-            document.getElementById('main-content')?.classList.remove('sidebar-hidden');
+// Opens the sidebar on wide screens (on narrow screens it stays as it is).
+function showSidebarOnWideScreens() {
+    if (window.innerWidth >= MOBILE_BREAKPOINT_WIDTH) {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        if (sidebar) {
+            sidebar.classList.remove('collapsed');
         }
-    } else {
-        if (window.innerWidth >= 900) {
-            document.getElementById('sidebar')?.classList.remove('collapsed');
-            document.getElementById('main-content')?.classList.remove('sidebar-hidden');
+        if (mainContent) {
+            mainContent.classList.remove('sidebar-hidden');
         }
     }
 }
 
-function buildHomeSidebar() {
-    const nav = document.getElementById('sidebar-nav');
-    const titleEl = document.querySelector('.sidebar-title');
-    if (titleEl) titleEl.textContent = 'Site Navigation';
-    if (!nav) return;
-    nav.innerHTML = '';
+// Hides every ".page" element and shows the one with id "page-<pageName>".
+function showPage(pageName) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    const pageElement = document.getElementById(`page-${pageName}`);
+    if (pageElement) {
+        pageElement.classList.add('active');
+    }
+    if (pageName !== 'charter') {
+        window.scrollTo(0, 0);
+    }
 
-    SITE_PAGES.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'nav-article';
-        const btn = document.createElement('button');
-        btn.className = 'nav-article-btn';
-        btn.innerHTML = `${p.icon} ${p.label}`;
-        btn.addEventListener('click', () => {
-            navigate(p.href);
-            if (window.innerWidth < 900) closeSidebar();
+    // Pages that are not policy documents show the general site navigation
+    if (pageName === 'home' || pageName === 'join' || pageName === 'about' || pageName === 'admin') {
+        buildHomeSidebar();
+    }
+    showSidebarOnWideScreens();
+}
+
+// Fills the sidebar with links to the main pages of the site.
+function buildHomeSidebar() {
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const sidebarTitle = document.querySelector('.sidebar-title');
+    if (sidebarTitle) {
+        sidebarTitle.textContent = 'Site Navigation';
+    }
+    if (!sidebarNav) {
+        return;
+    }
+    sidebarNav.innerHTML = '';
+
+    SITE_PAGES.forEach(sitePage => {
+        const articleContainer = document.createElement('div');
+        articleContainer.className = 'nav-article';
+        const pageButton = document.createElement('button');
+        pageButton.className = 'nav-article-btn';
+        pageButton.innerHTML = `${sitePage.icon} ${sitePage.label}`;
+        pageButton.addEventListener('click', () => {
+            navigate(sitePage.href);
+            if (window.innerWidth < MOBILE_BREAKPOINT_WIDTH) {
+                closeSidebar();
+            }
         });
-        const row = document.createElement('div');
-        row.className = 'nav-article-row';
-        row.appendChild(btn);
-        div.appendChild(row);
-        nav.appendChild(div);
+        const buttonRow = document.createElement('div');
+        buttonRow.className = 'nav-article-row';
+        buttonRow.appendChild(pageButton);
+        articleContainer.appendChild(buttonRow);
+        sidebarNav.appendChild(articleContainer);
     });
 }
 
-function updateActiveNav(page) {
-    document.querySelectorAll('.nav-link').forEach(l =>
-        l.classList.toggle('active', l.dataset.page === page));
+// Highlights the header link whose data-page matches "pageName".
+function updateActiveNav(pageName) {
+    document.querySelectorAll('.nav-link').forEach(navLink => {
+        navLink.classList.toggle('active', navLink.dataset.page === pageName);
+    });
 }
 
 /* ─── Sections Data ─── */
-async function loadSections(docKey = 'charter', { force = false } = {}) {
-    if (!force && docSectionsCache[docKey]) {
-        sections = docSectionsCache[docKey];
+
+/**
+ * Loads the list of sections for a document from the API (or from the
+ * in-memory cache if it was already loaded) and rebuilds the sidebar.
+ * Pass { force: true } to ignore the cache and always ask the server.
+ */
+async function loadSections(documentKey = 'charter', { force = false } = {}) {
+    if (!force && documentSectionsCache[documentKey]) {
+        sections = documentSectionsCache[documentKey];
         buildSidebar();
-        if (docKey === 'charter') buildArticleCards();
+        if (documentKey === 'charter') {
+            buildArticleCards();
+        }
         return;
     }
     try {
-        const doc = DOCS[docKey];
-        const res = await apiFetch(doc.apiSections);
-        if (res.ok) {
-            docSectionsCache[docKey] = res.sections || [];
-            sections = docSectionsCache[docKey];
+        const documentConfig = DOCUMENT_CONFIG[documentKey];
+        const apiResponse = await apiFetch(documentConfig.apiSections);
+        if (apiResponse.ok) {
+            documentSectionsCache[documentKey] = apiResponse.sections || [];
+            sections = documentSectionsCache[documentKey];
             buildSidebar();
-            if (docKey === 'charter') await buildArticleCards();
+            if (documentKey === 'charter') {
+                await buildArticleCards();
+            }
         }
-    } catch (e) {
-        console.error('Failed to load sections for', docKey, e);
+    } catch (loadError) {
+        console.error('Failed to load sections for', documentKey, loadError);
     }
+}
+
+// Sorts two section rows by their order_index, smallest first.
+function compareByOrderIndex(firstSection, secondSection) {
+    return firstSection.order_index - secondSection.order_index;
 }
 
 // Top-level navigable pages: articles, standalone pages, schedules (not subsections)
 function topLevelPages() {
-    return sections.filter(s => s.type !== 'subsection').sort((a, b) => a.order_index - b.order_index);
+    return sections
+        .filter(section => section.type !== 'subsection')
+        .sort(compareByOrderIndex);
 }
+
 // Subsections belonging to an article
 function subsectionsOf(articleId) {
-    return sections.filter(s => s.parent_id === articleId && s.type === 'subsection')
-        .sort((a, b) => a.order_index - b.order_index);
+    return sections
+        .filter(section => section.parent_id === articleId && section.type === 'subsection')
+        .sort(compareByOrderIndex);
 }
 
 /* ─── Sidebar ─── */
-function buildSidebar() {
-    const nav = document.getElementById('sidebar-nav');
-    const titleEl = document.querySelector('.sidebar-title');
-    if (titleEl) titleEl.textContent = DOCS[currentDoc].sidebarTitle;
 
-    nav.innerHTML = '';
-    if (!sections.length) {
-        nav.innerHTML = '<div class="sidebar-loading">No sections found.</div>';
+// Returns the small "1.2" style number badge shown before a title, or an
+// empty string when the section has no number.
+function buildNumberBadgeHtml(section) {
+    if (section.number) {
+        return `<span class="nav-number">${section.number}</span> `;
+    }
+    return '';
+}
+
+/**
+ * Rebuilds the sidebar for the current document: one entry per top-level
+ * page, with an expandable list of subsections when the page has any.
+ */
+function buildSidebar() {
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const sidebarTitle = document.querySelector('.sidebar-title');
+    if (sidebarTitle) {
+        sidebarTitle.textContent = DOCUMENT_CONFIG[currentDocumentKey].sidebarTitle;
     }
 
-    const urlBase = DOCS[currentDoc].urlBase;
+    sidebarNav.innerHTML = '';
+    if (!sections.length) {
+        sidebarNav.innerHTML = '<div class="sidebar-loading">No sections found.</div>';
+    }
+
+    const urlBase = DOCUMENT_CONFIG[currentDocumentKey].urlBase;
     const pages = topLevelPages();
     pages.forEach(page => {
-        const children = subsectionsOf(page.id);
-        const div = document.createElement('div');
-        div.className = 'nav-article';
-        div.dataset.id = page.id;
-        div.dataset.slug = page.slug;
+        const childSections = subsectionsOf(page.id);
+        const articleContainer = document.createElement('div');
+        articleContainer.className = 'nav-article';
+        articleContainer.dataset.id = page.id;
+        articleContainer.dataset.slug = page.slug;
 
-        if (children.length) {
-            div.innerHTML = `
+        if (childSections.length) {
+            const subsectionButtonsHtml = childSections.map(childSection => `
+            <button class="nav-sub-btn" data-slug="${page.slug}" data-anchor="${childSection.anchor || ''}">
+              ${childSection.title}
+            </button>`).join('');
+
+            articleContainer.innerHTML = `
         <div class="nav-article-row">
           <button class="nav-article-btn" data-slug="${page.slug}">
-            ${page.number ? `<span class="nav-number">${page.number}</span> ` : ''}${page.title}
+            ${buildNumberBadgeHtml(page)}${page.title}
           </button>
           <button class="nav-chevron-btn" aria-label="Toggle subsections">
             <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -526,54 +680,65 @@ function buildSidebar() {
           </button>
         </div>
         <div class="nav-subsections" style="display:none">
-          ${children.map(c => `
-            <button class="nav-sub-btn" data-slug="${page.slug}" data-anchor="${c.anchor || ''}">
-              ${c.title}
-            </button>`).join('')}
+          ${subsectionButtonsHtml}
         </div>`;
 
-            div.querySelector('.nav-article-btn').addEventListener('click', () => {
+            articleContainer.querySelector('.nav-article-btn').addEventListener('click', () => {
                 navigate(`${urlBase}/${page.slug}`);
-                if (window.innerWidth < 900) closeSidebar();
+                if (window.innerWidth < MOBILE_BREAKPOINT_WIDTH) {
+                    closeSidebar();
+                }
             });
-            div.querySelector('.nav-chevron-btn').addEventListener('click', () => {
-                const sub = div.querySelector('.nav-subsections');
-                const open = sub.style.display !== 'none';
-                sub.style.display = open ? 'none' : 'block';
-                div.classList.toggle('expanded', !open);
+            articleContainer.querySelector('.nav-chevron-btn').addEventListener('click', () => {
+                const subsectionList = articleContainer.querySelector('.nav-subsections');
+                const isOpen = subsectionList.style.display !== 'none';
+                if (isOpen) {
+                    subsectionList.style.display = 'none';
+                } else {
+                    subsectionList.style.display = 'block';
+                }
+                articleContainer.classList.toggle('expanded', !isOpen);
             });
-            div.querySelectorAll('.nav-sub-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const slug = btn.dataset.slug;
-                    const anchor = btn.dataset.anchor;
-                    navigate(`${urlBase}/${slug}${anchor ? '#' + anchor : ''}`);
-                    if (window.innerWidth < 900) closeSidebar();
+            articleContainer.querySelectorAll('.nav-sub-btn').forEach(subsectionButton => {
+                subsectionButton.addEventListener('click', () => {
+                    const slug = subsectionButton.dataset.slug;
+                    const anchor = subsectionButton.dataset.anchor;
+                    let targetPath = `${urlBase}/${slug}`;
+                    if (anchor) {
+                        targetPath = targetPath + '#' + anchor;
+                    }
+                    navigate(targetPath);
+                    if (window.innerWidth < MOBILE_BREAKPOINT_WIDTH) {
+                        closeSidebar();
+                    }
                 });
             });
         } else {
-            div.innerHTML = `
+            articleContainer.innerHTML = `
         <div class="nav-article-row">
           <button class="nav-article-btn" data-slug="${page.slug}">
-            ${page.number ? `<span class="nav-number">${page.number}</span> ` : ''}${page.title}
+            ${buildNumberBadgeHtml(page)}${page.title}
           </button>
         </div>`;
-            div.querySelector('.nav-article-btn').addEventListener('click', () => {
+            articleContainer.querySelector('.nav-article-btn').addEventListener('click', () => {
                 navigate(`${urlBase}/${page.slug}`);
-                if (window.innerWidth < 900) closeSidebar();
+                if (window.innerWidth < MOBILE_BREAKPOINT_WIDTH) {
+                    closeSidebar();
+                }
             });
         }
-        nav.appendChild(div);
+        sidebarNav.appendChild(articleContainer);
     });
 
-    if (currentUser?.is_admin) {
-        const addBtn = document.createElement('button');
-        addBtn.className = 'btn btn-sm btn-ghost sidebar-add-btn';
-        addBtn.textContent = '+ Add Section';
-        addBtn.addEventListener('click', () => openAddSectionModal(null));
-        nav.appendChild(addBtn);
+    if (currentUser && currentUser.is_admin) {
+        const addSectionButton = document.createElement('button');
+        addSectionButton.className = 'btn btn-sm btn-ghost sidebar-add-btn';
+        addSectionButton.textContent = '+ Add Section';
+        addSectionButton.addEventListener('click', () => openAddSectionModal(null));
+        sidebarNav.appendChild(addSectionButton);
     }
 
-    nav.appendChild(buildSiteNavSection());
+    sidebarNav.appendChild(buildSiteNavSection());
 }
 
 const SITE_PAGES = [
@@ -585,124 +750,228 @@ const SITE_PAGES = [
     { label: 'About PolicySpot', href: '/about', icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` },
 ];
 
+// Builds the collapsible "Site Navigation" block shown at the bottom of a
+// document's sidebar, listing every main page of the site.
 function buildSiteNavSection() {
     const wrapper = document.createElement('div');
     wrapper.className = 'site-nav-section';
 
-    const header = document.createElement('button');
-    header.className = 'site-nav-header';
-    header.setAttribute('aria-expanded', 'false');
-    header.innerHTML = `
+    const headerButton = document.createElement('button');
+    headerButton.className = 'site-nav-header';
+    headerButton.setAttribute('aria-expanded', 'false');
+    headerButton.innerHTML = `
         <span>Site Navigation</span>
         <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none">
             <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>`;
 
-    const list = document.createElement('div');
-    list.className = 'site-nav-list';
-    list.hidden = true;
+    const linkList = document.createElement('div');
+    linkList.className = 'site-nav-list';
+    linkList.hidden = true;
 
-    const currentHref = DOCS[currentDoc]?.urlBase;
-    SITE_PAGES.forEach(p => {
-        const btn = document.createElement('button');
-        btn.className = 'nav-sub-btn site-nav-link' + (p.href === currentHref ? ' active' : '');
-        btn.innerHTML = `${p.icon} ${p.label}`;
-        btn.addEventListener('click', () => {
-            navigate(p.href);
-            if (window.innerWidth < 900) closeSidebar();
+    let currentHref = undefined;
+    if (DOCUMENT_CONFIG[currentDocumentKey]) {
+        currentHref = DOCUMENT_CONFIG[currentDocumentKey].urlBase;
+    }
+    SITE_PAGES.forEach(sitePage => {
+        const linkButton = document.createElement('button');
+        linkButton.className = 'nav-sub-btn site-nav-link';
+        if (sitePage.href === currentHref) {
+            linkButton.className = linkButton.className + ' active';
+        }
+        linkButton.innerHTML = `${sitePage.icon} ${sitePage.label}`;
+        linkButton.addEventListener('click', () => {
+            navigate(sitePage.href);
+            if (window.innerWidth < MOBILE_BREAKPOINT_WIDTH) {
+                closeSidebar();
+            }
         });
-        list.appendChild(btn);
+        linkList.appendChild(linkButton);
     });
 
-    header.addEventListener('click', () => {
-        const open = !list.hidden;
-        list.hidden = open;
-        header.setAttribute('aria-expanded', String(!open));
-        header.querySelector('.nav-chevron').style.transform = open ? '' : 'rotate(90deg)';
+    headerButton.addEventListener('click', () => {
+        const isOpen = !linkList.hidden;
+        linkList.hidden = isOpen;
+        headerButton.setAttribute('aria-expanded', String(!isOpen));
+        const chevron = headerButton.querySelector('.nav-chevron');
+        if (isOpen) {
+            chevron.style.transform = '';
+        } else {
+            chevron.style.transform = 'rotate(90deg)';
+        }
     });
 
-    wrapper.appendChild(header);
-    wrapper.appendChild(list);
+    wrapper.appendChild(headerButton);
+    wrapper.appendChild(linkList);
     return wrapper;
 }
 
-async function buildArticleCards() {
-    const grid = document.getElementById('article-cards');
-    if (!grid) return;
-    const pages = topLevelPages();
-    if (!pages.length) return;
-    const urlBase = DOCS['charter'].urlBase;
+/* ─── Shared helpers for article cards ─── */
 
+// True when the given user is allowed to see editor-only details.
+function isAdminOrEditor(user) {
+    if (!user) {
+        return false;
+    }
+    return Boolean(user.is_admin || user.is_editor);
+}
+
+// Asks the API how many times each section of a document has been viewed.
+// Returns an object of { sectionId: viewCount }, or an empty object on failure.
+async function fetchViewCounts(documentKey) {
     let viewCounts = {};
     try {
-        const res = await apiFetch('/api/policy/section-views?doc=charter');
-        if (res.ok) viewCounts = res.views || {};
-    } catch {}
+        const apiResponse = await apiFetch(`/api/policy/section-views?doc=${documentKey}`);
+        if (apiResponse.ok) {
+            viewCounts = apiResponse.views || {};
+        }
+    } catch (fetchError) {
+        // view counts are optional, carry on without them
+    }
+    return viewCounts;
+}
 
-    const pagesWithViews = pages.map(p => {
-        const subs = subsectionsOf(p.id);
-        const allIds = [p.id, ...subs.map(s => s.id)];
-        const total = allIds.reduce((sum, id) => sum + (viewCounts[id] || 0), 0);
-        return { ...p, totalViews: total };
+/**
+ * Adds a "totalViews" number to every page (its own views plus the views of
+ * all of its subsections). When at least one page has views, the list is
+ * sorted with the most viewed first; otherwise the original order is kept.
+ */
+function addViewTotalsAndSort(pages, viewCounts) {
+    const pagesWithViews = pages.map(page => {
+        const childSections = subsectionsOf(page.id);
+        const allSectionIds = [page.id];
+        childSections.forEach(childSection => allSectionIds.push(childSection.id));
+        let totalViews = 0;
+        allSectionIds.forEach(sectionId => {
+            totalViews = totalViews + (viewCounts[sectionId] || 0);
+        });
+        return { ...page, totalViews: totalViews };
     });
 
-    const hasAnyViews = pagesWithViews.some(p => p.totalViews > 0);
+    const hasAnyViews = pagesWithViews.some(page => page.totalViews > 0);
     if (hasAnyViews) {
-        pagesWithViews.sort((a, b) => {
-            if (b.totalViews !== a.totalViews) return b.totalViews - a.totalViews;
-            return a.order_index - b.order_index;
+        pagesWithViews.sort((firstPage, secondPage) => {
+            if (secondPage.totalViews !== firstPage.totalViews) {
+                return secondPage.totalViews - firstPage.totalViews;
+            }
+            return firstPage.order_index - secondPage.order_index;
         });
     }
+    return pagesWithViews;
+}
 
-    grid.innerHTML = pagesWithViews.map(p => `
-    <div class="glass-card article-card" data-slug="${p.slug}" tabindex="0" role="button">
-      ${p.number ? `<div class="card-num">${p.number}</div>` : ''}
-      <div class="card-title">${p.title}</div>
-      ${p.totalViews > 0 ? `<div class="card-views">${Number(p.totalViews).toLocaleString()} view${p.totalViews === 1 ? '' : 's'}</div>` : ''}
-    </div>`).join('');
-    grid.querySelectorAll('.article-card').forEach(card => {
-        const fn = () => navigate(`${urlBase}/${card.dataset.slug}`);
-        card.addEventListener('click', fn);
-        card.addEventListener('keydown', e => e.key === 'Enter' && fn());
+// Returns "1 view" / "25 views" HTML, or an empty string when there are no views.
+function buildViewCountHtml(totalViews) {
+    if (totalViews <= 0) {
+        return '';
+    }
+    let viewWord = 'views';
+    if (totalViews === 1) {
+        viewWord = 'view';
+    }
+    return `<div class="card-views">${Number(totalViews).toLocaleString()} ${viewWord}</div>`;
+}
+
+// Returns the card number HTML, or an empty string when the page has no number.
+function buildCardNumberHtml(page) {
+    if (page.number) {
+        return `<div class="card-num">${page.number}</div>`;
+    }
+    return '';
+}
+
+// Makes every ".article-card" inside "container" open its page on click or Enter.
+function attachArticleCardHandlers(container, getTargetPath) {
+    container.querySelectorAll('.article-card').forEach(card => {
+        const openCard = () => navigate(getTargetPath(card));
+        card.addEventListener('click', openCard);
+        card.addEventListener('keydown', keyboardEvent => {
+            if (keyboardEvent.key === 'Enter') {
+                openCard();
+            }
+        });
     });
 }
 
-/* ─── Doc Index (charter index generalised for all docs) ─── */
-async function renderDocIndex() {
-    const doc = DOCS[currentDoc];
+// Fills the "Most Viewed Pages" cards on the Charter home page.
+async function buildArticleCards() {
+    const cardGrid = document.getElementById('article-cards');
+    if (!cardGrid) {
+        return;
+    }
+    const pages = topLevelPages();
+    if (!pages.length) {
+        return;
+    }
+    const urlBase = DOCUMENT_CONFIG['charter'].urlBase;
+
+    const viewCounts = await fetchViewCounts('charter');
+    const pagesWithViews = addViewTotalsAndSort(pages, viewCounts);
+
+    cardGrid.innerHTML = pagesWithViews.map(page => `
+    <div class="glass-card article-card" data-slug="${page.slug}" tabindex="0" role="button">
+      ${buildCardNumberHtml(page)}
+      <div class="card-title">${page.title}</div>
+      ${buildViewCountHtml(page.totalViews)}
+    </div>`).join('');
+    attachArticleCardHandlers(cardGrid, card => `${urlBase}/${card.dataset.slug}`);
+}
+
+/* ─── Document Index (charter index generalised for all documents) ─── */
+
+/**
+ * Shows the landing page of the current document: a hero banner (or a simple
+ * heading), the "Most Viewed Pages" cards and a table of contents.
+ * The Charter has its own index already written in index.html.
+ */
+async function renderDocumentIndex() {
+    const documentConfig = DOCUMENT_CONFIG[currentDocumentKey];
     updateBreadcrumb(null);
     updateDocNavFooter(null);
     updateSidebarActive(null, null);
 
-    if (currentDoc === 'charter') {
+    if (currentDocumentKey === 'charter') {
         const indexView = document.getElementById('charter-index-view');
         const articleView = document.getElementById('charter-article-view');
-        if (indexView) indexView.style.display = '';
-        if (articleView) articleView.style.display = 'none';
+        if (indexView) {
+            indexView.style.display = '';
+        }
+        if (articleView) {
+            articleView.style.display = 'none';
+        }
         await buildArticleCards();
         return;
     }
 
-    const contentEl = document.getElementById(doc.contentEl);
-    if (!contentEl) return;
-    const urlBase = doc.urlBase;
+    const contentElement = document.getElementById(documentConfig.contentElementId);
+    if (!contentElement) {
+        return;
+    }
+    const urlBase = documentConfig.urlBase;
     const pages = topLevelPages();
-
     const firstPage = pages[0];
-    const heroHtml = doc.hero ? `
+
+    // Top of the page: either the document's hero banner or a plain heading
+    let topOfPageHtml = '';
+    if (documentConfig.hero) {
+        let startReadingButtonHtml = '';
+        if (firstPage) {
+            startReadingButtonHtml = `<a href="${documentConfig.urlBase}/${firstPage.slug}" class="btn btn-ghost" data-navlink>Start Reading</a>`;
+        }
+        topOfPageHtml = `
     <section class="hero glass-card">
         <div class="hero-body">
-            <div class="hero-badge">${doc.hero.badge}</div>
-            <h1 class="hero-title">${doc.hero.title}</h1>
-            <p class="hero-sub">${doc.hero.sub}</p>
+            <div class="hero-badge">${documentConfig.hero.badge}</div>
+            <h1 class="hero-title">${documentConfig.hero.title}</h1>
+            <p class="hero-sub">${documentConfig.hero.subtitle}</p>
             <div class="hero-actions">
-                <a href="${doc.urlBase}" class="btn btn-primary" data-navlink>
+                <a href="${documentConfig.urlBase}" class="btn btn-primary" data-navlink>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/>
                         <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>
                     Read the Document
                 </a>
-                ${firstPage ? `<a href="${doc.urlBase}/${firstPage.slug}" class="btn btn-ghost" data-navlink>Start Reading</a>` : ''}
+                ${startReadingButtonHtml}
             </div>
         </div>
         <div class="hero-graphic">
@@ -714,13 +983,41 @@ async function renderDocIndex() {
                 <line x1="36" y1="74" x2="66" y2="74" stroke="var(--brand)" stroke-width="3" stroke-linecap="round"/>
             </svg>
         </div>
-    </section>` : '';
+    </section>`;
+    } else {
+        let documentBadgeHtml = '';
+        if (isAdminOrEditor(currentUser)) {
+            documentBadgeHtml = '<div class="section-type-badge">Document</div>';
+        }
+        topOfPageHtml = `<div class="section-content-inner"><div class="section-header">
+        ${documentBadgeHtml}
+        <h1 class="section-heading">${documentConfig.label}</h1>
+      </div></div>`;
+    }
 
-    contentEl.innerHTML = `
-      ${doc.hero ? heroHtml : `<div class="section-content-inner"><div class="section-header">
-        ${currentUser && (currentUser.is_admin || currentUser.is_editor) ? '<div class="section-type-badge">Document</div>' : ''}
-        <h1 class="section-heading">${doc.label}</h1>
-      </div></div>`}
+    // Table of contents: one card per page, listing its subsections underneath
+    const tableOfContentsHtml = pages.map(page => {
+        const childSections = subsectionsOf(page.id);
+        let numberHtml = '';
+        if (page.number) {
+            numberHtml = `<span class="card-num">${page.number} — </span>`;
+        }
+        let subsectionListHtml = '';
+        if (childSections.length) {
+            const subsectionItemsHtml = childSections
+                .map(childSection => `<span class="toc-sub-item">${childSection.title}</span>`)
+                .join('');
+            subsectionListHtml = `<div class="toc-card-subs">${subsectionItemsHtml}</div>`;
+        }
+        return `
+              <a href="${urlBase}/${page.slug}" class="toc-card-btn" data-href="${urlBase}/${page.slug}">
+                <div class="toc-card-title">${numberHtml}${page.title}</div>
+                ${subsectionListHtml}
+              </a>`;
+    }).join('');
+
+    contentElement.innerHTML = `
+      ${topOfPageHtml}
       <section class="section-grid">
         <h2 class="section-title">Most Viewed Pages</h2>
         <div class="card-grid" id="doc-index-cards">
@@ -730,97 +1027,83 @@ async function renderDocIndex() {
       <div class="section-body">
         <h2>Table of Contents</h2>
         <div class="toc-card-list">
-          ${pages.map(p => {
-            const children = subsectionsOf(p.id);
-            return `
-              <a href="${urlBase}/${p.slug}" class="toc-card-btn" data-href="${urlBase}/${p.slug}">
-                <div class="toc-card-title">${p.number ? `<span class="card-num">${p.number} — </span>` : ''}${p.title}</div>
-                ${children.length ? `<div class="toc-card-subs">${children.map(c => `<span class="toc-sub-item">${c.title}</span>`).join('')}</div>` : ''}
-              </a>`;
-          }).join('')}
+          ${tableOfContentsHtml}
         </div>
       </div>`;
 
-    contentEl.querySelectorAll('.toc-card-btn').forEach(a => {
-        a.addEventListener('click', e => {
-            e.preventDefault();
-            navigate(a.dataset.href);
+    contentElement.querySelectorAll('.toc-card-btn').forEach(tableOfContentsLink => {
+        tableOfContentsLink.addEventListener('click', clickEvent => {
+            clickEvent.preventDefault();
+            navigate(tableOfContentsLink.dataset.href);
         });
     });
 
-    let viewCounts = {};
-    try {
-        const res = await apiFetch(`/api/policy/section-views?doc=${currentDoc}`);
-        if (res.ok) viewCounts = res.views || {};
-    } catch {}
+    const viewCounts = await fetchViewCounts(currentDocumentKey);
+    const pagesWithViews = addViewTotalsAndSort(pages, viewCounts);
 
-    const pagesWithViews = pages.map(p => {
-        const subs = subsectionsOf(p.id);
-        const allIds = [p.id, ...subs.map(s => s.id)];
-        const total = allIds.reduce((sum, id) => sum + (viewCounts[id] || 0), 0);
-        return { ...p, totalViews: total };
-    });
-
-    const hasAnyViews = pagesWithViews.some(p => p.totalViews > 0);
-    if (hasAnyViews) {
-        pagesWithViews.sort((a, b) => {
-            if (b.totalViews !== a.totalViews) return b.totalViews - a.totalViews;
-            return a.order_index - b.order_index;
-        });
-    }
-
-    const cardGrid = contentEl.querySelector('#doc-index-cards');
+    const cardGrid = contentElement.querySelector('#doc-index-cards');
     if (cardGrid) {
-        cardGrid.innerHTML = pagesWithViews.map(p => `
-            <div class="glass-card article-card" data-href="${urlBase}/${p.slug}" tabindex="0" role="button">
-              ${p.number ? `<div class="card-num">${p.number}</div>` : ''}
-              <div class="card-title">${p.title}</div>
-              ${p.totalViews > 0 ? `<div class="card-views">${Number(p.totalViews).toLocaleString()} view${p.totalViews === 1 ? '' : 's'}</div>` : ''}
+        cardGrid.innerHTML = pagesWithViews.map(page => `
+            <div class="glass-card article-card" data-href="${urlBase}/${page.slug}" tabindex="0" role="button">
+              ${buildCardNumberHtml(page)}
+              <div class="card-title">${page.title}</div>
+              ${buildViewCountHtml(page.totalViews)}
             </div>`).join('');
-        cardGrid.querySelectorAll('.article-card').forEach(card => {
-            const fn = () => navigate(card.dataset.href);
-            card.addEventListener('click', fn);
-            card.addEventListener('keydown', e => e.key === 'Enter' && fn());
-        });
+        attachArticleCardHandlers(cardGrid, card => card.dataset.href);
     }
 }
 
 /* ─── Page Loading ─── */
-async function loadPage(slug, anchor) {
-    const doc = DOCS[currentDoc];
 
-    if (currentDoc === 'charter') {
+/**
+ * Loads and displays one page of the current document by its slug.
+ * Uses the cached section list when possible and falls back to asking the
+ * API for that single section. When "anchor" is given, the page scrolls to
+ * the subsection with that id after rendering.
+ */
+async function loadPage(slug, anchor) {
+    const documentConfig = DOCUMENT_CONFIG[currentDocumentKey];
+
+    if (currentDocumentKey === 'charter') {
         const indexView = document.getElementById('charter-index-view');
         const articleView = document.getElementById('charter-article-view');
-        if (indexView) indexView.style.display = 'none';
-        if (articleView) articleView.style.display = '';
+        if (indexView) {
+            indexView.style.display = 'none';
+        }
+        if (articleView) {
+            articleView.style.display = '';
+        }
     }
 
-    const contentEl = document.getElementById(doc.contentEl);
-    if (!contentEl) return;
-    contentEl.innerHTML = '<div class="section-loading"><span class="spinner large"></span><p>Loading...</p></div>';
+    const contentElement = document.getElementById(documentConfig.contentElementId);
+    if (!contentElement) {
+        return;
+    }
+    contentElement.innerHTML = '<div class="section-loading"><span class="spinner large"></span><p>Loading...</p></div>';
     updateBreadcrumb(null);
     updateDocNavFooter(null);
 
-    let section = sections.find(s => s.slug === slug && s.type !== 'subsection');
+    let section = sections.find(candidate => candidate.slug === slug && candidate.type !== 'subsection');
 
     if (!section) {
         try {
-            const res = await apiFetch(`${doc.apiSection}?slug=${encodeURIComponent(slug)}`);
-            if (!res.ok) throw new Error(res.error || 'Not found');
-            section = res.section;
+            const apiResponse = await apiFetch(`${documentConfig.apiSection}?slug=${encodeURIComponent(slug)}`);
+            if (!apiResponse.ok) {
+                throw new Error(apiResponse.error || 'Not found');
+            }
+            section = apiResponse.section;
             if (section.type === 'article' || section.type === 'page') {
-                const allRes = await apiFetch(doc.apiSections);
-                if (allRes.ok) {
-                    docSectionsCache[currentDoc] = allRes.sections;
-                    sections = docSectionsCache[currentDoc];
+                const allSectionsResponse = await apiFetch(documentConfig.apiSections);
+                if (allSectionsResponse.ok) {
+                    documentSectionsCache[currentDocumentKey] = allSectionsResponse.sections;
+                    sections = documentSectionsCache[currentDocumentKey];
                 }
             }
-        } catch (e) {
-            contentEl.innerHTML = `<div class="section-content-inner">
+        } catch (loadError) {
+            contentElement.innerHTML = `<div class="section-content-inner">
         <h1 class="section-heading">Not Found</h1>
         <p>The section <code>${slug}</code> could not be loaded.</p>
-        <a href="${doc.urlBase}" style="color:var(--brand-dark)">Back to ${doc.label}</a>
+        <a href="${documentConfig.urlBase}" style="color:var(--brand-dark)">Back to ${documentConfig.label}</a>
       </div>`;
             return;
         }
@@ -842,53 +1125,99 @@ async function loadPage(slug, anchor) {
 
     if (anchor) {
         setTimeout(() => {
-            const el = document.getElementById(anchor);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const anchorElement = document.getElementById(anchor);
+            if (anchorElement) {
+                anchorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }, 80);
     } else {
         window.scrollTo(0, 0);
     }
 }
 
+// Returns "1.2 — " when the section has a number, otherwise an empty string.
+function buildHeadingNumberPrefix(section) {
+    if (section.number) {
+        return `${section.number} — `;
+    }
+    return '';
+}
+
+/**
+ * Builds the shared header shown at the top of an article or standalone page:
+ * a type badge and edit buttons for signed-in staff, then the page heading.
+ */
+function buildSectionHeaderHtml(section, typeLabel, urlBase, canEditSlug, canEditContent) {
+    let typeBadgeHtml = '';
+    if (isAdminOrEditor(currentUser)) {
+        typeBadgeHtml = `<div class="section-type-badge">${typeLabel}</div>`;
+    }
+    let slugDisplayHtml = '';
+    if (currentUser) {
+        slugDisplayHtml = `<span class="section-slug-display">${urlBase}/${section.slug}</span>`;
+    }
+    let editSlugButtonHtml = '';
+    if (canEditSlug) {
+        editSlugButtonHtml = `<button class="edit-slug-btn" data-id="${section.id}" data-slug="${section.slug}">Edit slug</button>`;
+    }
+    let editContentButtonHtml = '';
+    if (canEditContent) {
+        editContentButtonHtml = `<button class="edit-content-btn" data-id="${section.id}">Edit</button>`;
+    }
+    return `
+      <div class="section-header">
+        ${typeBadgeHtml}
+        <div class="section-meta">
+          ${slugDisplayHtml}
+          ${editSlugButtonHtml}
+          ${editContentButtonHtml}
+        </div>
+        <h1 class="section-heading">${buildHeadingNumberPrefix(section)}${section.title}</h1>
+      </div>`;
+}
+
 /* Renders an article page: intro block + all subsections inline with anchor ids */
 function renderArticlePage(article, activeAnchor) {
-    const doc = DOCS[currentDoc];
-    const contentEl = document.getElementById(doc.contentEl);
-    if (!contentEl) return;
-    const subs = subsectionsOf(article.id);
-    const canEditSlug = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
-    const canEditContent = currentUser && currentUser.is_admin;
-    const urlBase = doc.urlBase;
+    const documentConfig = DOCUMENT_CONFIG[currentDocumentKey];
+    const contentElement = document.getElementById(documentConfig.contentElementId);
+    if (!contentElement) {
+        return;
+    }
+    const childSections = subsectionsOf(article.id);
+    const canEditSlug = currentDocumentKey === 'charter' && isAdminOrEditor(currentUser);
+    const canEditContent = Boolean(currentUser && currentUser.is_admin);
+    const urlBase = documentConfig.urlBase;
 
-    let html = `<div class="section-content-inner">
-    <div class="section-header">
-      ${currentUser && (currentUser.is_admin || currentUser.is_editor) ? '<div class="section-type-badge">Article</div>' : ''}
-      <div class="section-meta">
-        ${currentUser ? `<span class="section-slug-display">${urlBase}/${article.slug}</span>` : ''}
-        ${canEditSlug ? `<button class="edit-slug-btn" data-id="${article.id}" data-slug="${article.slug}">Edit slug</button>` : ''}
-        ${canEditContent ? `<button class="edit-content-btn" data-id="${article.id}">Edit</button>` : ''}
-      </div>
-      <h1 class="section-heading">${article.number ? `${article.number} — ` : ''}${article.title}</h1>
-    </div>`;
+    let html = `<div class="section-content-inner">`;
+    html += buildSectionHeaderHtml(article, 'Article', urlBase, canEditSlug, canEditContent);
 
     if (article.content) {
         html += `<div class="section-body article-intro">${renderMarkdown(article.content)}</div>`;
     }
 
-    subs.forEach(sub => {
+    childSections.forEach(childSection => {
+        const subsectionAnchor = childSection.anchor || childSection.slug;
+        let subsectionNumberHtml = '';
+        if (childSection.number) {
+            subsectionNumberHtml = `<span class="subsection-num">${childSection.number}</span>`;
+        }
+        let editButtonHtml = '';
+        if (canEditContent) {
+            editButtonHtml = `<button class="edit-content-btn" data-id="${childSection.id}">Edit</button>`;
+        }
         html += `
-      <div class="subsection-block" id="${sub.anchor || sub.slug}">
+      <div class="subsection-block" id="${subsectionAnchor}">
         <div class="subsection-header">
           <h2 class="subsection-heading">
-            <a class="anchor-link" href="${urlBase}/${article.slug}#${sub.anchor || sub.slug}" aria-label="Link to section">
+            <a class="anchor-link" href="${urlBase}/${article.slug}#${subsectionAnchor}" aria-label="Link to section">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </a>
-            ${sub.title}
+            ${childSection.title}
           </h2>
-          ${sub.number ? `<span class="subsection-num">${sub.number}</span>` : ''}
-          ${canEditContent ? `<button class="edit-content-btn" data-id="${sub.id}">Edit</button>` : ''}
+          ${subsectionNumberHtml}
+          ${editButtonHtml}
         </div>
-        <div class="section-body subsection-body">${renderMarkdown(sub.content || '')}</div>
+        <div class="section-body subsection-body">${renderMarkdown(childSection.content || '')}</div>
       </div>`;
     });
 
@@ -897,138 +1226,104 @@ function renderArticlePage(article, activeAnchor) {
     }
 
     html += `</div>`;
-    contentEl.innerHTML = html;
-    initBlobMedia(contentEl);
+    contentElement.innerHTML = html;
+    initBlobMedia(contentElement);
 
     if (canEditSlug) {
-        contentEl.querySelectorAll('.edit-slug-btn').forEach(btn => {
-            const sec = sections.find(s => s.id === btn.dataset.id) || article;
-            btn.addEventListener('click', () => openSlugModal(sec));
+        contentElement.querySelectorAll('.edit-slug-btn').forEach(editSlugButton => {
+            const sectionToEdit = sections.find(candidate => candidate.id === editSlugButton.dataset.id) || article;
+            editSlugButton.addEventListener('click', () => openSlugModal(sectionToEdit));
         });
     }
 
     if (canEditContent) {
-        contentEl.querySelectorAll('.edit-content-btn').forEach(btn => {
-            const sec = sections.find(s => s.id === btn.dataset.id) || article;
-            btn.addEventListener('click', () => openContentModal(sec));
+        contentElement.querySelectorAll('.edit-content-btn').forEach(editContentButton => {
+            const sectionToEdit = sections.find(candidate => candidate.id === editContentButton.dataset.id) || article;
+            editContentButton.addEventListener('click', () => openContentModal(sectionToEdit));
         });
-        contentEl.querySelector('.add-subsection-btn')?.addEventListener('click', () => openAddSectionModal(article));
+        const addSubsectionButton = contentElement.querySelector('.add-subsection-btn');
+        if (addSubsectionButton) {
+            addSubsectionButton.addEventListener('click', () => openAddSectionModal(article));
+        }
     }
 
-    contentEl.querySelectorAll('.anchor-link').forEach(a => {
-        a.addEventListener('click', e => {
-            e.preventDefault();
-            history.replaceState({}, '', a.getAttribute('href'));
+    contentElement.querySelectorAll('.anchor-link').forEach(anchorLink => {
+        anchorLink.addEventListener('click', clickEvent => {
+            clickEvent.preventDefault();
+            history.replaceState({}, '', anchorLink.getAttribute('href'));
         });
     });
 }
 
 /* Renders a standalone page (Citation, Definitions, First Schedule, etc.) */
 function renderStandalonePage(section) {
-    const doc = DOCS[currentDoc];
-    const contentEl = document.getElementById(doc.contentEl);
-    if (!contentEl) return;
-    const canEditSlug = currentDoc === 'charter' && currentUser && (currentUser.is_admin || currentUser.is_editor);
-    const canEditContent = currentUser && currentUser.is_admin;
-    const typeLabel = { page: 'Section', schedule: 'Schedule' }[section.type] || 'Section';
-    const urlBase = doc.urlBase;
+    const documentConfig = DOCUMENT_CONFIG[currentDocumentKey];
+    const contentElement = document.getElementById(documentConfig.contentElementId);
+    if (!contentElement) {
+        return;
+    }
+    const canEditSlug = currentDocumentKey === 'charter' && isAdminOrEditor(currentUser);
+    const canEditContent = Boolean(currentUser && currentUser.is_admin);
+    let typeLabel = 'Section';
+    if (section.type === 'schedule') {
+        typeLabel = 'Schedule';
+    }
+    const urlBase = documentConfig.urlBase;
 
-    contentEl.innerHTML = `
+    contentElement.innerHTML = `
     <div class="section-content-inner">
-      <div class="section-header">
-        ${currentUser && (currentUser.is_admin || currentUser.is_editor) ? `<div class="section-type-badge">${typeLabel}</div>` : ''}
-        <div class="section-meta">
-          ${currentUser ? `<span class="section-slug-display">${urlBase}/${section.slug}</span>` : ''}
-          ${canEditSlug ? `<button class="edit-slug-btn" data-id="${section.id}" data-slug="${section.slug}">Edit slug</button>` : ''}
-          ${canEditContent ? `<button class="edit-content-btn" data-id="${section.id}">Edit</button>` : ''}
-        </div>
-        <h1 class="section-heading">${section.number ? `${section.number} — ` : ''}${section.title}</h1>
-      </div>
+      ${buildSectionHeaderHtml(section, typeLabel, urlBase, canEditSlug, canEditContent)}
       <div class="section-body" id="section-body-content">${renderMarkdown(section.content || '')}</div>
     </div>`;
-    initBlobMedia(contentEl);
+    initBlobMedia(contentElement);
 
     if (canEditSlug) {
-        contentEl.querySelector('.edit-slug-btn')?.addEventListener('click', () => openSlugModal(section));
+        const editSlugButton = contentElement.querySelector('.edit-slug-btn');
+        if (editSlugButton) {
+            editSlugButton.addEventListener('click', () => openSlugModal(section));
+        }
     }
     if (canEditContent) {
-        contentEl.querySelector('.edit-content-btn')?.addEventListener('click', () => openContentModal(section));
+        const editContentButton = contentElement.querySelector('.edit-content-btn');
+        if (editContentButton) {
+            editContentButton.addEventListener('click', () => openContentModal(section));
+        }
     }
 }
 
 /* ─── Markdown Renderer ─── */
-function renderMarkdown(md) {
-    // Stash is declared first so collapsible blocks (which need recursive
-    // renderMarkdown calls on raw content) can be extracted before HTML escaping.
-    const stash = [];
-    const S = h => { const t = `\x02${stash.length}\x02`; stash.push(h); return t; };
 
-    // Collapsible sections: +++ Title\ncontent\n+++
-    md = md.replace(/^\+\+\+ (.+)\n([\s\S]*?)^\+\+\+[ \t]*$/gm, (_, title, content) => {
-        const safeTitle = title.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        return S(`<details class="md-collapse">
-          <summary class="md-collapse-summary"><span class="md-collapse-title">${safeTitle}</span></summary>
-          <div class="md-collapse-body">${renderMarkdown(content.trim())}</div>
-        </details>`);
-    });
+// Replaces &, < and > with their HTML entity codes so text cannot inject HTML.
+function escapeHtmlCharacters(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
-    let html = md
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+/**
+ * Builds an <iframe> for an embedded web page. Google Docs, Sheets and
+ * Slides links are rewritten to their "preview" or "embed" addresses so they
+ * display inside the page instead of opening the editor.
+ */
+function buildIframeEmbedHtml(url) {
+    if (url.includes('docs.google.com/document/')) {
+        const previewUrl = url.replace(/\/(edit|view)[^/]*$/, '/preview');
+        return `<iframe class="section-embed section-embed-gdoc" src="${previewUrl}" loading="lazy" allowfullscreen></iframe>`;
+    }
+    if (url.includes('docs.google.com/spreadsheets/')) {
+        const previewUrl = url.replace(/\/(edit|view)[^/]*$/, '/preview');
+        return `<iframe class="section-embed section-embed-gsheet" src="${previewUrl}" loading="lazy" allowfullscreen></iframe>`;
+    }
+    if (url.includes('docs.google.com/presentation/')) {
+        const embedUrl = url.replace(/\/(edit|view|pub)[^/]*$/, '/embed');
+        return `<iframe class="section-embed section-embed-gslide" src="${embedUrl}" loading="lazy" allowfullscreen></iframe>`;
+    }
+    return `<iframe class="section-embed" src="${url}" loading="lazy" allowfullscreen></iframe>`;
+}
 
-    // Tables
-    const allowedCellTags = new Set(['p','ul','ol','li','mark','strong','em','b','i','u','br','a','code','span','div','h1','h2','h3','h4','h5','h6']);
-    const unescapeCell = text => text.replace(/&lt;(\/?\w+.*?)&gt;/g, (match, inner) => {
-        const tag = (inner.match(/^\/?([\w]+)/)?.[1] || '').toLowerCase();
-        return allowedCellTags.has(tag) ? `<${inner}>` : match;
-    });
-    html = html.replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)+)/gm, (_, header, body) => {
-        const ths = header.split('|').filter(c => c.trim()).map(c => `<th>${unescapeCell(c.trim())}</th>`).join('');
-        const trs = body.trim().split('\n').map(row => {
-            const tds = row.split('|').filter(c => c.trim()).map(c => `<td>${unescapeCell(c.trim())}</td>`).join('');
-            return `<tr>${tds}</tr>`;
-        }).join('');
-        return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>\n`;
-    });
-    // Headings
-    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-    html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
-    // HR
-    html = html.replace(/^---$/gm, '<hr/>');
-    // Blockquote
-    html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-
-    // Embeds: {{embed: url}}
-    html = html.replace(/\{\{embed:\s*(https?:\/\/[^}]+)\}\}/g, (_, rawUrl) => {
-        const url = rawUrl.trim();
-        if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url))
-            return S(`<audio class="section-audio" controls data-blob-src="${url}"></audio>`);
-        if (/\.pdf(\?.*)?$/i.test(url))
-            return S(`<iframe class="section-embed section-embed-pdf" src="${url}" loading="lazy"></iframe>`);
-        if (url.includes('docs.google.com/document/'))
-            return S(`<iframe class="section-embed section-embed-gdoc" src="${url.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`);
-        if (url.includes('docs.google.com/spreadsheets/'))
-            return S(`<iframe class="section-embed section-embed-gsheet" src="${url.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`);
-        if (url.includes('docs.google.com/presentation/'))
-            return S(`<iframe class="section-embed section-embed-gslide" src="${url.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`);
-        return S(`<iframe class="section-embed" src="${url}" loading="lazy" allowfullscreen></iframe>`);
-    });
-    // Media: ![alt]{type}(url) — type is img|doc|audio|embed (optional, defaults to img)
-    html = html.replace(/!\[([^\]]*)\](?:\{(img|doc|audio|embed)\})?\((https?:\/\/[^)]+)\)/g, (_, alt, type, src) => {
-        type = type || 'img';
-        if (type === 'img') {
-            return S(alt
-                ? `<figure class="section-img-figure"><img class="section-img" src="${src}" alt="${alt}"><figcaption class="section-img-caption">${alt}</figcaption></figure>`
-                : `<img class="section-img" src="${src}" alt="">`);
-        }
-        if (type === 'audio')
-            return S(`<audio class="section-audio" controls data-blob-src="${src}"></audio>`);
-        if (type === 'doc') {
-            const filename = alt || src.split('/').pop();
-            const ext = filename.split('.').pop().toUpperCase();
-            return S(`<div class="doc-card">
+// Builds the download/open card shown for an attached document such as a PDF.
+function buildDocumentCardHtml(fileUrl, altText) {
+    const filename = altText || fileUrl.split('/').pop();
+    const fileExtension = filename.split('.').pop().toUpperCase();
+    return `<div class="doc-card">
               <div class="doc-card-icon">
                 <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M3 0h14l11 10v21a3 3 0 01-3 3H3a3 3 0 01-3-3V3a3 3 0 013-3z" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
@@ -1037,26 +1332,128 @@ function renderMarkdown(md) {
                   <line x1="6" y1="21" x2="22" y2="21" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
                   <line x1="6" y1="26" x2="15" y2="26" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
-                <span class="doc-card-ext">${ext}</span>
+                <span class="doc-card-ext">${fileExtension}</span>
               </div>
               <div class="doc-card-info">
                 <span class="doc-card-name">${filename}</span>
-                <span class="doc-card-type">${ext}</span>
+                <span class="doc-card-type">${fileExtension}</span>
               </div>
               <div class="doc-card-actions">
-                <button class="btn btn-sm btn-ghost doc-card-btn" onclick="downloadAsBlob('${src}','${filename}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</button>
-                <button class="btn btn-sm btn-ghost doc-card-btn" onclick="openAsBlob('${src}','${filename}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open</button>
+                <button class="btn btn-sm btn-ghost doc-card-btn" onclick="downloadAsBlob('${fileUrl}','${filename}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download</button>
+                <button class="btn btn-sm btn-ghost doc-card-btn" onclick="openAsBlob('${fileUrl}','${filename}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open</button>
               </div>
-            </div>`);
+            </div>`;
+}
+
+/**
+ * Converts the site's Markdown dialect into HTML.
+ *
+ * Supported syntax, in the order it is processed:
+ *   +++ Title ... +++          collapsible block
+ *   | a | b |                  tables (a few safe HTML tags allowed in cells)
+ *   #, ##, ###                 headings
+ *   ---                        horizontal rule
+ *   > text                     block quote
+ *   {{embed: url}}             embedded audio, PDF, Google file or web page
+ *   ![alt]{type}(url)          image / doc / audio / embed
+ *   **bold**, *italic*, __underline__, _italic_
+ *   [text](url)                links
+ *   `code`                     inline code
+ *   - item                     bullet lists (2 spaces = 1 nesting level)
+ *   1. / 2.1. / (a)            numbered outline lists
+ *
+ * Finished blocks of HTML are "stashed" (swapped for a placeholder token)
+ * so that later steps, such as bold or italic, cannot change them. The
+ * placeholders are swapped back for the real HTML at the very end.
+ */
+function renderMarkdown(markdownText) {
+    // Stash is declared first so collapsible blocks (which need recursive
+    // renderMarkdown calls on raw content) can be extracted before HTML escaping.
+    const stashedBlocks = [];
+    const stashHtml = blockHtml => {
+        const placeholderToken = `\x02${stashedBlocks.length}\x02`;
+        stashedBlocks.push(blockHtml);
+        return placeholderToken;
+    };
+
+    // Collapsible sections: +++ Title\ncontent\n+++
+    markdownText = markdownText.replace(/^\+\+\+ (.+)\n([\s\S]*?)^\+\+\+[ \t]*$/gm, (fullMatch, title, innerContent) => {
+        const safeTitle = escapeHtmlCharacters(title.trim());
+        return stashHtml(`<details class="md-collapse">
+          <summary class="md-collapse-summary"><span class="md-collapse-title">${safeTitle}</span></summary>
+          <div class="md-collapse-body">${renderMarkdown(innerContent.trim())}</div>
+        </details>`);
+    });
+
+    let html = escapeHtmlCharacters(markdownText);
+
+    // Tables
+    const allowedCellTags = new Set(['p','ul','ol','li','mark','strong','em','b','i','u','br','a','code','span','div','h1','h2','h3','h4','h5','h6']);
+    // Inside table cells, a short list of harmless HTML tags is allowed through
+    const unescapeCell = cellText => cellText.replace(/&lt;(\/?\w+.*?)&gt;/g, (fullMatch, innerTag) => {
+        const tagNameMatch = innerTag.match(/^\/?([\w]+)/);
+        let tagName = '';
+        if (tagNameMatch && tagNameMatch[1]) {
+            tagName = tagNameMatch[1].toLowerCase();
         }
-        if (type === 'embed') {
-            if (src.includes('docs.google.com/document/'))
-                return S(`<iframe class="section-embed section-embed-gdoc" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`);
-            if (src.includes('docs.google.com/spreadsheets/'))
-                return S(`<iframe class="section-embed section-embed-gsheet" src="${src.replace(/\/(edit|view)[^/]*$/, '/preview')}" loading="lazy" allowfullscreen></iframe>`);
-            if (src.includes('docs.google.com/presentation/'))
-                return S(`<iframe class="section-embed section-embed-gslide" src="${src.replace(/\/(edit|view|pub)[^/]*$/, '/embed')}" loading="lazy" allowfullscreen></iframe>`);
-            return S(`<iframe class="section-embed" src="${src}" loading="lazy" allowfullscreen></iframe>`);
+        if (allowedCellTags.has(tagName)) {
+            return `<${innerTag}>`;
+        }
+        return fullMatch;
+    });
+    html = html.replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)+)/gm, (fullMatch, headerRow, bodyRows) => {
+        const headerCellsHtml = headerRow
+            .split('|')
+            .filter(cell => cell.trim())
+            .map(cell => `<th>${unescapeCell(cell.trim())}</th>`)
+            .join('');
+        const bodyRowsHtml = bodyRows.trim().split('\n').map(row => {
+            const rowCellsHtml = row
+                .split('|')
+                .filter(cell => cell.trim())
+                .map(cell => `<td>${unescapeCell(cell.trim())}</td>`)
+                .join('');
+            return `<tr>${rowCellsHtml}</tr>`;
+        }).join('');
+        return `<table><thead><tr>${headerCellsHtml}</tr></thead><tbody>${bodyRowsHtml}</tbody></table>\n`;
+    });
+    // Headings
+    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
+    // Horizontal rule
+    html = html.replace(/^---$/gm, '<hr/>');
+    // Blockquote
+    html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+
+    // Embeds: {{embed: url}}
+    html = html.replace(/\{\{embed:\s*(https?:\/\/[^}]+)\}\}/g, (fullMatch, rawUrl) => {
+        const url = rawUrl.trim();
+        if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url)) {
+            return stashHtml(`<audio class="section-audio" controls data-blob-src="${url}"></audio>`);
+        }
+        if (/\.pdf(\?.*)?$/i.test(url)) {
+            return stashHtml(`<iframe class="section-embed section-embed-pdf" src="${url}" loading="lazy"></iframe>`);
+        }
+        return stashHtml(buildIframeEmbedHtml(url));
+    });
+    // Media: ![alt]{type}(url) — type is img|doc|audio|embed (optional, defaults to img)
+    html = html.replace(/!\[([^\]]*)\](?:\{(img|doc|audio|embed)\})?\((https?:\/\/[^)]+)\)/g, (fullMatch, altText, mediaType, sourceUrl) => {
+        mediaType = mediaType || 'img';
+        if (mediaType === 'img') {
+            if (altText) {
+                return stashHtml(`<figure class="section-img-figure"><img class="section-img" src="${sourceUrl}" alt="${altText}"><figcaption class="section-img-caption">${altText}</figcaption></figure>`);
+            }
+            return stashHtml(`<img class="section-img" src="${sourceUrl}" alt="">`);
+        }
+        if (mediaType === 'audio') {
+            return stashHtml(`<audio class="section-audio" controls data-blob-src="${sourceUrl}"></audio>`);
+        }
+        if (mediaType === 'doc') {
+            return stashHtml(buildDocumentCardHtml(sourceUrl, altText));
+        }
+        if (mediaType === 'embed') {
+            return stashHtml(buildIframeEmbedHtml(sourceUrl));
         }
     });
 
@@ -1065,126 +1462,196 @@ function renderMarkdown(md) {
     html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
     html = html.replace(/__(.+?)__/g, '<u>$1</u>');
     html = html.replace(/_(.+?)_/g, '<em>$1</em>');
-    // Links
-    html = html.replace(/\[([^\]]+)\]\(((?:https?:\/\/|mailto:)[^)]+)\)/g, (_, text, href) => {
-        const external = href.startsWith('http');
-        return `<a href="${href}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''}>${text}</a>`;
+    // Links (web links open in a new tab, mailto links do not)
+    html = html.replace(/\[([^\]]+)\]\(((?:https?:\/\/|mailto:)[^)]+)\)/g, (fullMatch, linkText, linkHref) => {
+        let newTabAttributes = '';
+        if (linkHref.startsWith('http')) {
+            newTabAttributes = ' target="_blank" rel="noopener noreferrer"';
+        }
+        return `<a href="${linkHref}"${newTabAttributes}>${linkText}</a>`;
     });
     // Inline code
     html = html.replace(/`(.+?)`/g, '<code>$1</code>');
     // Unordered lists — supports nesting via leading spaces (2 spaces = 1 level)
-    html = html.replace(/((?:^[ ]*- .+\n?)+)/gm, match => {
-        const lines = match.trimEnd().split('\n').filter(l => /^\s*- /.test(l));
-        let out = '';
-        const stack = []; // stack of indent depths, one entry per open <ul>
-        for (const line of lines) {
-            const m = line.match(/^(\s*)- (.*)$/);
-            if (!m) continue;
-            const indent = m[1].length;
-            const text  = m[2];
-            if (stack.length === 0) {
-                out += '<ul>';
-                stack.push(indent);
-                out += `<li>${text}`;
-            } else if (indent > stack[stack.length - 1]) {
-                out += `<ul><li>${text}`;
-                stack.push(indent);
-            } else if (indent === stack[stack.length - 1]) {
-                out += `</li><li>${text}`;
+    html = html.replace(/((?:^[ ]*- .+\n?)+)/gm, listBlock => {
+        const listLines = listBlock.trimEnd().split('\n').filter(line => /^\s*- /.test(line));
+        let output = '';
+        const openIndentStack = []; // stack of indent depths, one entry per open <ul>
+        for (const line of listLines) {
+            const lineMatch = line.match(/^(\s*)- (.*)$/);
+            if (!lineMatch) {
+                continue;
+            }
+            const indentWidth = lineMatch[1].length;
+            const itemText = lineMatch[2];
+            const currentIndent = openIndentStack[openIndentStack.length - 1];
+            if (openIndentStack.length === 0) {
+                // First item: open the outermost list
+                output += '<ul>';
+                openIndentStack.push(indentWidth);
+                output += `<li>${itemText}`;
+            } else if (indentWidth > currentIndent) {
+                // Deeper indent: open a nested list inside the current item
+                output += `<ul><li>${itemText}`;
+                openIndentStack.push(indentWidth);
+            } else if (indentWidth === currentIndent) {
+                // Same indent: close the previous item and start a sibling
+                output += `</li><li>${itemText}`;
             } else {
-                out += '</li>';
-                while (stack.length > 0 && stack[stack.length - 1] > indent) {
-                    out += '</ul>';
-                    stack.pop();
-                    if (stack.length > 0) out += '</li>';
+                // Shallower indent: close nested lists until the levels match
+                output += '</li>';
+                while (openIndentStack.length > 0 && openIndentStack[openIndentStack.length - 1] > indentWidth) {
+                    output += '</ul>';
+                    openIndentStack.pop();
+                    if (openIndentStack.length > 0) {
+                        output += '</li>';
+                    }
                 }
-                out += `<li>${text}`;
+                output += `<li>${itemText}`;
             }
         }
-        out += '</li>';
-        while (stack.length > 0) { out += '</ul>'; stack.pop(); }
-        return out;
+        output += '</li>';
+        while (openIndentStack.length > 0) {
+            output += '</ul>';
+            openIndentStack.pop();
+        }
+        return output;
     });
     // Ordered / decimal-outline lists (1., 2.1., 2.1.1., etc.) with optional (a)/(b) sub-items
-    html = html.replace(/((?:^(?:(?:\d+\.)+[ \t].+|\([a-zA-Z]\)[ \t].+)\n?)+)/gm, match => {
+    html = html.replace(/((?:^(?:(?:\d+\.)+[ \t].+|\([a-zA-Z]\)[ \t].+)\n?)+)/gm, listBlock => {
         let currentDepth = 0;
-        const items = match.trim().split('\n').map(line => {
-            const dm = line.match(/^((?:\d+\.)+)[ \t](.+)$/);
-            if (dm) {
-                const numPart = dm[1];
-                currentDepth = (numPart.match(/\./g) || []).length - 1;
-                return `<li class="ol-depth-${currentDepth}"><strong>${numPart}</strong> ${dm[2]}</li>`;
+        const listItemsHtml = listBlock.trim().split('\n').map(line => {
+            const decimalMatch = line.match(/^((?:\d+\.)+)[ \t](.+)$/);
+            if (decimalMatch) {
+                const numberPart = decimalMatch[1];
+                // "2.1." has two dots, so it sits one level deeper than "2."
+                const dotMatches = numberPart.match(/\./g) || [];
+                currentDepth = dotMatches.length - 1;
+                return `<li class="ol-depth-${currentDepth}"><strong>${numberPart}</strong> ${decimalMatch[2]}</li>`;
             }
-            const am = line.match(/^(\([a-zA-Z]\))[ \t](.+)$/);
-            if (am) {
-                return `<li class="ol-depth-${currentDepth + 1}">${am[1]} ${am[2]}</li>`;
+            const letterMatch = line.match(/^(\([a-zA-Z]\))[ \t](.+)$/);
+            if (letterMatch) {
+                return `<li class="ol-depth-${currentDepth + 1}">${letterMatch[1]} ${letterMatch[2]}</li>`;
             }
             return '';
         }).filter(Boolean).join('');
-        return `<ol class="decimal-list">${items}</ol>`;
+        return `<ol class="decimal-list">${listItemsHtml}</ol>`;
     });
     // Paragraphs — stash tokens that stand alone are treated as block-level
-    html = html.split(/\n\n+/).map(para => {
-        const t = para.trim();
-        if (!t) return '';
-        if (/^<(h[1-6]|ul|ol|table|blockquote|hr)/.test(t)) return t;
-        if (/^\x02\d+\x02$/.test(t)) return t;
-        return `<p>${t.replace(/\n/g, '<br/>')}</p>`;
+    html = html.split(/\n\n+/).map(paragraph => {
+        const trimmedParagraph = paragraph.trim();
+        if (!trimmedParagraph) {
+            return '';
+        }
+        if (/^<(h[1-6]|ul|ol|table|blockquote|hr)/.test(trimmedParagraph)) {
+            return trimmedParagraph;
+        }
+        if (/^\x02\d+\x02$/.test(trimmedParagraph)) {
+            return trimmedParagraph;
+        }
+        return `<p>${trimmedParagraph.replace(/\n/g, '<br/>')}</p>`;
     }).join('\n');
 
     // Restore stashed blocks
-    stash.forEach((block, i) => { html = html.replace(`\x02${i}\x02`, () => block); });
+    stashedBlocks.forEach((blockHtml, blockIndex) => {
+        html = html.replace(`\x02${blockIndex}\x02`, () => blockHtml);
+    });
 
     return html;
 }
 
 /* ─── Breadcrumb ─── */
+
+// Fills the "Home > Document > Page" trail above the content.
 function updateBreadcrumb(section) {
-    const doc = DOCS[currentDoc];
-    const bc = document.getElementById(doc.breadcrumbEl);
-    if (!bc) return;
-    const sep = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
-    if (!section) {
-        bc.innerHTML = `<a href="/" class="bc-link">Home</a>${sep}<a href="${doc.urlBase}" class="bc-link">${doc.sidebarTitle}</a>`;
-    } else {
-        bc.innerHTML = `<a href="/" class="bc-link">Home</a>${sep}<a href="${doc.urlBase}" class="bc-link">${doc.sidebarTitle}</a>${sep}<span>${section.title}</span>`;
+    const documentConfig = DOCUMENT_CONFIG[currentDocumentKey];
+    const breadcrumbElement = document.getElementById(documentConfig.breadcrumbElementId);
+    if (!breadcrumbElement) {
+        return;
     }
-    bc.querySelectorAll('.bc-link').forEach(a => {
-        a.addEventListener('click', e => {
-            e.preventDefault();
-            navigate(a.getAttribute('href'));
+    const separatorIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+    let breadcrumbHtml = `<a href="/" class="bc-link">Home</a>${separatorIcon}<a href="${documentConfig.urlBase}" class="bc-link">${documentConfig.sidebarTitle}</a>`;
+    if (section) {
+        breadcrumbHtml += `${separatorIcon}<span>${section.title}</span>`;
+    }
+    breadcrumbElement.innerHTML = breadcrumbHtml;
+    breadcrumbElement.querySelectorAll('.bc-link').forEach(breadcrumbLink => {
+        breadcrumbLink.addEventListener('click', clickEvent => {
+            clickEvent.preventDefault();
+            navigate(breadcrumbLink.getAttribute('href'));
         });
     });
 }
 
-/* ─── Prev/Next Footer ─── */
+/* ─── Previous / Next Footer ─── */
+
+/**
+ * Fills the footer under a page with the "last updated" date, a view counter
+ * placeholder (filled later by trackPageViews) and Previous / Next buttons.
+ */
 function updateDocNavFooter(section) {
-    const doc = DOCS[currentDoc];
-    const footer = document.getElementById(doc.navFooterEl);
-    if (!footer) return;
+    const documentConfig = DOCUMENT_CONFIG[currentDocumentKey];
+    const footerElement = document.getElementById(documentConfig.navFooterElementId);
+    if (!footerElement) {
+        return;
+    }
     if (!section) {
-        footer.innerHTML = '';
+        footerElement.innerHTML = '';
         return;
     }
 
     // Most recent updated_at across the section and all its subsections
-    const candidates = [section, ...sections.filter(s => s.parent_id === section.id)]
-        .map(s => s.updated_at).filter(Boolean);
-    const latestDate = candidates.length
-        ? new Date(candidates.reduce((a, b) => (a > b ? a : b)))
-        : null;
-    const lastUpdated = latestDate
-        ? latestDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-        : null;
+    const relatedSections = [section].concat(sections.filter(candidate => candidate.parent_id === section.id));
+    const updateDates = relatedSections
+        .map(relatedSection => relatedSection.updated_at)
+        .filter(Boolean);
+    let lastUpdatedText = null;
+    if (updateDates.length) {
+        let latestDateText = updateDates[0];
+        updateDates.forEach(dateText => {
+            if (dateText > latestDateText) {
+                latestDateText = dateText;
+            }
+        });
+        const latestDate = new Date(latestDateText);
+        lastUpdatedText = latestDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
 
-    const urlBase = doc.urlBase;
+    const urlBase = documentConfig.urlBase;
     const pages = topLevelPages();
-    const idx = pages.findIndex(s => s.id === section.id);
-    const prev = idx > 0 ? pages[idx - 1] : null;
-    const next = idx < pages.length - 1 ? pages[idx + 1] : null;
-    footer.innerHTML = `
+    const pageIndex = pages.findIndex(page => page.id === section.id);
+    let previousPage = null;
+    if (pageIndex > 0) {
+        previousPage = pages[pageIndex - 1];
+    }
+    let nextPage = null;
+    if (pageIndex < pages.length - 1) {
+        nextPage = pages[pageIndex + 1];
+    }
+
+    let lastUpdatedHtml = '';
+    if (lastUpdatedText) {
+        lastUpdatedHtml = `<span class="doc-last-updated">Last updated: ${lastUpdatedText}</span>`;
+    }
+    // An empty <span> keeps the "Next" button on the right when there is no previous page
+    let previousButtonHtml = '<span></span>';
+    if (previousPage) {
+        previousButtonHtml = `<button class="doc-nav-btn" data-slug="${previousPage.slug}">
+        <span class="doc-nav-label">← Previous</span>
+        <span class="doc-nav-title">${buildHeadingNumberPrefix(previousPage)}${previousPage.title}</span>
+      </button>`;
+    }
+    let nextButtonHtml = '';
+    if (nextPage) {
+        nextButtonHtml = `<button class="doc-nav-btn next" data-slug="${nextPage.slug}">
+        <span class="doc-nav-label">Next →</span>
+        <span class="doc-nav-title">${buildHeadingNumberPrefix(nextPage)}${nextPage.title}</span>
+      </button>`;
+    }
+
+    footerElement.innerHTML = `
     <div class="doc-page-meta">
-      ${lastUpdated ? `<span class="doc-last-updated">Last updated: ${lastUpdated}</span>` : ''}
+      ${lastUpdatedHtml}
       <span class="doc-views" id="doc-views-count">
         <svg class="doc-views-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -1193,93 +1660,127 @@ function updateDocNavFooter(section) {
       </span>
     </div>
     <div class="doc-nav-buttons">
-      ${prev ? `<button class="doc-nav-btn" data-slug="${prev.slug}">
-        <span class="doc-nav-label">← Previous</span>
-        <span class="doc-nav-title">${prev.number ? prev.number + ' — ' : ''}${prev.title}</span>
-      </button>` : '<span></span>'}
-      ${next ? `<button class="doc-nav-btn next" data-slug="${next.slug}">
-        <span class="doc-nav-label">Next →</span>
-        <span class="doc-nav-title">${next.number ? next.number + ' — ' : ''}${next.title}</span>
-      </button>` : ''}
+      ${previousButtonHtml}
+      ${nextButtonHtml}
     </div>`;
-    footer.querySelectorAll('.doc-nav-btn').forEach(btn =>
-        btn.addEventListener('click', () => navigate(`${urlBase}/${btn.dataset.slug}`)));
+    footerElement.querySelectorAll('.doc-nav-btn').forEach(navigationButton => {
+        navigationButton.addEventListener('click', () => navigate(`${urlBase}/${navigationButton.dataset.slug}`));
+    });
 }
 
 /* ─── Page Visit Tracking ─── */
+
+// Guesses whether the reader is on a tablet, a phone or a desktop computer.
 function detectDeviceType() {
-    const ua = navigator.userAgent;
-    if (/iPad|Tablet/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua))) return 'Tablet';
-    if (/Mobile|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return 'Mobile';
-    if (typeof window !== 'undefined' && window.innerWidth < 768) return 'Mobile';
+    const userAgent = navigator.userAgent;
+    const looksLikeTablet = /iPad|Tablet/i.test(userAgent) || (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent));
+    if (looksLikeTablet) {
+        return 'Tablet';
+    }
+    if (/Mobile|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) {
+        return 'Mobile';
+    }
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        return 'Mobile';
+    }
     return 'Desktop';
 }
 
+/**
+ * Records a visit to this page and shows the combined view count of the page
+ * and its subsections in the footer.
+ */
 async function trackPageViews(section) {
-    const countEl = document.getElementById('doc-views-count');
-    const subs    = sections.filter(s => s.parent_id === section.id);
-    const allIds  = [section.id, ...subs.map(s => s.id)];
+    const viewCountElement = document.getElementById('doc-views-count');
+    const childSections = sections.filter(candidate => candidate.parent_id === section.id);
+    const allSectionIds = [section.id];
+    childSections.forEach(childSection => allSectionIds.push(childSection.id));
 
     try {
-        const res = await apiFetch('/api/policy/track-visit', {
+        const apiResponse = await apiFetch('/api/policy/track-visit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 section_id:  section.id,
-                doc:         currentDoc,
+                doc:         currentDocumentKey,
                 slug:        section.slug,
                 device_type: detectDeviceType(),
-                all_ids:     allIds,
+                all_ids:     allSectionIds,
             }),
         });
-        if (countEl) {
-            const spinner = countEl.querySelector('.doc-views-spinner');
-            if (spinner) spinner.remove();
-            const label = countEl.querySelector('.doc-views-label') || document.createElement('span');
-            label.className = 'doc-views-label';
-            label.textContent = res.ok && res.total != null
-                ? `${Number(res.total).toLocaleString()} view${res.total === 1 ? '' : 's'}`
-                : '';
-            if (!countEl.contains(label)) countEl.appendChild(label);
+        if (viewCountElement) {
+            const loadingSpinner = viewCountElement.querySelector('.doc-views-spinner');
+            if (loadingSpinner) {
+                loadingSpinner.remove();
+            }
+            const viewCountLabel = viewCountElement.querySelector('.doc-views-label') || document.createElement('span');
+            viewCountLabel.className = 'doc-views-label';
+            // Zero is a valid total, so only a missing (null or undefined) total is skipped
+            if (apiResponse.ok && apiResponse.total !== null && apiResponse.total !== undefined) {
+                let viewWord = 'views';
+                if (apiResponse.total === 1) {
+                    viewWord = 'view';
+                }
+                viewCountLabel.textContent = `${Number(apiResponse.total).toLocaleString()} ${viewWord}`;
+            } else {
+                viewCountLabel.textContent = '';
+            }
+            if (!viewCountElement.contains(viewCountLabel)) {
+                viewCountElement.appendChild(viewCountLabel);
+            }
         }
-    } catch {
-        if (countEl) {
-            const spinner = countEl.querySelector('.doc-views-spinner');
-            if (spinner) spinner.remove();
+    } catch (trackingError) {
+        if (viewCountElement) {
+            const loadingSpinner = viewCountElement.querySelector('.doc-views-spinner');
+            if (loadingSpinner) {
+                loadingSpinner.remove();
+            }
         }
     }
 }
 
 /* ─── Sidebar Active State ─── */
+
+// Highlights the sidebar entry for the open page (and subsection, if any)
+// and expands its list of subsections.
 function updateSidebarActive(slug, anchor) {
     // Clear all active states
-    document.querySelectorAll('.nav-article-btn, .nav-sub-btn').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-article-btn, .nav-sub-btn').forEach(navigationButton => {
+        navigationButton.classList.remove('active');
+    });
 
-    if (!slug) return;
+    if (!slug) {
+        return;
+    }
 
     // Mark the article button active
-    document.querySelectorAll(`.nav-article-btn[data-slug="${slug}"]`).forEach(el => el.classList.add('active'));
+    document.querySelectorAll(`.nav-article-btn[data-slug="${slug}"]`).forEach(articleButton => {
+        articleButton.classList.add('active');
+    });
 
     if (anchor) {
         // Mark the specific subsection button active
-        document.querySelectorAll(`.nav-sub-btn[data-slug="${slug}"][data-anchor="${anchor}"]`)
-            .forEach(el => el.classList.add('active'));
+        document.querySelectorAll(`.nav-sub-btn[data-slug="${slug}"][data-anchor="${anchor}"]`).forEach(subsectionButton => {
+            subsectionButton.classList.add('active');
+        });
     }
 
     // Expand the parent article
-    const articleDiv = document.querySelector(`.nav-article[data-slug="${slug}"]`);
-    if (articleDiv) {
-        const sub = articleDiv.querySelector('.nav-subsections');
-        if (sub) {
-            sub.style.display = 'block';
-            articleDiv.classList.add('expanded');
+    const articleContainer = document.querySelector(`.nav-article[data-slug="${slug}"]`);
+    if (articleContainer) {
+        const subsectionList = articleContainer.querySelector('.nav-subsections');
+        if (subsectionList) {
+            subsectionList.style.display = 'block';
+            articleContainer.classList.add('expanded');
         }
     }
 }
 
 /* ─── Sidebar Toggle ─── */
 function ensureSidebarOpen() {
-    if (window.innerWidth >= 900) return; // desktop: always visible
+    if (window.innerWidth >= MOBILE_BREAKPOINT_WIDTH) {
+        return; // desktop: always visible
+    }
     // Don't auto-open on mobile, let user toggle
 }
 
@@ -1293,127 +1794,171 @@ function closeSidebar() {
     document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
+// On desktop the sidebar collapses to the side; on mobile it slides in and out.
 function toggleSidebar() {
-    if (window.innerWidth >= 900) {
+    if (window.innerWidth >= MOBILE_BREAKPOINT_WIDTH) {
         const sidebar = document.getElementById('sidebar');
-        const main = document.getElementById('main-content');
+        const mainContent = document.getElementById('main-content');
         sidebar.classList.toggle('collapsed');
-        main.classList.toggle('sidebar-hidden');
+        mainContent.classList.toggle('sidebar-hidden');
     } else {
         const isOpen = document.getElementById('sidebar').classList.contains('open');
-        isOpen ? closeSidebar() : openSidebar();
+        if (isOpen) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
     }
 }
 
 /* ─── Session / Auth ─── */
+
+// Checks the saved session token with the server and signs the user back in.
 async function restoreSession() {
-    const token = localStorage.getItem('gftv-token');
-    if (token) {
+    const sessionToken = localStorage.getItem('gftv-token');
+    if (sessionToken) {
         try {
-            const res = await apiFetch('/api/auth/me', {
+            const apiResponse = await apiFetch('/api/auth/me', {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${sessionToken}`
                 }
             });
-            if (res.ok) {
-                currentUser = res.user;
+            if (apiResponse.ok) {
+                currentUser = apiResponse.user;
             } else {
                 localStorage.removeItem('gftv-token');
             }
-        } catch (e) {
+        } catch (sessionError) {
             localStorage.removeItem('gftv-token');
         }
     }
     updateUserUI();
 }
 
-function updateUserUI() {
-    const area = document.getElementById('user-area');
-    const sidebarArea = document.getElementById('sidebar-user-area');
+// Shows or hides a dropdown menu element (by id) each time it is called.
+function toggleDropdownVisibility(dropdownElementId) {
+    const dropdownElement = document.getElementById(dropdownElementId);
+    if (dropdownElement.style.display === 'none') {
+        dropdownElement.style.display = 'block';
+    } else {
+        dropdownElement.style.display = 'none';
+    }
+}
 
-    if (currentUser) {
-        if (area) {
-            area.innerHTML = `
-      <div class="user-chip" id="user-chip" tabindex="0">
+// Adds an event listener to the element with the given id, but only if that
+// element exists on the page (some pages do not include every element).
+function addListenerIfPresent(elementId, eventName, eventHandler) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.addEventListener(eventName, eventHandler);
+    }
+}
+
+// Builds the signed-in user's name chip with its dropdown menu.
+// "idPrefix" is '' for the header copy and 'sidebar-' for the sidebar copy.
+function buildUserChipHtml(idPrefix) {
+    let adminPanelButtonHtml = '';
+    if (currentUser.is_admin) {
+        adminPanelButtonHtml = `<button class="user-dropdown-item" id="${idPrefix}goto-admin">Admin Panel</button>`;
+    }
+    return `
+      <div class="user-chip" id="${idPrefix}user-chip" tabindex="0">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2"/></svg>
-        ${currentUser.display_name}
+        ${escapeHtmlCharacters(String(currentUser.display_name || ''))}
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"/></svg>
-        <div class="user-dropdown" id="user-dropdown" style="display:none">
-          ${currentUser.is_admin ? `<button class="user-dropdown-item" id="goto-admin">Admin Panel</button>` : ''}
-          <button class="user-dropdown-item danger" id="logout-btn">Sign Out</button>
+        <div class="user-dropdown" id="${idPrefix}user-dropdown" style="display:none">
+          ${adminPanelButtonHtml}
+          <button class="user-dropdown-item danger" id="${idPrefix}logout-btn">Sign Out</button>
         </div>
       </div>`;
-            const chip = document.getElementById('user-chip');
-            chip.addEventListener('click', e => {
-                e.stopPropagation();
-                const dd = document.getElementById('user-dropdown');
-                dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
-            });
-            document.getElementById('logout-btn')?.addEventListener('click', logout);
-            document.getElementById('goto-admin')?.addEventListener('click', () => navigate('/admin'));
-            document.addEventListener('click', () => {
-                const dd = document.getElementById('user-dropdown');
-                if (dd) dd.style.display = 'none';
-            }, { once: true });
+}
+
+// Connects the clicks of a user chip created by buildUserChipHtml.
+function attachUserChipHandlers(idPrefix) {
+    const userChip = document.getElementById(`${idPrefix}user-chip`);
+    userChip.addEventListener('click', clickEvent => {
+        clickEvent.stopPropagation();
+        toggleDropdownVisibility(`${idPrefix}user-dropdown`);
+    });
+    addListenerIfPresent(`${idPrefix}logout-btn`, 'click', logout);
+    addListenerIfPresent(`${idPrefix}goto-admin`, 'click', () => navigate('/admin'));
+}
+
+// Closes a user dropdown the next time anything on the page is clicked.
+function closeDropdownOnNextClick(dropdownElementId) {
+    document.addEventListener('click', () => {
+        const dropdownElement = document.getElementById(dropdownElementId);
+        if (dropdownElement) {
+            dropdownElement.style.display = 'none';
+        }
+    }, { once: true });
+}
+
+/**
+ * Redraws the header and sidebar account areas: a user chip with a dropdown
+ * when someone is signed in, or "Sign In" buttons when nobody is.
+ */
+function updateUserUI() {
+    const headerUserArea = document.getElementById('user-area');
+    const sidebarUserArea = document.getElementById('sidebar-user-area');
+    const openSearchFromSidebar = () => {
+        closeSidebar();
+        openSearch();
+    };
+
+    if (currentUser) {
+        if (headerUserArea) {
+            headerUserArea.innerHTML = buildUserChipHtml('');
+            attachUserChipHandlers('');
+            closeDropdownOnNextClick('user-dropdown');
         }
 
-        if (sidebarArea) {
-            sidebarArea.innerHTML = `
-      <div class="user-chip" id="sidebar-user-chip" tabindex="0">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2"/></svg>
-        ${currentUser.display_name}
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"/></svg>
-        <div class="user-dropdown" id="sidebar-user-dropdown" style="display:none">
-          ${currentUser.is_admin ? `<button class="user-dropdown-item" id="sidebar-goto-admin">Admin Panel</button>` : ''}
-          <button class="user-dropdown-item danger" id="sidebar-logout-btn">Sign Out</button>
-        </div>
-      </div>
+        if (sidebarUserArea) {
+            sidebarUserArea.innerHTML = buildUserChipHtml('sidebar-') + `
       <button class="btn btn-ghost btn-sm" id="sidebar-search-btn">Search</button>`;
-            const sidebarChip = document.getElementById('sidebar-user-chip');
-            sidebarChip.addEventListener('click', e => {
-                e.stopPropagation();
-                const dd = document.getElementById('sidebar-user-dropdown');
-                dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
-            });
-            document.getElementById('sidebar-logout-btn')?.addEventListener('click', logout);
-            document.getElementById('sidebar-goto-admin')?.addEventListener('click', () => navigate('/admin'));
-            document.getElementById('sidebar-search-btn')?.addEventListener('click', () => { closeSidebar(); openSearch(); });
-            document.addEventListener('click', () => {
-                const dd = document.getElementById('sidebar-user-dropdown');
-                if (dd) dd.style.display = 'none';
-            }, { once: true });
+            attachUserChipHandlers('sidebar-');
+            addListenerIfPresent('sidebar-search-btn', 'click', openSearchFromSidebar);
+            closeDropdownOnNextClick('sidebar-user-dropdown');
         }
     } else {
-        if (area) {
-            area.innerHTML = `<button class="btn btn-ghost btn-sm" id="login-btn">Sign In</button>`;
-            document.getElementById('login-btn')?.addEventListener('click', () => openModal('auth-modal'));
+        if (headerUserArea) {
+            headerUserArea.innerHTML = `<button class="btn btn-ghost btn-sm" id="login-btn">Sign In</button>`;
+            addListenerIfPresent('login-btn', 'click', () => openModal('auth-modal'));
         }
-        if (sidebarArea) {
-            sidebarArea.innerHTML = `
+        if (sidebarUserArea) {
+            sidebarUserArea.innerHTML = `
       <button class="btn btn-ghost btn-sm" id="sidebar-login-btn">Sign In</button>
       <button class="btn btn-ghost btn-sm" id="sidebar-search-btn">Search</button>`;
-            document.getElementById('sidebar-login-btn')?.addEventListener('click', () => openModal('auth-modal'));
-            document.getElementById('sidebar-search-btn')?.addEventListener('click', () => { closeSidebar(); openSearch(); });
+            addListenerIfPresent('sidebar-login-btn', 'click', () => openModal('auth-modal'));
+            addListenerIfPresent('sidebar-search-btn', 'click', openSearchFromSidebar);
         }
     }
 }
+
 async function logout() {
-    const token = localStorage.getItem('gftv-token');
-    if (token) await apiFetch('/api/auth/logout', {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
+    const sessionToken = localStorage.getItem('gftv-token');
+    if (sessionToken) {
+        await apiFetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${sessionToken}`
+            }
+        });
+    }
     localStorage.removeItem('gftv-token');
     currentUser = null;
     updateUserUI();
     showToast('Signed out', 'success');
-    if (location.pathname === '/admin') navigate('/');
+    if (location.pathname === '/admin') {
+        navigate('/');
+    }
 }
 
 /* ─── Auth Form ─── */
-let _totpChallengeToken = null;
+
+// The token the server gave us after a correct password, while it waits
+// for the user's two-factor code.
+let totpChallengeToken = null;
 
 function showTotpStep() {
     document.getElementById('auth-form-login').classList.add('hidden');
@@ -1429,357 +1974,496 @@ function showLoginStep() {
     document.getElementById('auth-form-totp').classList.add('hidden');
     document.getElementById('auth-form-login').classList.remove('hidden');
     document.getElementById('auth-modal-title').textContent = 'Sign In';
-    _totpChallengeToken = null;
+    totpChallengeToken = null;
     clearAuthError();
 }
 
-function completeLogin(res) {
-    localStorage.setItem('gftv-token', res.token);
-    if (res.device_token) localStorage.setItem('gftv-device-token', res.device_token);
-    currentUser = res.user;
+// Saves the new session (and trusted-device token, if any) and updates the page.
+function completeLogin(loginResponse) {
+    localStorage.setItem('gftv-token', loginResponse.token);
+    if (loginResponse.device_token) {
+        localStorage.setItem('gftv-device-token', loginResponse.device_token);
+    }
+    currentUser = loginResponse.user;
     updateUserUI();
     closeModal('auth-modal');
-    showToast('Welcome back, ' + res.user.display_name, 'success');
+    showToast('Welcome back, ' + loginResponse.user.display_name, 'success');
 }
 
-document.getElementById('login-form')?.addEventListener('submit', async () => {
+addListenerIfPresent('login-form', 'submit', async () => {
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
     clearAuthError();
-    if (!username || !password) return showAuthError('Please fill in all fields.');
-    const device_token = localStorage.getItem('gftv-device-token') || undefined;
-    const res = await apiFetch('/api/auth/login', {
+    if (!username || !password) {
+        return showAuthError('Please fill in all fields.');
+    }
+    const deviceToken = localStorage.getItem('gftv-device-token') || undefined;
+    const apiResponse = await apiFetch('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ username, password, device_token }),
+        body: JSON.stringify({ username: username, password: password, device_token: deviceToken }),
         headers: { 'Content-Type': 'application/json' }
     });
-    if (!res.ok) return showAuthError(res.error || 'Login failed');
-    if (res.totp_required) {
-        _totpChallengeToken = res.challenge_token;
+    if (!apiResponse.ok) {
+        return showAuthError(apiResponse.error || 'Login failed');
+    }
+    if (apiResponse.totp_required) {
+        totpChallengeToken = apiResponse.challenge_token;
         showTotpStep();
     } else {
-        completeLogin(res);
+        completeLogin(apiResponse);
     }
 });
 
-document.getElementById('totp-submit')?.addEventListener('click', async () => {
+addListenerIfPresent('totp-submit', 'click', async () => {
     const code = document.getElementById('totp-code').value.trim();
-    const trust_device = document.getElementById('totp-trust-device').checked;
+    const trustDevice = document.getElementById('totp-trust-device').checked;
     clearAuthError();
-    if (!code) return showAuthError('Please enter your authentication code.');
-    if (!_totpChallengeToken) return showAuthError('Session expired, please log in again.');
-    const res = await apiFetch('/api/auth/totp-verify', {
+    if (!code) {
+        return showAuthError('Please enter your authentication code.');
+    }
+    if (!totpChallengeToken) {
+        return showAuthError('Session expired, please log in again.');
+    }
+    const apiResponse = await apiFetch('/api/auth/totp-verify', {
         method: 'POST',
-        body: JSON.stringify({ challenge_token: _totpChallengeToken, code, trust_device }),
+        body: JSON.stringify({ challenge_token: totpChallengeToken, code: code, trust_device: trustDevice }),
         headers: { 'Content-Type': 'application/json' }
     });
-    if (res.ok) {
-        completeLogin(res);
+    if (apiResponse.ok) {
+        completeLogin(apiResponse);
     } else {
-        showAuthError(res.error || 'Invalid code');
+        showAuthError(apiResponse.error || 'Invalid code');
     }
 });
 
-document.getElementById('totp-use-backup')?.addEventListener('click', () => {
-    const label = document.getElementById('totp-code-label');
-    const input = document.getElementById('totp-code');
-    const btn = document.getElementById('totp-use-backup');
-    const isBackup = input.getAttribute('data-mode') === 'backup';
-    if (isBackup) {
-        label.textContent = 'Authentication Code';
-        input.placeholder = '000000';
-        input.inputMode = 'numeric';
-        input.maxLength = 20;
-        input.removeAttribute('data-mode');
-        btn.textContent = 'Use a backup code instead';
+// Switches the code box between "authenticator app code" and "backup code".
+addListenerIfPresent('totp-use-backup', 'click', () => {
+    const codeLabel = document.getElementById('totp-code-label');
+    const codeInput = document.getElementById('totp-code');
+    const switchButton = document.getElementById('totp-use-backup');
+    const isBackupMode = codeInput.getAttribute('data-mode') === 'backup';
+    if (isBackupMode) {
+        codeLabel.textContent = 'Authentication Code';
+        codeInput.placeholder = '000000';
+        codeInput.inputMode = 'numeric';
+        codeInput.maxLength = 20;
+        codeInput.removeAttribute('data-mode');
+        switchButton.textContent = 'Use a backup code instead';
     } else {
-        label.textContent = 'Backup Code';
-        input.placeholder = 'xxxx-xxxx-xxxx';
-        input.inputMode = 'text';
-        input.maxLength = 50;
-        input.setAttribute('data-mode', 'backup');
-        btn.textContent = 'Use authenticator app instead';
+        codeLabel.textContent = 'Backup Code';
+        codeInput.placeholder = 'xxxx-xxxx-xxxx';
+        codeInput.inputMode = 'text';
+        codeInput.maxLength = 50;
+        codeInput.setAttribute('data-mode', 'backup');
+        switchButton.textContent = 'Use authenticator app instead';
     }
-    input.value = '';
+    codeInput.value = '';
     clearAuthError();
 });
 
-document.getElementById('totp-back')?.addEventListener('click', showLoginStep);
-document.getElementById('reg-submit')?.addEventListener('click', async () => {
-    const display_name = document.getElementById('reg-display').value.trim();
+addListenerIfPresent('totp-back', 'click', showLoginStep);
+
+addListenerIfPresent('reg-submit', 'click', async () => {
+    const displayName = document.getElementById('reg-display').value.trim();
     const username = document.getElementById('reg-username').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
     clearAuthError();
-    if (!display_name || !username || !email || !password) return showAuthError('Please fill in all fields.');
-    const res = await apiFetch('/api/auth/register', {
+    if (!displayName || !username || !email || !password) {
+        return showAuthError('Please fill in all fields.');
+    }
+    const apiResponse = await apiFetch('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify({
-            display_name,
-            username,
-            email,
-            password
+            display_name: displayName,
+            username: username,
+            email: email,
+            password: password
         }),
         headers: {
             'Content-Type': 'application/json'
         }
     });
-    if (res.ok) {
+    if (apiResponse.ok) {
         closeModal('auth-modal');
         showToast('Account created! Awaiting admin approval.', 'success');
-    } else showAuthError(res.error || 'Registration failed');
+    } else {
+        showAuthError(apiResponse.error || 'Registration failed');
+    }
 });
-document.getElementById('show-register')?.addEventListener('click', () => {
+
+addListenerIfPresent('show-register', 'click', () => {
     document.getElementById('auth-form-login').classList.add('hidden');
     document.getElementById('auth-form-register').classList.remove('hidden');
     document.getElementById('auth-modal-title').textContent = 'Create Account';
     clearAuthError();
 });
-document.getElementById('show-login')?.addEventListener('click', () => {
+
+addListenerIfPresent('show-login', 'click', () => {
     document.getElementById('auth-form-register').classList.add('hidden');
     document.getElementById('auth-form-login').classList.remove('hidden');
     document.getElementById('auth-modal-title').textContent = 'Sign In';
     clearAuthError();
 });
 
-function showAuthError(msg) {
-    const el = document.getElementById('auth-error');
-    if (el) {
-        el.textContent = msg;
-        el.classList.remove('hidden');
+function showAuthError(errorMessage) {
+    const errorElement = document.getElementById('auth-error');
+    if (errorElement) {
+        errorElement.textContent = errorMessage;
+        errorElement.classList.remove('hidden');
     }
 }
 
 function clearAuthError() {
-    const el = document.getElementById('auth-error');
-    if (el) {
-        el.textContent = '';
-        el.classList.add('hidden');
+    const errorElement = document.getElementById('auth-error');
+    if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.classList.add('hidden');
     }
 }
 
 /* ─── Copy Toolbar ─── */
+
+const PUBLIC_SITE_ORIGIN = 'https://policy.globalfurry.tv';
+
+// Hides every "copy" dropdown menu and resets its position.
+function hideAllCopyDropdowns() {
+    document.querySelectorAll('.copy-dropdown').forEach(copyDropdown => {
+        copyDropdown.hidden = true;
+        copyDropdown.style.right = '';
+        copyDropdown.style.left = '';
+    });
+}
+
+// Builds a Markdown copy of the open page, including all of its subsections.
+function buildCurrentPageMarkdown() {
+    const urlBase = DOCUMENT_CONFIG[currentDocumentKey].urlBase;
+    let childSections = [];
+    if (currentSection.type === 'article') {
+        childSections = subsectionsOf(currentSection.id);
+    }
+    let markdownText = `# ${currentSection.title}\n\nSource: ${PUBLIC_SITE_ORIGIN}${urlBase}/${currentSection.slug}\n\n${currentSection.content || ''}`;
+    childSections.forEach(childSection => {
+        markdownText += `\n\n## ${childSection.title}\n\n${childSection.content || ''}`;
+    });
+    return markdownText;
+}
+
+// Loads the html2pdf library from a CDN the first time it is needed.
+function loadHtml2PdfLibrary() {
+    return new Promise((resolve, reject) => {
+        if (window.html2pdf) {
+            return resolve(window.html2pdf);
+        }
+        const scriptElement = document.createElement('script');
+        scriptElement.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        scriptElement.onload = () => resolve(window.html2pdf);
+        scriptElement.onerror = reject;
+        document.head.appendChild(scriptElement);
+    });
+}
+
+// Looks up the reader's public IP address for the PDF footer ("Unknown" on failure).
+function fetchPublicIpAddress() {
+    return fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(responseJson => responseJson.ip)
+        .catch(() => 'Unknown');
+}
+
+// Loads the site logo and converts it to a data URL that jsPDF can draw.
+// Resolves with null if the logo cannot be loaded.
+function loadLogoAsDataUrl() {
+    return new Promise(resolve => {
+        const logoImage = new Image();
+        logoImage.crossOrigin = 'anonymous';
+        logoImage.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = logoImage.naturalWidth;
+            canvas.height = logoImage.naturalHeight;
+            canvas.getContext('2d').drawImage(logoImage, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+        };
+        logoImage.onerror = () => resolve(null);
+        logoImage.src = '/GHS-main.png';
+    });
+}
+
+/**
+ * Draws the PolicySpot header (logo, name, GFTV badge) and the footer (page
+ * address, export time, IP address and page number) on every page of the PDF.
+ * All measurements are in millimetres.
+ */
+function drawPdfHeadersAndFooters(pdfDocument, logoDataUrl, pageUrl, exportDateTime, ipAddress) {
+    const totalPages = pdfDocument.internal.getNumberOfPages();
+    const pageWidth = pdfDocument.internal.pageSize.getWidth();
+    const pageHeight = pdfDocument.internal.pageSize.getHeight();
+    for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+        pdfDocument.setPage(pageNumber);
+        // Header
+        let titleTextX = 14;
+        if (logoDataUrl) {
+            pdfDocument.addImage(logoDataUrl, 'PNG', 14, 5, 9, 9);
+            titleTextX = 25;
+        }
+        pdfDocument.setFontSize(12);
+        pdfDocument.setFont('helvetica', 'bold');
+        pdfDocument.setTextColor(30, 30, 50);
+        pdfDocument.text('PolicySpot', titleTextX, 10.5);
+        const badgeX = titleTextX + pdfDocument.getTextWidth('PolicySpot') + 2;
+        pdfDocument.setFillColor(74, 106, 138);
+        pdfDocument.setFontSize(6.5);
+        pdfDocument.roundedRect(badgeX, 6.2, pdfDocument.getTextWidth('GFTV') + 3, 5, 1, 1, 'F');
+        pdfDocument.setTextColor(255, 255, 255);
+        pdfDocument.text('GFTV', badgeX + 1.5, 10.2);
+        pdfDocument.setDrawColor(180, 190, 200);
+        pdfDocument.setLineWidth(0.3);
+        pdfDocument.line(14, 17, pageWidth - 14, 17);
+        // Footer
+        pdfDocument.line(14, pageHeight - 18, pageWidth - 14, pageHeight - 18);
+        pdfDocument.setFontSize(7.5);
+        pdfDocument.setFont('helvetica', 'normal');
+        pdfDocument.setTextColor(100, 110, 120);
+        pdfDocument.text(pageUrl, 14, pageHeight - 13.5);
+        pdfDocument.text(`Exported: ${exportDateTime}`, 14, pageHeight - 9);
+        pdfDocument.text(`Exporting IP: ${ipAddress}`, 14, pageHeight - 4.5);
+        const pageLabel = `${pageNumber} / ${totalPages}`;
+        pdfDocument.text(pageLabel, pageWidth - 14 - pdfDocument.getTextWidth(pageLabel), pageHeight - 4.5);
+    }
+}
+
+/**
+ * Turns the open page into a PDF (using html2pdf) and opens it in a new tab.
+ * While the PDF is made, the page is temporarily switched to the default
+ * light theme and every collapsible block is opened; both are put back
+ * afterwards, whether the export worked or not.
+ */
+function exportCurrentPageAsPdf() {
+    const documentConfig = DOCUMENT_CONFIG[currentDocumentKey];
+    const contentElementId = documentConfig.contentElementId;
+    const contentElement = document.getElementById(contentElementId);
+    if (!contentElement) {
+        return;
+    }
+    const pageTitle = currentSection.title || 'export';
+    const pageUrl = `${PUBLIC_SITE_ORIGIN}${documentConfig.urlBase}/${currentSection.slug}`;
+    const exportDateTime = new Date().toLocaleString('en-GB', {
+        year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
+    });
+    const pdfOptions = {
+        margin: [22, 14, 24, 14],
+        filename: `${pageTitle}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: {
+            mode: ['css', 'legacy'],
+            avoid: ['tr', 'td', 'h1', 'h2', 'h3', 'h4', 'h5', 'img', 'figure', 'blockquote', 'li']
+        }
+    };
+    showToast('Generating PDF…', 'info');
+    // Inject temporary CSS so html2canvas captures correct break hints
+    const pdfPreparationStyle = document.createElement('style');
+    pdfPreparationStyle.id = 'pdf-prep-style';
+    pdfPreparationStyle.textContent = `
+                #${contentElementId} h1, #${contentElementId} h2,
+                #${contentElementId} h3, #${contentElementId} h4 { page-break-after: avoid; }
+                #${contentElementId} tr, #${contentElementId} img,
+                #${contentElementId} li, #${contentElementId} blockquote { page-break-inside: avoid; }
+            `;
+    document.head.appendChild(pdfPreparationStyle);
+
+    const savedTheme = snapshotTheme();
+    forceExportTheme();
+    // Expand all collapsibles for PDF capture, remember which were already open
+    const collapsibleElements = Array.from(contentElement.querySelectorAll('details.md-collapse'));
+    const collapsibleWasOpen = collapsibleElements.map(collapsibleElement => collapsibleElement.open);
+    collapsibleElements.forEach(collapsibleElement => {
+        collapsibleElement.open = true;
+    });
+
+    // Puts the page back the way it was before the export started
+    const undoExportPreparation = () => {
+        const preparationStyle = document.getElementById('pdf-prep-style');
+        if (preparationStyle) {
+            preparationStyle.remove();
+        }
+        collapsibleElements.forEach((collapsibleElement, elementIndex) => {
+            collapsibleElement.open = collapsibleWasOpen[elementIndex];
+        });
+        restoreTheme(savedTheme);
+    };
+
+    Promise.all([loadHtml2PdfLibrary(), fetchPublicIpAddress(), loadLogoAsDataUrl()])
+        .then(([html2pdfLibrary, ipAddress, logoDataUrl]) =>
+            html2pdfLibrary().set(pdfOptions).from(contentElement).toPdf().get('pdf').then(pdfDocument => {
+                drawPdfHeadersAndFooters(pdfDocument, logoDataUrl, pageUrl, exportDateTime, ipAddress);
+                return pdfDocument.output('bloburl');
+            })
+        )
+        .then(pdfBlobUrl => {
+            undoExportPreparation();
+            window.open(pdfBlobUrl, '_blank');
+            showToast('PDF opened in new tab', 'success');
+        })
+        .catch(() => {
+            undoExportPreparation();
+            showToast('Failed to generate PDF', 'error');
+        });
+}
+
+// Opens ChatGPT or Claude in a new tab, asking it to read the open page.
+function openPageInAiAssistant(assistantName) {
+    const urlBase = DOCUMENT_CONFIG[currentDocumentKey].urlBase;
+    let encodedPageUrl = 'https%3A%2F%2Fpolicy.globalfurry.tv';
+    if (currentSection) {
+        encodedPageUrl = encodeURIComponent(`${PUBLIC_SITE_ORIGIN}${urlBase}/${currentSection.slug}`);
+    }
+    if (assistantName === 'chatgpt') {
+        window.open(`https://chat.openai.com/?q=Read%20${encodedPageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
+    } else {
+        window.open(`https://claude.ai/new?q=Read%20${encodedPageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
+    }
+}
+
+/**
+ * Wires up the "Copy" toolbar dropdown on document pages: opening and
+ * closing the menu, and the actions inside it (copy or view as Markdown,
+ * export as PDF, open in ChatGPT or Claude).
+ */
 function setupCopyDropdown() {
-    document.addEventListener('click', e => {
-        const btn = e.target.closest('.copy-dropdown-btn');
-        if (btn) {
-            e.stopPropagation();
-            const dd = btn.closest('.doc-actions').querySelector('.copy-dropdown');
-            const isOpen = !dd.hidden;
-            document.querySelectorAll('.copy-dropdown').forEach(d => { d.hidden = true; d.style.right = ''; d.style.left = ''; });
-            if (!isOpen) {
-                dd.hidden = false;
-                const rect = dd.getBoundingClientRect();
-                if (rect.left < 8) {
-                    dd.style.right = 'auto';
-                    dd.style.left = '0';
+    // Opening / closing the dropdown menu
+    document.addEventListener('click', clickEvent => {
+        const dropdownButton = clickEvent.target.closest('.copy-dropdown-btn');
+        if (dropdownButton) {
+            clickEvent.stopPropagation();
+            const copyDropdown = dropdownButton.closest('.doc-actions').querySelector('.copy-dropdown');
+            const wasOpen = !copyDropdown.hidden;
+            hideAllCopyDropdowns();
+            if (!wasOpen) {
+                copyDropdown.hidden = false;
+                // Keep the menu on screen if it would stick out past the left edge
+                const dropdownRectangle = copyDropdown.getBoundingClientRect();
+                if (dropdownRectangle.left < 8) {
+                    copyDropdown.style.right = 'auto';
+                    copyDropdown.style.left = '0';
                 }
             }
             return;
         }
-        if (!e.target.closest('.copy-dropdown')) {
-            document.querySelectorAll('.copy-dropdown').forEach(d => { d.hidden = true; d.style.right = ''; d.style.left = ''; });
+        if (!clickEvent.target.closest('.copy-dropdown')) {
+            hideAllCopyDropdowns();
         }
     });
 
-    document.addEventListener('click', e => {
-        const item = e.target.closest('[data-action]');
-        if (!item) return;
-        const action = item.dataset.action;
-        const dd = item.closest('.copy-dropdown');
-        if (dd) dd.hidden = true;
+    // The actions inside the menu
+    document.addEventListener('click', clickEvent => {
+        const actionItem = clickEvent.target.closest('[data-action]');
+        if (!actionItem) {
+            return;
+        }
+        const action = actionItem.dataset.action;
+        const copyDropdown = actionItem.closest('.copy-dropdown');
+        if (copyDropdown) {
+            copyDropdown.hidden = true;
+        }
 
         setTimeout(() => {
-        if (action === 'copy-md' || action === 'view-md') {
-            if (!currentSection) return showToast('No page loaded', 'error');
-            const urlBase = DOCS[currentDoc].urlBase;
-            const subs = currentSection.type === 'article' ? subsectionsOf(currentSection.id) : [];
-            let md = `# ${currentSection.title}\n\nSource: https://policy.globalfurry.tv${urlBase}/${currentSection.slug}\n\n${currentSection.content || ''}`;
-            subs.forEach(s => { md += `\n\n## ${s.title}\n\n${s.content || ''}`; });
-            if (action === 'copy-md') {
-                navigator.clipboard.writeText(md).then(() => showToast('Copied as Markdown', 'success'));
-            } else {
-                window.open(URL.createObjectURL(new Blob([md], { type: 'text/plain' })), '_blank');
-            }
-        } else if (action === 'export-pdf') {
-            if (!currentSection) return showToast('No page loaded', 'error');
-            const docCfg = DOCS[currentDoc];
-            const contentEl = document.getElementById(docCfg.contentEl);
-            if (!contentEl) return;
-            const title = currentSection.title || 'export';
-            const pageUrl = `https://policy.globalfurry.tv${docCfg.urlBase}/${currentSection.slug}`;
-            const exportDateTime = new Date().toLocaleString('en-GB', {
-                year: 'numeric', month: 'long', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
-            });
-            const opt = {
-                margin: [22, 14, 24, 14],
-                filename: `${title}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: {
-                    mode: ['css', 'legacy'],
-                    avoid: ['tr', 'td', 'h1', 'h2', 'h3', 'h4', 'h5', 'img', 'figure', 'blockquote', 'li']
+            if (action === 'copy-md' || action === 'view-md') {
+                if (!currentSection) {
+                    return showToast('No page loaded', 'error');
                 }
-            };
-            showToast('Generating PDF…', 'info');
-            // Inject temporary CSS so html2canvas captures correct break hints
-            const pdfPrepStyle = document.createElement('style');
-            pdfPrepStyle.id = 'pdf-prep-style';
-            pdfPrepStyle.textContent = `
-                #${docCfg.contentEl} h1, #${docCfg.contentEl} h2,
-                #${docCfg.contentEl} h3, #${docCfg.contentEl} h4 { page-break-after: avoid; }
-                #${docCfg.contentEl} tr, #${docCfg.contentEl} img,
-                #${docCfg.contentEl} li, #${docCfg.contentEl} blockquote { page-break-inside: avoid; }
-            `;
-            document.head.appendChild(pdfPrepStyle);
-            const loadHtml2pdf = () => new Promise((resolve, reject) => {
-                if (window.html2pdf) return resolve(window.html2pdf);
-                const s = document.createElement('script');
-                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-                s.onload = () => resolve(window.html2pdf);
-                s.onerror = reject;
-                document.head.appendChild(s);
-            });
-            const getIp = () => fetch('https://api.ipify.org?format=json')
-                .then(r => r.json()).then(d => d.ip).catch(() => 'Unknown');
-            const loadLogo = () => new Promise(resolve => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-                    canvas.getContext('2d').drawImage(img, 0, 0);
-                    resolve(canvas.toDataURL('image/png'));
-                };
-                img.onerror = () => resolve(null);
-                img.src = '/GHS-main.png';
-            });
-            const savedTheme = snapshotTheme();
-            forceExportTheme();
-            // Expand all collapsibles for PDF capture, remember which were already open
-            const collapseEls = Array.from(contentEl.querySelectorAll('details.md-collapse'));
-            const collapseWasOpen = collapseEls.map(d => d.open);
-            collapseEls.forEach(d => { d.open = true; });
-            Promise.all([loadHtml2pdf(), getIp(), loadLogo()])
-                .then(([h2p, ip, logoDataUrl]) =>
-                    h2p().set(opt).from(contentEl).toPdf().get('pdf').then(pdf => {
-                        const totalPages = pdf.internal.getNumberOfPages();
-                        const pageW = pdf.internal.pageSize.getWidth();
-                        const pageH = pdf.internal.pageSize.getHeight();
-                        for (let i = 1; i <= totalPages; i++) {
-                            pdf.setPage(i);
-                            // Header
-                            if (logoDataUrl) pdf.addImage(logoDataUrl, 'PNG', 14, 5, 9, 9);
-                            const textX = logoDataUrl ? 25 : 14;
-                            pdf.setFontSize(12);
-                            pdf.setFont('helvetica', 'bold');
-                            pdf.setTextColor(30, 30, 50);
-                            pdf.text('PolicySpot', textX, 10.5);
-                            const badgeX = textX + pdf.getTextWidth('PolicySpot') + 2;
-                            pdf.setFillColor(74, 106, 138);
-                            pdf.setFontSize(6.5);
-                            pdf.roundedRect(badgeX, 6.2, pdf.getTextWidth('GFTV') + 3, 5, 1, 1, 'F');
-                            pdf.setTextColor(255, 255, 255);
-                            pdf.text('GFTV', badgeX + 1.5, 10.2);
-                            pdf.setDrawColor(180, 190, 200);
-                            pdf.setLineWidth(0.3);
-                            pdf.line(14, 17, pageW - 14, 17);
-                            // Footer
-                            pdf.line(14, pageH - 18, pageW - 14, pageH - 18);
-                            pdf.setFontSize(7.5);
-                            pdf.setFont('helvetica', 'normal');
-                            pdf.setTextColor(100, 110, 120);
-                            pdf.text(pageUrl, 14, pageH - 13.5);
-                            pdf.text(`Exported: ${exportDateTime}`, 14, pageH - 9);
-                            pdf.text(`Exporting IP: ${ip}`, 14, pageH - 4.5);
-                            const pageLabel = `${i} / ${totalPages}`;
-                            pdf.text(pageLabel, pageW - 14 - pdf.getTextWidth(pageLabel), pageH - 4.5);
-                        }
-                        return pdf.output('bloburl');
-                    })
-                )
-                .then(url => {
-                    document.getElementById('pdf-prep-style')?.remove();
-                    collapseEls.forEach((d, i) => { d.open = collapseWasOpen[i]; });
-                    restoreTheme(savedTheme);
-                    window.open(url, '_blank');
-                    showToast('PDF opened in new tab', 'success');
-                })
-                .catch(() => {
-                    document.getElementById('pdf-prep-style')?.remove();
-                    collapseEls.forEach((d, i) => { d.open = collapseWasOpen[i]; });
-                    restoreTheme(savedTheme);
-                    showToast('Failed to generate PDF', 'error');
-                });
-        } else if (action === 'chatgpt' || action === 'claude') {
-            const urlBase = DOCS[currentDoc].urlBase;
-            const pageUrl = currentSection ?
-                encodeURIComponent(`https://policy.globalfurry.tv${urlBase}/${currentSection.slug}`) :
-                'https%3A%2F%2Fpolicy.globalfurry.tv';
-            if (action === 'chatgpt') {
-                window.open(`https://chat.openai.com/?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
-            } else {
-                window.open(`https://claude.ai/new?q=Read%20${pageUrl}%20and%20answer%20questions%20about%20the%20content.`, '_blank');
+                const markdownText = buildCurrentPageMarkdown();
+                if (action === 'copy-md') {
+                    navigator.clipboard.writeText(markdownText).then(() => showToast('Copied as Markdown', 'success'));
+                } else {
+                    const markdownBlob = new Blob([markdownText], { type: 'text/plain' });
+                    window.open(URL.createObjectURL(markdownBlob), '_blank');
+                }
+            } else if (action === 'export-pdf') {
+                if (!currentSection) {
+                    return showToast('No page loaded', 'error');
+                }
+                exportCurrentPageAsPdf();
+            } else if (action === 'chatgpt' || action === 'claude') {
+                openPageInAiAssistant(action);
             }
-        }
         }, 0);
     });
 }
 
 /* ─── Slug Modal ─── */
 function openSlugModal(section) {
+    const urlBase = DOCUMENT_CONFIG[currentDocumentKey].urlBase;
     document.getElementById('slug-input').value = section.slug;
     document.getElementById('slug-section-id').value = section.id;
-    document.getElementById('slug-preview').textContent = `policy.globalfurry.tv${DOCS[currentDoc].urlBase}/${section.slug}`;
+    document.getElementById('slug-preview').textContent = `policy.globalfurry.tv${urlBase}/${section.slug}`;
     document.getElementById('slug-error').classList.add('hidden');
     openModal('slug-modal');
 }
-document.getElementById('slug-input')?.addEventListener('input', e => {
-    const preview = document.getElementById('slug-preview');
-    if (preview) preview.textContent = `policy.globalfurry.tv${DOCS[currentDoc].urlBase}/${e.target.value}`;
+
+// Live preview of the address while the slug is being typed
+addListenerIfPresent('slug-input', 'input', inputEvent => {
+    const slugPreview = document.getElementById('slug-preview');
+    if (slugPreview) {
+        const urlBase = DOCUMENT_CONFIG[currentDocumentKey].urlBase;
+        slugPreview.textContent = `policy.globalfurry.tv${urlBase}/${inputEvent.target.value}`;
+    }
 });
-document.getElementById('slug-save')?.addEventListener('click', async () => {
-    const id = document.getElementById('slug-section-id').value;
+
+addListenerIfPresent('slug-save', 'click', async () => {
+    const sectionId = document.getElementById('slug-section-id').value;
     const slug = document.getElementById('slug-input').value.trim();
-    const errEl = document.getElementById('slug-error');
-    errEl.classList.add('hidden');
+    const errorElement = document.getElementById('slug-error');
+    errorElement.classList.add('hidden');
     if (!slug) {
-        errEl.textContent = 'Slug cannot be empty';
-        errEl.classList.remove('hidden');
+        errorElement.textContent = 'Slug cannot be empty';
+        errorElement.classList.remove('hidden');
         return;
     }
-    const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch('/api/policy/update-slug', {
+    const sessionToken = localStorage.getItem('gftv-token');
+    const apiResponse = await apiFetch('/api/policy/update-slug', {
         method: 'PUT',
         body: JSON.stringify({
-            id,
-            slug
+            id: sectionId,
+            slug: slug
         }),
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${sessionToken}`
         }
     });
-    if (res.ok) {
+    if (apiResponse.ok) {
         closeModal('slug-modal');
         showToast('Slug updated', 'success');
-        const sec = sections.find(s => s.id === id);
-        if (sec) sec.slug = slug;
-        navigate(`${DOCS[currentDoc].urlBase}/${slug}`);
+        const updatedSection = sections.find(candidate => candidate.id === sectionId);
+        if (updatedSection) {
+            updatedSection.slug = slug;
+        }
+        navigate(`${DOCUMENT_CONFIG[currentDocumentKey].urlBase}/${slug}`);
         buildSidebar();
     } else {
-        errEl.textContent = res.error || 'Update failed';
-        errEl.classList.remove('hidden');
+        errorElement.textContent = apiResponse.error || 'Update failed';
+        errorElement.classList.remove('hidden');
     }
 });
 
 /* ─── Content Edit Modal ─── */
+
+// Shows an element when "shouldShow" is true and hides it otherwise.
+function setElementVisible(element, shouldShow) {
+    if (shouldShow) {
+        element.style.display = '';
+    } else {
+        element.style.display = 'none';
+    }
+}
+
+// Opens the editor pre-filled with an existing section's details.
 function openContentModal(section) {
     document.getElementById('content-edit-id').value = section.id;
-    document.getElementById('content-edit-table').value = currentDoc;
+    document.getElementById('content-edit-table').value = currentDocumentKey;
     document.getElementById('content-edit-title').value = section.title || '';
     document.getElementById('content-edit-slug').value = section.slug || '';
     document.getElementById('content-edit-number').value = section.number || '';
@@ -1788,18 +2472,25 @@ function openContentModal(section) {
     document.getElementById('content-edit-mode').value = 'edit';
     document.getElementById('content-edit-parent-id').value = section.parent_id || '';
 
+    // Only subsections have an anchor field
     const anchorGroup = document.getElementById('content-edit-anchor-group');
-    if (anchorGroup) anchorGroup.style.display = section.type === 'subsection' ? '' : 'none';
+    if (anchorGroup) {
+        setElementVisible(anchorGroup, section.type === 'subsection');
+    }
     document.getElementById('content-edit-type-group').style.display = 'none';
 
     document.getElementById('content-modal-title').textContent = 'Edit Section';
 
-    const siblings = section.type === 'subsection'
-        ? subsectionsOf(section.parent_id)
-        : topLevelPages();
-    const idx = siblings.findIndex(s => s.id === section.id);
-    document.getElementById('content-edit-move-up').style.display = idx > 0 ? '' : 'none';
-    document.getElementById('content-edit-move-down').style.display = (idx >= 0 && idx < siblings.length - 1) ? '' : 'none';
+    // Only show "move up" / "move down" when there is somewhere to move to
+    let siblingSections = topLevelPages();
+    if (section.type === 'subsection') {
+        siblingSections = subsectionsOf(section.parent_id);
+    }
+    const positionAmongSiblings = siblingSections.findIndex(sibling => sibling.id === section.id);
+    const canMoveUp = positionAmongSiblings > 0;
+    const canMoveDown = positionAmongSiblings >= 0 && positionAmongSiblings < siblingSections.length - 1;
+    setElementVisible(document.getElementById('content-edit-move-up'), canMoveUp);
+    setElementVisible(document.getElementById('content-edit-move-down'), canMoveDown);
     document.getElementById('content-edit-delete').style.display = '';
 
     document.getElementById('content-edit-error').classList.add('hidden');
@@ -1807,22 +2498,32 @@ function openContentModal(section) {
     editorInitHistory(document.getElementById('content-edit-content'));
 }
 
+// Opens the editor empty, ready to create a new section (or a subsection
+// of "parentSection" when one is given).
 function openAddSectionModal(parentSection) {
     document.getElementById('content-edit-id').value = '';
-    document.getElementById('content-edit-table').value = currentDoc;
+    document.getElementById('content-edit-table').value = currentDocumentKey;
     document.getElementById('content-edit-title').value = '';
     document.getElementById('content-edit-slug').value = '';
     document.getElementById('content-edit-number').value = '';
     document.getElementById('content-edit-anchor').value = '';
     document.getElementById('content-edit-content').value = '';
     document.getElementById('content-edit-mode').value = 'add';
-    document.getElementById('content-edit-parent-id').value = parentSection ? parentSection.id : '';
+    let parentId = '';
+    if (parentSection) {
+        parentId = parentSection.id;
+    }
+    document.getElementById('content-edit-parent-id').value = parentId;
 
-    const isSubsection = !!parentSection;
-    document.getElementById('content-edit-anchor-group').style.display = isSubsection ? '' : 'none';
-    document.getElementById('content-edit-type-group').style.display = isSubsection ? 'none' : '';
+    const isSubsection = Boolean(parentSection);
+    setElementVisible(document.getElementById('content-edit-anchor-group'), isSubsection);
+    setElementVisible(document.getElementById('content-edit-type-group'), !isSubsection);
 
-    document.getElementById('content-modal-title').textContent = isSubsection ? 'Add Subsection' : 'Add Section';
+    let modalTitle = 'Add Section';
+    if (isSubsection) {
+        modalTitle = 'Add Subsection';
+    }
+    document.getElementById('content-modal-title').textContent = modalTitle;
     document.getElementById('content-edit-move-up').style.display = 'none';
     document.getElementById('content-edit-move-down').style.display = 'none';
     document.getElementById('content-edit-delete').style.display = 'none';
@@ -1832,695 +2533,976 @@ function openAddSectionModal(parentSection) {
     editorInitHistory(document.getElementById('content-edit-content'));
 }
 
-/* ─── Markdown Editor History (undo/redo) ─── */
-const editorHistory = { stack: [], pos: -1, debounceTimer: null };
+/* ─── Markdown Editor History (undo/redo) ───
+   Every saved state stores the text and the cursor selection. "position"
+   points at the state currently shown; undo moves it back, redo moves it
+   forward. Saving a new state throws away anything after "position". */
+const MAXIMUM_HISTORY_STATES = 200;
+const editorHistory = { stack: [], position: -1, debounceTimer: null };
 
-function editorSaveState(ta) {
-    editorHistory.stack = editorHistory.stack.slice(0, editorHistory.pos + 1);
-    editorHistory.stack.push({ value: ta.value, ss: ta.selectionStart, se: ta.selectionEnd });
-    if (editorHistory.stack.length > 200) editorHistory.stack.shift();
-    editorHistory.pos = editorHistory.stack.length - 1;
+function editorSaveState(textArea) {
+    editorHistory.stack = editorHistory.stack.slice(0, editorHistory.position + 1);
+    editorHistory.stack.push({
+        value: textArea.value,
+        selectionStart: textArea.selectionStart,
+        selectionEnd: textArea.selectionEnd
+    });
+    if (editorHistory.stack.length > MAXIMUM_HISTORY_STATES) {
+        editorHistory.stack.shift();
+    }
+    editorHistory.position = editorHistory.stack.length - 1;
 }
 
-function editorInitHistory(ta) {
+function editorInitHistory(textArea) {
     clearTimeout(editorHistory.debounceTimer);
-    editorHistory.stack = [{ value: ta.value, ss: 0, se: 0 }];
-    editorHistory.pos = 0;
+    editorHistory.stack = [{ value: textArea.value, selectionStart: 0, selectionEnd: 0 }];
+    editorHistory.position = 0;
 }
 
-function editorUndo(ta) {
-    if (editorHistory.pos > 0) {
-        editorHistory.pos--;
-        const s = editorHistory.stack[editorHistory.pos];
-        ta.value = s.value;
-        ta.selectionStart = s.ss;
-        ta.selectionEnd   = s.se;
+// Puts a saved history state back into the text area.
+function restoreEditorState(textArea, savedState) {
+    textArea.value = savedState.value;
+    textArea.selectionStart = savedState.selectionStart;
+    textArea.selectionEnd = savedState.selectionEnd;
+}
+
+function editorUndo(textArea) {
+    if (editorHistory.position > 0) {
+        editorHistory.position--;
+        restoreEditorState(textArea, editorHistory.stack[editorHistory.position]);
     }
 }
 
-function editorRedo(ta) {
-    if (editorHistory.pos < editorHistory.stack.length - 1) {
-        editorHistory.pos++;
-        const s = editorHistory.stack[editorHistory.pos];
-        ta.value = s.value;
-        ta.selectionStart = s.ss;
-        ta.selectionEnd   = s.se;
+function editorRedo(textArea) {
+    if (editorHistory.position < editorHistory.stack.length - 1) {
+        editorHistory.position++;
+        restoreEditorState(textArea, editorHistory.stack[editorHistory.position]);
     }
 }
 
 // Debounced history push on regular typing (groups keystrokes ~600ms apart)
-document.getElementById('content-edit-content')?.addEventListener('input', e => {
+addListenerIfPresent('content-edit-content', 'input', inputEvent => {
     clearTimeout(editorHistory.debounceTimer);
-    editorHistory.debounceTimer = setTimeout(() => editorSaveState(e.target), 600);
+    editorHistory.debounceTimer = setTimeout(() => editorSaveState(inputEvent.target), 600);
 });
 
 /* ─── Markdown Editor Keyboard Shortcuts ─── */
-function applyMarkdownFormat(ta, open, close) {
-    editorSaveState(ta);
-    const start = ta.selectionStart;
-    const end   = ta.selectionEnd;
-    const val   = ta.value;
-    const sel   = val.substring(start, end);
 
-    // Toggle off if selection is already wrapped
-    const charsBefore = val.substring(Math.max(0, start - open.length), start);
-    const charsAfter  = val.substring(end, end + close.length);
-    if (charsBefore === open && charsAfter === close) {
-        ta.value = val.substring(0, start - open.length) + sel + val.substring(end + close.length);
-        ta.selectionStart = start - open.length;
-        ta.selectionEnd   = end - open.length;
+/**
+ * Wraps the selected text in "openingMarker" and "closingMarker" (for
+ * example ** and ** for bold). If the selection is already wrapped, the
+ * markers are removed instead, so pressing the shortcut twice undoes it.
+ * With nothing selected, the word "text" is inserted and selected.
+ */
+function applyMarkdownFormat(textArea, openingMarker, closingMarker) {
+    editorSaveState(textArea);
+    const selectionStart = textArea.selectionStart;
+    const selectionEnd = textArea.selectionEnd;
+    const fullText = textArea.value;
+    const selectedText = fullText.substring(selectionStart, selectionEnd);
+
+    // Toggle off if the markers sit just outside the selection
+    const charactersBefore = fullText.substring(Math.max(0, selectionStart - openingMarker.length), selectionStart);
+    const charactersAfter = fullText.substring(selectionEnd, selectionEnd + closingMarker.length);
+    if (charactersBefore === openingMarker && charactersAfter === closingMarker) {
+        textArea.value = fullText.substring(0, selectionStart - openingMarker.length)
+            + selectedText
+            + fullText.substring(selectionEnd + closingMarker.length);
+        textArea.selectionStart = selectionStart - openingMarker.length;
+        textArea.selectionEnd = selectionEnd - openingMarker.length;
         return;
     }
-    if (sel.startsWith(open) && sel.endsWith(close) && sel.length > open.length + close.length) {
-        const inner = sel.slice(open.length, sel.length - close.length);
-        ta.value = val.substring(0, start) + inner + val.substring(end);
-        ta.selectionStart = start;
-        ta.selectionEnd   = start + inner.length;
+    // Toggle off if the markers are inside the selection
+    const selectionIsWrapped = selectedText.startsWith(openingMarker)
+        && selectedText.endsWith(closingMarker)
+        && selectedText.length > openingMarker.length + closingMarker.length;
+    if (selectionIsWrapped) {
+        const innerText = selectedText.slice(openingMarker.length, selectedText.length - closingMarker.length);
+        textArea.value = fullText.substring(0, selectionStart) + innerText + fullText.substring(selectionEnd);
+        textArea.selectionStart = selectionStart;
+        textArea.selectionEnd = selectionStart + innerText.length;
         return;
     }
 
-    const placeholder = sel || 'text';
-    ta.value = val.substring(0, start) + open + placeholder + close + val.substring(end);
-    ta.selectionStart = start + open.length;
-    ta.selectionEnd   = start + open.length + placeholder.length;
+    const textToWrap = selectedText || 'text';
+    textArea.value = fullText.substring(0, selectionStart) + openingMarker + textToWrap + closingMarker + fullText.substring(selectionEnd);
+    textArea.selectionStart = selectionStart + openingMarker.length;
+    textArea.selectionEnd = selectionStart + openingMarker.length + textToWrap.length;
 }
 
-document.getElementById('content-edit-content')?.addEventListener('keydown', e => {
-    if (!e.ctrlKey && !e.metaKey) return;
-    const ta = e.target;
-    switch (e.key.toLowerCase()) {
+// Ctrl+Shift+I: inserts an image placeholder and selects the "url" part.
+function insertImagePlaceholder(textArea) {
+    editorSaveState(textArea);
+    const selectionStart = textArea.selectionStart;
+    const selectedText = textArea.value.substring(selectionStart, textArea.selectionEnd);
+    const altText = selectedText || 'alt';
+    const imageMarkdown = `![${altText}]{img}(url)`;
+    textArea.value = textArea.value.substring(0, selectionStart) + imageMarkdown + textArea.value.substring(textArea.selectionEnd);
+    const urlStart = selectionStart + `![${altText}]{img}(`.length;
+    textArea.selectionStart = urlStart;
+    textArea.selectionEnd = urlStart + 'url'.length;
+    textArea.focus();
+}
+
+// Ctrl+K: turns the selection into a link, or inserts a "[link text](url)" placeholder.
+function insertLinkPlaceholder(textArea) {
+    editorSaveState(textArea);
+    const selectionStart = textArea.selectionStart;
+    const selectedText = textArea.value.substring(selectionStart, textArea.selectionEnd);
+    if (selectedText) {
+        textArea.value = textArea.value.substring(0, selectionStart) + '[' + selectedText + '](url)' + textArea.value.substring(textArea.selectionEnd);
+        // Select the word "url" so it can be typed over
+        textArea.selectionStart = selectionStart + selectedText.length + 3;
+        textArea.selectionEnd = selectionStart + selectedText.length + 6;
+    } else {
+        textArea.value = textArea.value.substring(0, selectionStart) + '[link text](url)' + textArea.value.substring(selectionStart);
+        // Select the words "link text" so they can be typed over
+        textArea.selectionStart = selectionStart + 1;
+        textArea.selectionEnd = selectionStart + 10;
+    }
+}
+
+/**
+ * Keyboard shortcuts in the Markdown editor (Ctrl on Windows/Linux, Cmd on Mac):
+ *   Z undo, Shift+Z / Y redo, B bold, I italic, Shift+I image,
+ *   U underline, K link, ` inline code, S save.
+ */
+addListenerIfPresent('content-edit-content', 'keydown', keyboardEvent => {
+    if (!keyboardEvent.ctrlKey && !keyboardEvent.metaKey) {
+        return;
+    }
+    const textArea = keyboardEvent.target;
+    switch (keyboardEvent.key.toLowerCase()) {
         case 'z':
-            e.preventDefault();
-            if (e.shiftKey) editorRedo(ta); else editorUndo(ta);
+            keyboardEvent.preventDefault();
+            if (keyboardEvent.shiftKey) {
+                editorRedo(textArea);
+            } else {
+                editorUndo(textArea);
+            }
             break;
         case 'y':
-            e.preventDefault();
-            editorRedo(ta);
+            keyboardEvent.preventDefault();
+            editorRedo(textArea);
             break;
         case 'b':
-            e.preventDefault();
-            applyMarkdownFormat(ta, '**', '**');
+            keyboardEvent.preventDefault();
+            applyMarkdownFormat(textArea, '**', '**');
             break;
         case 'i':
-            e.preventDefault();
-            if (e.shiftKey) {
-                editorSaveState(ta);
-                const _start = ta.selectionStart;
-                const _sel   = ta.value.substring(_start, ta.selectionEnd);
-                const _alt   = _sel || 'alt';
-                const _md    = `![${_alt}]{img}(url)`;
-                ta.value = ta.value.substring(0, _start) + _md + ta.value.substring(ta.selectionEnd);
-                const _urlStart = _start + `![${_alt}]{img}(`.length;
-                ta.selectionStart = _urlStart;
-                ta.selectionEnd   = _urlStart + 3;
-                ta.focus();
+            keyboardEvent.preventDefault();
+            if (keyboardEvent.shiftKey) {
+                insertImagePlaceholder(textArea);
             } else {
-                applyMarkdownFormat(ta, '*', '*');
+                applyMarkdownFormat(textArea, '*', '*');
             }
             break;
         case 'u':
-            e.preventDefault();
-            applyMarkdownFormat(ta, '__', '__');
+            keyboardEvent.preventDefault();
+            applyMarkdownFormat(textArea, '__', '__');
             break;
-        case 'k': {
-            e.preventDefault();
-            editorSaveState(ta);
-            const start = ta.selectionStart;
-            const sel   = ta.value.substring(start, ta.selectionEnd);
-            if (sel) {
-                ta.value = ta.value.substring(0, start) + '[' + sel + '](url)' + ta.value.substring(ta.selectionEnd);
-                ta.selectionStart = start + sel.length + 3;
-                ta.selectionEnd   = start + sel.length + 6;
-            } else {
-                ta.value = ta.value.substring(0, start) + '[link text](url)' + ta.value.substring(start);
-                ta.selectionStart = start + 1;
-                ta.selectionEnd   = start + 10;
+        case 'k':
+            keyboardEvent.preventDefault();
+            insertLinkPlaceholder(textArea);
+            break;
+        case '`':
+            keyboardEvent.preventDefault();
+            applyMarkdownFormat(textArea, '`', '`');
+            break;
+        case 's': {
+            keyboardEvent.preventDefault();
+            const saveButton = document.getElementById('content-edit-save');
+            if (saveButton) {
+                saveButton.click();
             }
             break;
         }
-        case '`':
-            e.preventDefault();
-            applyMarkdownFormat(ta, '`', '`');
-            break;
-        case 's':
-            e.preventDefault();
-            document.getElementById('content-edit-save')?.click();
-            break;
     }
 });
 
-/* ─── Image Picker (Ctrl+Shift+I) ─── */
-const imgPicker = {
-    ta: null, cursorPos: 0,
-    selectedUrl: null, compressed: null, originalFile: null,
-    docFile: null, selectedDocUrl: null, selectedDocName: null,
-    sndFile: null, selectedSndUrl: null, selectedSndName: null,
+/* ─── Media Picker (images, documents, sounds and embeds) ───
+   One modal with several tabs. This object remembers what has been chosen
+   so far, and which text area / cursor position to insert the result at. */
+const mediaPicker = {
+    textArea: null,
+    cursorPosition: 0,
+    // Images
+    selectedImageUrl: null,
+    compressedImage: null,
+    originalFile: null,
+    // Documents
+    documentFile: null,
+    selectedDocumentUrl: null,
+    selectedDocumentName: null,
+    // Sounds
+    soundFile: null,
+    selectedSoundUrl: null,
+    selectedSoundName: null,
 };
 
-// Client-side compression via Canvas. Returns { base64, mime, width, height, size }.
+/**
+ * Shrinks an image in the browser before upload by drawing it onto a canvas.
+ * Images wider than "maxWidth" are scaled down. GIFs stay GIF, small PNGs
+ * stay PNG, and everything else becomes WebP.
+ * Resolves with { base64, mimeType, width, height, size }.
+ */
 function compressImage(file, maxWidth = 1920, quality = 0.82) {
     return new Promise((resolve, reject) => {
-        const img = new Image();
-        const objUrl = URL.createObjectURL(file);
-        img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error('Failed to load image')); };
-        img.onload = () => {
-            URL.revokeObjectURL(objUrl);
-            let w = img.naturalWidth, h = img.naturalHeight;
-            if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
-            const canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            // GIF stays GIF; small PNGs stay PNG; everything else → WebP
-            const outMime = file.type === 'image/gif'  ? 'image/gif'
-                          : file.type === 'image/png' && file.size < 100_000 ? 'image/png'
-                          : 'image/webp';
-            canvas.toBlob(blob => {
-                const reader = new FileReader();
-                reader.onload = () => resolve({
-                    base64: reader.result.split(',')[1],
-                    mime: blob.type, width: w, height: h, size: blob.size,
-                });
-                reader.readAsDataURL(blob);
-            }, outMime, quality);
+        const image = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        image.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error('Failed to load image'));
         };
-        img.src = objUrl;
+        image.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            let width = image.naturalWidth;
+            let height = image.naturalHeight;
+            if (width > maxWidth) {
+                height = Math.round(height * maxWidth / width);
+                width = maxWidth;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+            // GIF stays GIF; small PNGs stay PNG; everything else → WebP
+            let outputMimeType = 'image/webp';
+            if (file.type === 'image/gif') {
+                outputMimeType = 'image/gif';
+            } else if (file.type === 'image/png' && file.size < 100_000) {
+                outputMimeType = 'image/png';
+            }
+            canvas.toBlob(compressedBlob => {
+                const fileReader = new FileReader();
+                fileReader.onload = () => resolve({
+                    base64: fileReader.result.split(',')[1],
+                    mimeType: compressedBlob.type,
+                    width: width,
+                    height: height,
+                    size: compressedBlob.size,
+                });
+                fileReader.readAsDataURL(compressedBlob);
+            }, outputMimeType, quality);
+        };
+        image.src = objectUrl;
     });
 }
 
-function openImagePicker(ta) {
-    imgPicker.ta        = ta;
-    imgPicker.cursorPos = ta.selectionStart;
-    imgPicker.selectedUrl  = null;
-    imgPicker.compressed   = null;
-    imgPicker.originalFile = null;
+// Sets the "hidden" property of an element, if the element exists.
+function setHiddenIfPresent(elementId, isHidden) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.hidden = isHidden;
+    }
+}
 
-    imgPicker.docFile = null; imgPicker.selectedDocUrl = null; imgPicker.selectedDocName = null;
-    imgPicker.sndFile = null; imgPicker.selectedSndUrl = null; imgPicker.selectedSndName = null;
+// Opens the media picker and resets every tab to its empty state.
+function openImagePicker(textArea) {
+    mediaPicker.textArea = textArea;
+    mediaPicker.cursorPosition = textArea.selectionStart;
+    mediaPicker.selectedImageUrl = null;
+    mediaPicker.compressedImage = null;
+    mediaPicker.originalFile = null;
+
+    mediaPicker.documentFile = null;
+    mediaPicker.selectedDocumentUrl = null;
+    mediaPicker.selectedDocumentName = null;
+    mediaPicker.soundFile = null;
+    mediaPicker.selectedSoundUrl = null;
+    mediaPicker.selectedSoundName = null;
 
     // Reset upload pane
-    document.getElementById('img-drop-zone').hidden    = false;
+    document.getElementById('img-drop-zone').hidden = false;
     document.getElementById('img-preview-wrap').hidden = true;
-    document.getElementById('img-alt-upload').value    = '';
+    document.getElementById('img-alt-upload').value = '';
     document.getElementById('img-insert-btn').disabled = true;
 
-    // Reset doc/snd/embed panes
-    const _docDrop  = document.getElementById('doc-drop-zone');
-    const _docReady = document.getElementById('doc-file-ready');
-    const _sndDrop  = document.getElementById('snd-drop-zone');
-    const _sndReady = document.getElementById('snd-file-ready');
-    const _embedIn  = document.getElementById('embed-url-input');
-    const _embedBdg = document.getElementById('embed-type-badge');
-    if (_docDrop)  _docDrop.hidden  = false;
-    if (_docReady) _docReady.hidden = true;
-    if (_sndDrop)  _sndDrop.hidden  = false;
-    if (_sndReady) _sndReady.hidden = true;
-    if (_embedIn)  _embedIn.value   = '';
-    if (_embedBdg) _embedBdg.hidden = true;
+    // Reset document / sound / embed panes
+    setHiddenIfPresent('doc-drop-zone', false);
+    setHiddenIfPresent('doc-file-ready', true);
+    setHiddenIfPresent('snd-drop-zone', false);
+    setHiddenIfPresent('snd-file-ready', true);
+    setHiddenIfPresent('embed-type-badge', true);
+    const embedUrlInput = document.getElementById('embed-url-input');
+    if (embedUrlInput) {
+        embedUrlInput.value = '';
+    }
 
-    switchImgTab('upload');
+    switchMediaPickerTab('upload');
     openModal('image-picker-modal');
 }
 
-function switchImgTab(tab) {
-    document.querySelectorAll('.img-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    document.querySelectorAll('.img-tab-pane').forEach(p => p.classList.toggle('hidden', p.id !== `img-pane-${tab}`));
-    if (tab === 'library')   loadImageLibrary();
-    if (tab === 'documents') loadDocumentLibrary();
-    if (tab === 'sounds')    loadSoundLibrary();
+// Shows one tab of the media picker and loads its library list if needed.
+function switchMediaPickerTab(tabName) {
+    document.querySelectorAll('.img-tab-btn').forEach(tabButton => {
+        tabButton.classList.toggle('active', tabButton.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.img-tab-pane').forEach(tabPane => {
+        tabPane.classList.toggle('hidden', tabPane.id !== `img-pane-${tabName}`);
+    });
+    if (tabName === 'library') {
+        loadImageLibrary();
+    }
+    if (tabName === 'documents') {
+        loadDocumentLibrary();
+    }
+    if (tabName === 'sounds') {
+        loadSoundLibrary();
+    }
 }
 
-let libraryLoaded = false;
-async function loadImageLibrary() {
-    const grid = document.getElementById('img-library-grid');
-    if (libraryLoaded) return; // already populated this session
-    grid.innerHTML = '<p class="img-library-empty">Loading&hellip;</p>';
+// Turns a byte count into whole kilobytes.
+function bytesToKilobytes(byteCount) {
+    return Math.round(byteCount / 1024);
+}
 
-    const res = await apiFetch('/api/policy/images');
-    libraryLoaded = true;
-    if (!res.ok || !res.images?.length) {
-        grid.innerHTML = '<p class="img-library-empty">No images uploaded yet.</p>';
+// Returns the file extension in capitals, e.g. "report.pdf" gives "PDF".
+function getUpperCaseExtension(filename) {
+    return filename.split('.').pop().toUpperCase();
+}
+
+// Turns a file name like "my_photo-1.png" into readable alt text "my photo 1".
+function filenameToAltText(filename) {
+    return filename.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+}
+
+// True when an API response contains a non-empty list under "listName".
+function responseHasItems(apiResponse, listName) {
+    const itemList = apiResponse[listName];
+    return Boolean(apiResponse.ok && itemList && itemList.length);
+}
+
+let isImageLibraryLoaded = false;
+
+// Fills the "Library" tab with every uploaded image (once per page view).
+async function loadImageLibrary() {
+    const libraryGrid = document.getElementById('img-library-grid');
+    if (isImageLibraryLoaded) {
+        return; // already populated this session
+    }
+    libraryGrid.innerHTML = '<p class="img-library-empty">Loading&hellip;</p>';
+
+    const apiResponse = await apiFetch('/api/policy/images');
+    isImageLibraryLoaded = true;
+    if (!responseHasItems(apiResponse, 'images')) {
+        libraryGrid.innerHTML = '<p class="img-library-empty">No images uploaded yet.</p>';
         return;
     }
 
-    grid.innerHTML = '';
-    res.images.forEach(img => {
-        const tile = document.createElement('div');
-        tile.className   = 'img-library-tile';
-        tile.dataset.url = img.public_url;
-        const kb  = Math.round(img.file_size / 1024);
-        const dim = img.width ? `${img.width}×${img.height}` : '';
-        tile.innerHTML = `
-            <img src="${img.public_url}" alt="${img.filename}" loading="lazy">
-            <span class="img-tile-name" title="${img.filename}">${img.filename}</span>
-            <span class="img-tile-meta">${dim}${dim && kb ? ' · ' : ''}${kb ? kb + ' KB' : ''}</span>`;
-        tile.addEventListener('click', () => {
-            document.querySelectorAll('.img-library-tile').forEach(t => t.classList.remove('selected'));
-            tile.classList.add('selected');
-            imgPicker.selectedUrl = img.public_url;
-            const defaultAlt = img.filename.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
-            document.getElementById('img-alt-library').value = defaultAlt;
+    libraryGrid.innerHTML = '';
+    apiResponse.images.forEach(imageRecord => {
+        const libraryTile = document.createElement('div');
+        libraryTile.className = 'img-library-tile';
+        libraryTile.dataset.url = imageRecord.public_url;
+        const sizeInKilobytes = bytesToKilobytes(imageRecord.file_size);
+        let dimensionsText = '';
+        if (imageRecord.width) {
+            dimensionsText = `${imageRecord.width}×${imageRecord.height}`;
+        }
+        let separatorText = '';
+        if (dimensionsText && sizeInKilobytes) {
+            separatorText = ' · ';
+        }
+        let sizeText = '';
+        if (sizeInKilobytes) {
+            sizeText = sizeInKilobytes + ' KB';
+        }
+        libraryTile.innerHTML = `
+            <img src="${imageRecord.public_url}" alt="${imageRecord.filename}" loading="lazy">
+            <span class="img-tile-name" title="${imageRecord.filename}">${imageRecord.filename}</span>
+            <span class="img-tile-meta">${dimensionsText}${separatorText}${sizeText}</span>`;
+        libraryTile.addEventListener('click', () => {
+            document.querySelectorAll('.img-library-tile').forEach(tile => tile.classList.remove('selected'));
+            libraryTile.classList.add('selected');
+            mediaPicker.selectedImageUrl = imageRecord.public_url;
+            document.getElementById('img-alt-library').value = filenameToAltText(imageRecord.filename);
             document.getElementById('img-alt-library-group').style.display = '';
             document.getElementById('img-insert-btn').disabled = false;
         });
-        grid.appendChild(tile);
+        libraryGrid.appendChild(libraryTile);
     });
 }
 
-let docsLoaded = false;
+/**
+ * Fills a document or sound library list with one clickable row per file.
+ * "onRowSelected" is called with the chosen file record when a row is clicked.
+ */
+function renderMediaFileRows(listElement, listSelector, fileRecords, onRowSelected) {
+    listElement.innerHTML = '';
+    fileRecords.forEach(fileRecord => {
+        const fileRow = document.createElement('div');
+        fileRow.className = 'media-file-row';
+        fileRow.innerHTML = `
+            <span class="media-file-ext">${getUpperCaseExtension(fileRecord.filename)}</span>
+            <span class="media-file-row-name" title="${fileRecord.filename}">${fileRecord.filename}</span>
+            <span class="media-file-row-size">${bytesToKilobytes(fileRecord.file_size)} KB</span>`;
+        fileRow.addEventListener('click', () => {
+            document.querySelectorAll(`${listSelector} .media-file-row`).forEach(row => row.classList.remove('selected'));
+            fileRow.classList.add('selected');
+            onRowSelected(fileRecord);
+            document.getElementById('img-insert-btn').disabled = false;
+        });
+        listElement.appendChild(fileRow);
+    });
+}
+
+let isDocumentLibraryLoaded = false;
+
+// Fills the "Documents" tab with every uploaded document (once per page view).
 async function loadDocumentLibrary() {
-    const list = document.getElementById('doc-library-list');
-    if (docsLoaded) return;
-    list.innerHTML = '<p class="media-library-empty">Loading&hellip;</p>';
-    const res = await apiFetch('/api/policy/documents');
-    docsLoaded = true;
-    if (!res.ok || !res.documents?.length) {
-        list.innerHTML = '<p class="media-library-empty">No documents uploaded yet.</p>';
+    const documentList = document.getElementById('doc-library-list');
+    if (isDocumentLibraryLoaded) {
         return;
     }
-    list.innerHTML = '';
-    res.documents.forEach(doc => {
-        const row = document.createElement('div');
-        row.className = 'media-file-row';
-        const kb  = Math.round(doc.file_size / 1024);
-        const ext = doc.filename.split('.').pop().toUpperCase();
-        row.innerHTML = `
-            <span class="media-file-ext">${ext}</span>
-            <span class="media-file-row-name" title="${doc.filename}">${doc.filename}</span>
-            <span class="media-file-row-size">${kb} KB</span>`;
-        row.addEventListener('click', () => {
-            document.querySelectorAll('#doc-library-list .media-file-row').forEach(r => r.classList.remove('selected'));
-            row.classList.add('selected');
-            imgPicker.selectedDocUrl  = doc.public_url;
-            imgPicker.selectedDocName = doc.filename;
-            imgPicker.docFile = null;
-            document.getElementById('doc-drop-zone').hidden  = false;
-            document.getElementById('doc-file-ready').hidden = true;
-            document.getElementById('img-insert-btn').disabled = false;
-        });
-        list.appendChild(row);
+    documentList.innerHTML = '<p class="media-library-empty">Loading&hellip;</p>';
+    const apiResponse = await apiFetch('/api/policy/documents');
+    isDocumentLibraryLoaded = true;
+    if (!responseHasItems(apiResponse, 'documents')) {
+        documentList.innerHTML = '<p class="media-library-empty">No documents uploaded yet.</p>';
+        return;
+    }
+    renderMediaFileRows(documentList, '#doc-library-list', apiResponse.documents, documentRecord => {
+        mediaPicker.selectedDocumentUrl = documentRecord.public_url;
+        mediaPicker.selectedDocumentName = documentRecord.filename;
+        mediaPicker.documentFile = null;
+        document.getElementById('doc-drop-zone').hidden = false;
+        document.getElementById('doc-file-ready').hidden = true;
     });
 }
 
-let soundsLoaded = false;
+let isSoundLibraryLoaded = false;
+
+// Fills the "Sounds" tab with every uploaded audio file (once per page view).
 async function loadSoundLibrary() {
-    const list = document.getElementById('snd-library-list');
-    if (soundsLoaded) return;
-    list.innerHTML = '<p class="media-library-empty">Loading&hellip;</p>';
-    const res = await apiFetch('/api/policy/sounds');
-    soundsLoaded = true;
-    if (!res.ok || !res.sounds?.length) {
-        list.innerHTML = '<p class="media-library-empty">No audio files uploaded yet.</p>';
+    const soundList = document.getElementById('snd-library-list');
+    if (isSoundLibraryLoaded) {
         return;
     }
-    list.innerHTML = '';
-    res.sounds.forEach(snd => {
-        const row = document.createElement('div');
-        row.className = 'media-file-row';
-        const kb  = Math.round(snd.file_size / 1024);
-        const ext = snd.filename.split('.').pop().toUpperCase();
-        row.innerHTML = `
-            <span class="media-file-ext">${ext}</span>
-            <span class="media-file-row-name" title="${snd.filename}">${snd.filename}</span>
-            <span class="media-file-row-size">${kb} KB</span>`;
-        row.addEventListener('click', () => {
-            document.querySelectorAll('#snd-library-list .media-file-row').forEach(r => r.classList.remove('selected'));
-            row.classList.add('selected');
-            imgPicker.selectedSndUrl  = snd.public_url;
-            imgPicker.selectedSndName = snd.filename;
-            imgPicker.sndFile = null;
-            document.getElementById('snd-drop-zone').hidden  = false;
-            document.getElementById('snd-file-ready').hidden = true;
-            document.getElementById('img-insert-btn').disabled = false;
-        });
-        list.appendChild(row);
+    soundList.innerHTML = '<p class="media-library-empty">Loading&hellip;</p>';
+    const apiResponse = await apiFetch('/api/policy/sounds');
+    isSoundLibraryLoaded = true;
+    if (!responseHasItems(apiResponse, 'sounds')) {
+        soundList.innerHTML = '<p class="media-library-empty">No audio files uploaded yet.</p>';
+        return;
+    }
+    renderMediaFileRows(soundList, '#snd-library-list', apiResponse.sounds, soundRecord => {
+        mediaPicker.selectedSoundUrl = soundRecord.public_url;
+        mediaPicker.selectedSoundName = soundRecord.filename;
+        mediaPicker.soundFile = null;
+        document.getElementById('snd-drop-zone').hidden = false;
+        document.getElementById('snd-file-ready').hidden = true;
     });
 }
 
-function handleDocFileSelected(file) {
-    if (!file) return;
-    imgPicker.docFile = file;
-    imgPicker.selectedDocUrl = null;
-    imgPicker.selectedDocName = null;
-    document.querySelectorAll('#doc-library-list .media-file-row').forEach(r => r.classList.remove('selected'));
-    document.getElementById('doc-drop-zone').hidden  = true;
+// Called when a document file is chosen from disk or dropped onto the drop zone.
+function handleDocumentFileSelected(file) {
+    if (!file) {
+        return;
+    }
+    mediaPicker.documentFile = file;
+    mediaPicker.selectedDocumentUrl = null;
+    mediaPicker.selectedDocumentName = null;
+    document.querySelectorAll('#doc-library-list .media-file-row').forEach(row => row.classList.remove('selected'));
+    document.getElementById('doc-drop-zone').hidden = true;
     document.getElementById('doc-file-ready').hidden = false;
     document.getElementById('doc-file-name').textContent = file.name;
-    document.getElementById('doc-file-size').textContent = `${Math.round(file.size / 1024)} KB`;
+    document.getElementById('doc-file-size').textContent = `${bytesToKilobytes(file.size)} KB`;
     document.getElementById('img-insert-btn').disabled = false;
 }
 
-function handleSndFileSelected(file) {
-    if (!file) return;
-    imgPicker.sndFile = file;
-    imgPicker.selectedSndUrl = null;
-    imgPicker.selectedSndName = null;
-    document.querySelectorAll('#snd-library-list .media-file-row').forEach(r => r.classList.remove('selected'));
-    document.getElementById('snd-drop-zone').hidden  = true;
+// Called when an audio file is chosen from disk or dropped onto the drop zone.
+function handleSoundFileSelected(file) {
+    if (!file) {
+        return;
+    }
+    mediaPicker.soundFile = file;
+    mediaPicker.selectedSoundUrl = null;
+    mediaPicker.selectedSoundName = null;
+    document.querySelectorAll('#snd-library-list .media-file-row').forEach(row => row.classList.remove('selected'));
+    document.getElementById('snd-drop-zone').hidden = true;
     document.getElementById('snd-file-ready').hidden = false;
     document.getElementById('snd-file-name').textContent = file.name;
-    document.getElementById('snd-file-size').textContent = `${Math.round(file.size / 1024)} KB`;
+    document.getElementById('snd-file-size').textContent = `${bytesToKilobytes(file.size)} KB`;
     document.getElementById('img-insert-btn').disabled = false;
 }
 
+// Reads a file and resolves with its contents as base64 text (without the "data:" prefix).
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload  = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+        const fileReader = new FileReader();
+        fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
+        fileReader.onerror = reject;
+        fileReader.readAsDataURL(file);
     });
 }
 
+// Describes what kind of player or viewer an embed address will produce.
 function getEmbedType(url) {
-    if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url))      return 'Audio Player';
-    if (/\.pdf(\?.*)?$/i.test(url))                          return 'PDF Viewer';
-    if (url.includes('docs.google.com/document/'))           return 'Google Doc';
-    if (url.includes('docs.google.com/spreadsheets/'))       return 'Google Sheet';
-    if (url.includes('docs.google.com/presentation/'))       return 'Google Slides';
+    if (/\.(mp3|aac|m4a|ogg|wav)(\?.*)?$/i.test(url)) {
+        return 'Audio Player';
+    }
+    if (/\.pdf(\?.*)?$/i.test(url)) {
+        return 'PDF Viewer';
+    }
+    if (url.includes('docs.google.com/document/')) {
+        return 'Google Doc';
+    }
+    if (url.includes('docs.google.com/spreadsheets/')) {
+        return 'Google Sheet';
+    }
+    if (url.includes('docs.google.com/presentation/')) {
+        return 'Google Slides';
+    }
     return 'Embedded Frame';
 }
 
-async function handleImgFileSelected(file) {
-    if (!file) return;
-    document.getElementById('img-drop-zone').hidden    = false;
+// Called when an image is chosen for upload: compresses it and shows a preview.
+async function handleImageFileSelected(file) {
+    if (!file) {
+        return;
+    }
+    document.getElementById('img-drop-zone').hidden = false;
     document.getElementById('img-preview-wrap').hidden = true;
     document.getElementById('img-insert-btn').disabled = true;
     document.getElementById('img-compress-info').textContent = 'Compressing…';
-    document.getElementById('img-drop-zone').hidden    = true;
+    document.getElementById('img-drop-zone').hidden = true;
     document.getElementById('img-preview-wrap').hidden = false;
 
     try {
-        const c = await compressImage(file);
-        imgPicker.compressed   = c;
-        imgPicker.originalFile = file;
-        document.getElementById('img-preview').src = `data:${c.mime};base64,${c.base64}`;
-        document.getElementById('img-alt-upload').value =
-            file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
-        const savings = file.size > 0 ? Math.round((1 - c.size / file.size) * 100) : 0;
-        document.getElementById('img-compress-info').textContent =
-            `${c.width}×${c.height} · ${Math.round(c.size / 1024)} KB` +
-            (savings > 5 ? ` (${savings}% smaller than original)` : '');
+        const compressedImage = await compressImage(file);
+        mediaPicker.compressedImage = compressedImage;
+        mediaPicker.originalFile = file;
+        document.getElementById('img-preview').src = `data:${compressedImage.mimeType};base64,${compressedImage.base64}`;
+        document.getElementById('img-alt-upload').value = filenameToAltText(file.name);
+        let percentageSaved = 0;
+        if (file.size > 0) {
+            percentageSaved = Math.round((1 - compressedImage.size / file.size) * 100);
+        }
+        let compressionInfoText = `${compressedImage.width}×${compressedImage.height} · ${bytesToKilobytes(compressedImage.size)} KB`;
+        if (percentageSaved > 5) {
+            compressionInfoText += ` (${percentageSaved}% smaller than original)`;
+        }
+        document.getElementById('img-compress-info').textContent = compressionInfoText;
         document.getElementById('img-insert-btn').disabled = false;
-    } catch {
+    } catch (compressionError) {
         document.getElementById('img-compress-info').textContent = 'Could not process image.';
     }
 }
 
-function insertMediaMarkdown(url, alt, type) {
-    const ta = imgPicker.ta;
-    if (!ta) return;
-    editorSaveState(ta);
-    const md  = `![${alt || ''}]{${type}}(${url})`;
-    const pos = imgPicker.cursorPos;
-    ta.value          = ta.value.substring(0, pos) + md + ta.value.substring(pos);
-    ta.selectionStart = pos + md.length;
-    ta.selectionEnd   = pos + md.length;
-    ta.focus();
+// Inserts "![alt]{type}(url)" into the editor at the remembered cursor position.
+function insertMediaMarkdown(url, altText, mediaType) {
+    const textArea = mediaPicker.textArea;
+    if (!textArea) {
+        return;
+    }
+    editorSaveState(textArea);
+    const mediaMarkdown = `![${altText || ''}]{${mediaType}}(${url})`;
+    const insertPosition = mediaPicker.cursorPosition;
+    textArea.value = textArea.value.substring(0, insertPosition) + mediaMarkdown + textArea.value.substring(insertPosition);
+    textArea.selectionStart = insertPosition + mediaMarkdown.length;
+    textArea.selectionEnd = insertPosition + mediaMarkdown.length;
+    textArea.focus();
+}
+
+// Returns the first file of a file list, or undefined when there is none.
+function getFirstFile(fileList) {
+    if (fileList && fileList.length > 0) {
+        return fileList[0];
+    }
+    return undefined;
+}
+
+/**
+ * Makes an element accept dragged-and-dropped files. While a file is dragged
+ * over it, the "drag-over" class is added. The dropped file is passed to
+ * "onFileDropped" only if "acceptsFile" says it is the right kind of file.
+ */
+function setupFileDropZone(dropZoneElementId, acceptsFile, onFileDropped) {
+    const dropZoneElement = document.getElementById(dropZoneElementId);
+    if (!dropZoneElement) {
+        return;
+    }
+    dropZoneElement.addEventListener('dragover', dragEvent => {
+        dragEvent.preventDefault();
+        dropZoneElement.classList.add('drag-over');
+    });
+    dropZoneElement.addEventListener('dragleave', () => dropZoneElement.classList.remove('drag-over'));
+    dropZoneElement.addEventListener('drop', dropEvent => {
+        dropEvent.preventDefault();
+        dropZoneElement.classList.remove('drag-over');
+        const droppedFile = getFirstFile(dropEvent.dataTransfer.files);
+        if (droppedFile && acceptsFile(droppedFile)) {
+            onFileDropped(droppedFile);
+        }
+    });
+}
+
+// Connects a "Browse" button to its hidden file input, and the file input to a handler.
+function setupFileBrowseButton(browseButtonId, fileInputId, onFileChosen) {
+    addListenerIfPresent(browseButtonId, 'click', () => document.getElementById(fileInputId).click());
+    addListenerIfPresent(fileInputId, 'change', changeEvent => {
+        onFileChosen(getFirstFile(changeEvent.target.files));
+        // Clear the input so choosing the same file again still fires "change"
+        changeEvent.target.value = '';
+    });
 }
 
 // Tab switching
-document.querySelectorAll('.img-tab-btn').forEach(btn =>
-    btn.addEventListener('click', () => switchImgTab(btn.dataset.tab)));
-
-// Browse button & file input
-document.getElementById('img-browse-btn')?.addEventListener('click', () =>
-    document.getElementById('img-file-input').click());
-
-document.getElementById('img-file-input')?.addEventListener('change', e => {
-    handleImgFileSelected(e.target.files?.[0]);
-    e.target.value = '';
+document.querySelectorAll('.img-tab-btn').forEach(tabButton => {
+    tabButton.addEventListener('click', () => switchMediaPickerTab(tabButton.dataset.tab));
 });
 
-// Drag and drop
-const dropZone = document.getElementById('img-drop-zone');
-dropZone?.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone?.addEventListener('drop', e => {
-    e.preventDefault();
-    dropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files?.[0];
-    if (file?.type.startsWith('image/')) handleImgFileSelected(file);
-});
+// Image browse and drag-and-drop
+setupFileBrowseButton('img-browse-btn', 'img-file-input', handleImageFileSelected);
+setupFileDropZone('img-drop-zone', file => file.type.startsWith('image/'), handleImageFileSelected);
 
 // Document browse, drop, clear
-document.getElementById('doc-browse-btn')?.addEventListener('click', () =>
-    document.getElementById('doc-file-input').click());
-document.getElementById('doc-file-input')?.addEventListener('change', e => {
-    handleDocFileSelected(e.target.files?.[0]);
-    e.target.value = '';
-});
-document.getElementById('doc-file-clear')?.addEventListener('click', () => {
-    imgPicker.docFile = null;
-    document.getElementById('doc-drop-zone').hidden  = false;
+setupFileBrowseButton('doc-browse-btn', 'doc-file-input', handleDocumentFileSelected);
+addListenerIfPresent('doc-file-clear', 'click', () => {
+    mediaPicker.documentFile = null;
+    document.getElementById('doc-drop-zone').hidden = false;
     document.getElementById('doc-file-ready').hidden = true;
-    if (!imgPicker.selectedDocUrl) document.getElementById('img-insert-btn').disabled = true;
+    if (!mediaPicker.selectedDocumentUrl) {
+        document.getElementById('img-insert-btn').disabled = true;
+    }
 });
-const docDropZone = document.getElementById('doc-drop-zone');
-docDropZone?.addEventListener('dragover', e => { e.preventDefault(); docDropZone.classList.add('drag-over'); });
-docDropZone?.addEventListener('dragleave', () => docDropZone.classList.remove('drag-over'));
-docDropZone?.addEventListener('drop', e => {
-    e.preventDefault();
-    docDropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleDocFileSelected(file);
-});
+setupFileDropZone('doc-drop-zone', () => true, handleDocumentFileSelected);
 
-// Embed URL input
-document.getElementById('embed-url-input')?.addEventListener('input', e => {
-    const url   = e.target.value.trim();
-    const badge = document.getElementById('embed-type-badge');
-    document.getElementById('img-insert-btn').disabled = !url;
-    if (url) { badge.hidden = false; badge.textContent = getEmbedType(url); }
-    else     { badge.hidden = true; }
+// Embed URL input: show what kind of embed the address will make
+addListenerIfPresent('embed-url-input', 'input', inputEvent => {
+    const embedUrl = inputEvent.target.value.trim();
+    const embedTypeBadge = document.getElementById('embed-type-badge');
+    document.getElementById('img-insert-btn').disabled = !embedUrl;
+    if (embedUrl) {
+        embedTypeBadge.hidden = false;
+        embedTypeBadge.textContent = getEmbedType(embedUrl);
+    } else {
+        embedTypeBadge.hidden = true;
+    }
 });
 
 // Sound browse, drop, clear
-document.getElementById('snd-browse-btn')?.addEventListener('click', () =>
-    document.getElementById('snd-file-input').click());
-document.getElementById('snd-file-input')?.addEventListener('change', e => {
-    handleSndFileSelected(e.target.files?.[0]);
-    e.target.value = '';
-});
-document.getElementById('snd-file-clear')?.addEventListener('click', () => {
-    imgPicker.sndFile = null;
-    document.getElementById('snd-drop-zone').hidden  = false;
+setupFileBrowseButton('snd-browse-btn', 'snd-file-input', handleSoundFileSelected);
+addListenerIfPresent('snd-file-clear', 'click', () => {
+    mediaPicker.soundFile = null;
+    document.getElementById('snd-drop-zone').hidden = false;
     document.getElementById('snd-file-ready').hidden = true;
-    if (!imgPicker.selectedSndUrl) document.getElementById('img-insert-btn').disabled = true;
+    if (!mediaPicker.selectedSoundUrl) {
+        document.getElementById('img-insert-btn').disabled = true;
+    }
 });
-const sndDropZone = document.getElementById('snd-drop-zone');
-sndDropZone?.addEventListener('dragover', e => { e.preventDefault(); sndDropZone.classList.add('drag-over'); });
-sndDropZone?.addEventListener('dragleave', () => sndDropZone.classList.remove('drag-over'));
-sndDropZone?.addEventListener('drop', e => {
-    e.preventDefault();
-    sndDropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleSndFileSelected(file);
-});
+setupFileDropZone('snd-drop-zone', () => true, handleSoundFileSelected);
 
-// Insert button
-document.getElementById('img-insert-btn')?.addEventListener('click', async () => {
-    const activeTab = document.querySelector('.img-tab-btn.active')?.dataset.tab;
-    const btn = document.getElementById('img-insert-btn');
+// Returns a readable message from an error, or "Unknown" when it has none.
+function getErrorMessage(error) {
+    if (error && error.message) {
+        return error.message;
+    }
+    return 'Unknown';
+}
+
+/**
+ * Uploads a document or audio file chosen from disk and inserts it into the
+ * editor. Returns true when the upload worked.
+ */
+async function uploadFileAndInsert(file, uploadEndpoint, mediaType, successMessage) {
+    const base64Data = await fileToBase64(file);
+    const apiResponse = await apiFetch(uploadEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, mime_type: file.type, data: base64Data }),
+    });
+    if (!apiResponse.ok) {
+        showToast(apiResponse.error || 'Upload failed', 'error');
+        return false;
+    }
+    insertMediaMarkdown(apiResponse.url, file.name, mediaType);
+    closeModal('image-picker-modal');
+    showToast(successMessage, 'success');
+    return true;
+}
+
+// Picks the file extension that matches a compressed image's MIME type.
+function getExtensionForImageMimeType(mimeType) {
+    if (mimeType === 'image/webp') {
+        return 'webp';
+    }
+    if (mimeType === 'image/png') {
+        return 'png';
+    }
+    if (mimeType === 'image/gif') {
+        return 'gif';
+    }
+    return 'jpg';
+}
+
+/**
+ * The media picker's "Insert" button. What it does depends on the open tab:
+ * library images, documents, sounds and embeds are inserted directly (after
+ * uploading a new file when one was chosen), and the upload tab uploads the
+ * compressed image first.
+ */
+addListenerIfPresent('img-insert-btn', 'click', async () => {
+    const activeTabButton = document.querySelector('.img-tab-btn.active');
+    let activeTab = undefined;
+    if (activeTabButton) {
+        activeTab = activeTabButton.dataset.tab;
+    }
+    const insertButton = document.getElementById('img-insert-btn');
 
     if (activeTab === 'library') {
-        if (!imgPicker.selectedUrl) return;
-        const alt = document.getElementById('img-alt-library').value.trim();
-        insertMediaMarkdown(imgPicker.selectedUrl, alt, 'img');
+        if (!mediaPicker.selectedImageUrl) {
+            return;
+        }
+        const altText = document.getElementById('img-alt-library').value.trim();
+        insertMediaMarkdown(mediaPicker.selectedImageUrl, altText, 'img');
         closeModal('image-picker-modal');
         return;
     }
 
     if (activeTab === 'documents') {
-        if (imgPicker.selectedDocUrl) {
-            insertMediaMarkdown(imgPicker.selectedDocUrl, imgPicker.selectedDocName, 'doc');
+        if (mediaPicker.selectedDocumentUrl) {
+            insertMediaMarkdown(mediaPicker.selectedDocumentUrl, mediaPicker.selectedDocumentName, 'doc');
             closeModal('image-picker-modal');
             return;
         }
-        if (!imgPicker.docFile) return;
-        btn.disabled = true; btn.textContent = 'Uploading…';
+        if (!mediaPicker.documentFile) {
+            return;
+        }
+        insertButton.disabled = true;
+        insertButton.textContent = 'Uploading…';
         try {
-            const file   = imgPicker.docFile;
-            const data   = await fileToBase64(file);
-            const res    = await apiFetch('/api/policy/upload-document', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename: file.name, mime_type: file.type, data }),
-            });
-            if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
-            docsLoaded = false;
-            insertMediaMarkdown(res.url, file.name, 'doc');
-            closeModal('image-picker-modal');
-            showToast('Document uploaded and inserted', 'success');
-        } catch (e) { showToast('Upload error: ' + (e?.message || 'Unknown'), 'error'); }
-        finally { btn.disabled = false; btn.textContent = 'Insert'; }
+            const uploadWorked = await uploadFileAndInsert(mediaPicker.documentFile, '/api/policy/upload-document', 'doc', 'Document uploaded and inserted');
+            if (uploadWorked) {
+                isDocumentLibraryLoaded = false; // reload the list next time the tab opens
+            }
+        } catch (uploadError) {
+            showToast('Upload error: ' + getErrorMessage(uploadError), 'error');
+        } finally {
+            insertButton.disabled = false;
+            insertButton.textContent = 'Insert';
+        }
         return;
     }
 
     if (activeTab === 'sounds') {
-        if (imgPicker.selectedSndUrl) {
-            insertMediaMarkdown(imgPicker.selectedSndUrl, imgPicker.selectedSndName, 'audio');
+        if (mediaPicker.selectedSoundUrl) {
+            insertMediaMarkdown(mediaPicker.selectedSoundUrl, mediaPicker.selectedSoundName, 'audio');
             closeModal('image-picker-modal');
             return;
         }
-        if (!imgPicker.sndFile) return;
-        btn.disabled = true; btn.textContent = 'Uploading…';
+        if (!mediaPicker.soundFile) {
+            return;
+        }
+        insertButton.disabled = true;
+        insertButton.textContent = 'Uploading…';
         try {
-            const file   = imgPicker.sndFile;
-            const data   = await fileToBase64(file);
-            const res    = await apiFetch('/api/policy/upload-sound', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename: file.name, mime_type: file.type, data }),
-            });
-            if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
-            soundsLoaded = false;
-            insertMediaMarkdown(res.url, file.name, 'audio');
-            closeModal('image-picker-modal');
-            showToast('Audio uploaded and inserted', 'success');
-        } catch (e) { showToast('Upload error: ' + (e?.message || 'Unknown'), 'error'); }
-        finally { btn.disabled = false; btn.textContent = 'Insert'; }
+            const uploadWorked = await uploadFileAndInsert(mediaPicker.soundFile, '/api/policy/upload-sound', 'audio', 'Audio uploaded and inserted');
+            if (uploadWorked) {
+                isSoundLibraryLoaded = false; // reload the list next time the tab opens
+            }
+        } catch (uploadError) {
+            showToast('Upload error: ' + getErrorMessage(uploadError), 'error');
+        } finally {
+            insertButton.disabled = false;
+            insertButton.textContent = 'Insert';
+        }
         return;
     }
 
     if (activeTab === 'embeds') {
-        const url = document.getElementById('embed-url-input').value.trim();
-        if (!url) return;
-        insertMediaMarkdown(url, '', 'embed');
+        const embedUrl = document.getElementById('embed-url-input').value.trim();
+        if (!embedUrl) {
+            return;
+        }
+        insertMediaMarkdown(embedUrl, '', 'embed');
         closeModal('image-picker-modal');
         return;
     }
 
     // Upload tab
-    if (!imgPicker.compressed) return;
-    btn.disabled    = true;
-    btn.textContent = 'Uploading…';
+    if (!mediaPicker.compressedImage) {
+        return;
+    }
+    insertButton.disabled = true;
+    insertButton.textContent = 'Uploading…';
 
     try {
-        const c    = imgPicker.compressed;
-        const file = imgPicker.originalFile;
-        const ext  = c.mime === 'image/webp' ? 'webp' : c.mime === 'image/png' ? 'png'
-                   : c.mime === 'image/gif'  ? 'gif'  : 'jpg';
-        const baseName = file.name.replace(/\.[^.]+$/, '');
-        const res = await apiFetch('/api/policy/upload-image', {
-            method:  'POST',
+        const compressedImage = mediaPicker.compressedImage;
+        const originalFile = mediaPicker.originalFile;
+        const fileExtension = getExtensionForImageMimeType(compressedImage.mimeType);
+        const baseName = originalFile.name.replace(/\.[^.]+$/, '');
+        const apiResponse = await apiFetch('/api/policy/upload-image', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                filename:  `${baseName}.${ext}`,
-                mime_type: c.mime,
-                data:      c.base64,
-                width:     c.width,
-                height:    c.height,
+                filename:  `${baseName}.${fileExtension}`,
+                mime_type: compressedImage.mimeType,
+                data:      compressedImage.base64,
+                width:     compressedImage.width,
+                height:    compressedImage.height,
             }),
         });
 
-        if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
+        if (!apiResponse.ok) {
+            showToast(apiResponse.error || 'Upload failed', 'error');
+            return;
+        }
 
-        // Prepend new image to the library grid so it's visible immediately
-        libraryLoaded = false; // force reload next time library tab opens
+        isImageLibraryLoaded = false; // force reload next time library tab opens
 
-        const alt = document.getElementById('img-alt-upload').value.trim()
-                 || baseName.replace(/[_-]/g, ' ');
-        insertMediaMarkdown(res.url, alt, 'img');
+        const altText = document.getElementById('img-alt-upload').value.trim() || baseName.replace(/[_-]/g, ' ');
+        insertMediaMarkdown(apiResponse.url, altText, 'img');
         closeModal('image-picker-modal');
         showToast('Image uploaded and inserted', 'success');
-    } catch (e) {
-        showToast('Upload error: ' + (e?.message || 'Unknown'), 'error');
+    } catch (uploadError) {
+        showToast('Upload error: ' + getErrorMessage(uploadError), 'error');
     } finally {
-        btn.disabled    = false;
-        btn.textContent = 'Insert';
+        insertButton.disabled = false;
+        insertButton.textContent = 'Insert';
     }
 });
 
-document.getElementById('content-edit-save')?.addEventListener('click', async () => {
-    const id       = document.getElementById('content-edit-id').value;
-    const table    = document.getElementById('content-edit-table').value;
-    const title    = document.getElementById('content-edit-title').value.trim();
-    const slug     = document.getElementById('content-edit-slug').value.trim();
-    const number   = document.getElementById('content-edit-number').value.trim();
-    const anchor   = document.getElementById('content-edit-anchor').value.trim();
-    const content  = document.getElementById('content-edit-content').value;
-    const mode     = document.getElementById('content-edit-mode').value;
+// Builds the request headers for an admin API call that sends JSON.
+function buildAuthorizedJsonHeaders() {
+    const sessionToken = localStorage.getItem('gftv-token');
+    return { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` };
+}
+
+// Shows an error message in the content editor.
+function showContentEditError(errorMessage) {
+    const errorElement = document.getElementById('content-edit-error');
+    errorElement.textContent = errorMessage;
+    errorElement.classList.remove('hidden');
+}
+
+/**
+ * The editor's "Save" button. In "add" mode it creates a new section,
+ * otherwise it updates the section being edited. Afterwards the sidebar is
+ * refreshed and the page for the saved section is shown.
+ */
+addListenerIfPresent('content-edit-save', 'click', async () => {
+    const sectionId = document.getElementById('content-edit-id').value;
+    const table = document.getElementById('content-edit-table').value;
+    const title = document.getElementById('content-edit-title').value.trim();
+    const slug = document.getElementById('content-edit-slug').value.trim();
+    const number = document.getElementById('content-edit-number').value.trim();
+    const anchor = document.getElementById('content-edit-anchor').value.trim();
+    const content = document.getElementById('content-edit-content').value;
+    const editorMode = document.getElementById('content-edit-mode').value;
     const parentId = document.getElementById('content-edit-parent-id').value;
-    const errEl    = document.getElementById('content-edit-error');
-    errEl.classList.add('hidden');
+    document.getElementById('content-edit-error').classList.add('hidden');
 
-    if (!title) { errEl.textContent = 'Title cannot be empty'; errEl.classList.remove('hidden'); return; }
-    if (!slug)  { errEl.textContent = 'Slug cannot be empty';  errEl.classList.remove('hidden'); return; }
+    if (!title) {
+        showContentEditError('Title cannot be empty');
+        return;
+    }
+    if (!slug) {
+        showContentEditError('Slug cannot be empty');
+        return;
+    }
 
-    const token = localStorage.getItem('gftv-token');
-
-    if (mode === 'add') {
-        const type = parentId
-            ? 'subsection'
-            : (document.getElementById('content-edit-type')?.value || 'article');
-        const res = await apiFetch('/api/policy/add-section', {
+    if (editorMode === 'add') {
+        // A section with a parent is always a subsection; otherwise use the chosen type
+        let sectionType = 'subsection';
+        if (!parentId) {
+            const typeSelect = document.getElementById('content-edit-type');
+            sectionType = 'article';
+            if (typeSelect && typeSelect.value) {
+                sectionType = typeSelect.value;
+            }
+        }
+        const apiResponse = await apiFetch('/api/policy/add-section', {
             method: 'POST',
-            body: JSON.stringify({ table, title, slug, content, type, parent_id: parentId || null, number: number || null, anchor: anchor || null }),
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+            body: JSON.stringify({
+                table: table,
+                title: title,
+                slug: slug,
+                content: content,
+                type: sectionType,
+                parent_id: parentId || null,
+                number: number || null,
+                anchor: anchor || null
+            }),
+            headers: buildAuthorizedJsonHeaders()
         });
-        if (res.ok) {
+        if (apiResponse.ok) {
             closeModal('content-modal');
             showToast('Section created', 'success');
-            docSectionsCache[currentDoc] = null;
-            await loadSections(currentDoc, { force: true });
-            navigate(`${DOCS[currentDoc].urlBase}/${res.section.slug}`);
+            documentSectionsCache[currentDocumentKey] = null;
+            await loadSections(currentDocumentKey, { force: true });
+            navigate(`${DOCUMENT_CONFIG[currentDocumentKey].urlBase}/${apiResponse.section.slug}`);
         } else {
-            errEl.textContent = res.error || 'Create failed';
-            errEl.classList.remove('hidden');
+            showContentEditError(apiResponse.error || 'Create failed');
         }
     } else {
-        const res = await apiFetch('/api/policy/update-section', {
+        const apiResponse = await apiFetch('/api/policy/update-section', {
             method: 'PUT',
-            body: JSON.stringify({ id, table, title, slug, content, anchor: anchor || null, number: number || null }),
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+            body: JSON.stringify({
+                id: sectionId,
+                table: table,
+                title: title,
+                slug: slug,
+                content: content,
+                anchor: anchor || null,
+                number: number || null
+            }),
+            headers: buildAuthorizedJsonHeaders()
         });
-        if (res.ok) {
+        if (apiResponse.ok) {
             closeModal('content-modal');
             showToast('Section updated', 'success');
-            const sec = sections.find(s => s.id === id);
-            if (sec) Object.assign(sec, res.section);
+            const editedSection = sections.find(candidate => candidate.id === sectionId);
+            if (editedSection) {
+                Object.assign(editedSection, apiResponse.section);
+            }
             buildSidebar();
-            navigate(`${DOCS[currentDoc].urlBase}/${res.section?.slug || slug}${location.hash}`, { replace: true });
+            let savedSlug = slug;
+            if (apiResponse.section && apiResponse.section.slug) {
+                savedSlug = apiResponse.section.slug;
+            }
+            navigate(`${DOCUMENT_CONFIG[currentDocumentKey].urlBase}/${savedSlug}${location.hash}`, { replace: true });
         } else {
-            errEl.textContent = res.error || 'Update failed';
-            errEl.classList.remove('hidden');
+            showContentEditError(apiResponse.error || 'Update failed');
         }
     }
 });
 
 /* ─── Move Up / Down ─── */
 async function moveSection(direction) {
-    const id    = document.getElementById('content-edit-id').value;
+    const sectionId = document.getElementById('content-edit-id').value;
     const table = document.getElementById('content-edit-table').value;
-    const errEl = document.getElementById('content-edit-error');
-    const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch('/api/policy/reorder-section', {
+    const apiResponse = await apiFetch('/api/policy/reorder-section', {
         method: 'PUT',
-        body: JSON.stringify({ id, table, direction }),
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+        body: JSON.stringify({ id: sectionId, table: table, direction: direction }),
+        headers: buildAuthorizedJsonHeaders()
     });
-    if (res.ok) {
+    if (apiResponse.ok) {
         closeModal('content-modal');
         showToast('Reordered', 'success');
-        docSectionsCache[currentDoc] = null;
-        await loadSections(currentDoc, { force: true });
+        documentSectionsCache[currentDocumentKey] = null;
+        await loadSections(currentDocumentKey, { force: true });
         navigate(location.pathname + location.hash, { replace: true });
     } else {
-        errEl.textContent = res.error || 'Reorder failed';
-        errEl.classList.remove('hidden');
+        showContentEditError(apiResponse.error || 'Reorder failed');
     }
 }
 
-document.getElementById('content-edit-move-up')?.addEventListener('click', () => moveSection('up'));
-document.getElementById('content-edit-move-down')?.addEventListener('click', () => moveSection('down'));
+addListenerIfPresent('content-edit-move-up', 'click', () => moveSection('up'));
+addListenerIfPresent('content-edit-move-down', 'click', () => moveSection('down'));
 
-/* ─── Delete Section ─── */
-let _pendingDeleteId = null;
-let _pendingDeleteTable = null;
-let _pendingDeleteParent = null;
+/* ─── Delete Section ───
+   Clicking "Delete" in the editor remembers which section to delete and
+   opens a confirmation dialog; the delete only happens after confirming. */
+let pendingDeleteSectionId = null;
+let pendingDeleteTable = null;
+let pendingDeleteParentId = null;
 
-document.getElementById('content-edit-delete')?.addEventListener('click', () => {
-    _pendingDeleteId = document.getElementById('content-edit-id').value;
-    _pendingDeleteTable = document.getElementById('content-edit-table').value;
-    _pendingDeleteParent = document.getElementById('content-edit-parent-id').value || null;
+addListenerIfPresent('content-edit-delete', 'click', () => {
+    pendingDeleteSectionId = document.getElementById('content-edit-id').value;
+    pendingDeleteTable = document.getElementById('content-edit-table').value;
+    pendingDeleteParentId = document.getElementById('content-edit-parent-id').value || null;
     const title = document.getElementById('content-edit-title').value;
     document.getElementById('delete-confirm-message').textContent =
         `Are you sure you want to delete "${title}"? This cannot be undone.`;
@@ -2529,37 +3511,44 @@ document.getElementById('content-edit-delete')?.addEventListener('click', () => 
     openModal('delete-confirm-modal');
 });
 
-document.getElementById('delete-confirm-btn')?.addEventListener('click', async () => {
-    if (!_pendingDeleteId || !_pendingDeleteTable) return;
-    const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch('/api/policy/delete-section', {
+addListenerIfPresent('delete-confirm-btn', 'click', async () => {
+    if (!pendingDeleteSectionId || !pendingDeleteTable) {
+        return;
+    }
+    const apiResponse = await apiFetch('/api/policy/delete-section', {
         method: 'DELETE',
-        body: JSON.stringify({ id: _pendingDeleteId, table: _pendingDeleteTable }),
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+        body: JSON.stringify({ id: pendingDeleteSectionId, table: pendingDeleteTable }),
+        headers: buildAuthorizedJsonHeaders()
     });
-    if (res.ok) {
+    if (apiResponse.ok) {
         closeModal('delete-confirm-modal');
         showToast('Section deleted', 'success');
-        docSectionsCache[currentDoc] = null;
-        await loadSections(currentDoc, { force: true });
-        if (_pendingDeleteParent) {
-            // Navigate back to the parent article
-            const parent = sections.find(s => s.id === _pendingDeleteParent);
-            if (parent) navigate(`${DOCS[currentDoc].urlBase}/${parent.slug}`);
-            else navigate(DOCS[currentDoc].urlBase);
-        } else {
-            navigate(DOCS[currentDoc].urlBase);
+        documentSectionsCache[currentDocumentKey] = null;
+        await loadSections(currentDocumentKey, { force: true });
+        const urlBase = DOCUMENT_CONFIG[currentDocumentKey].urlBase;
+        // Go back to the parent article if it still exists, otherwise to the document index
+        let parentSection = null;
+        if (pendingDeleteParentId) {
+            parentSection = sections.find(candidate => candidate.id === pendingDeleteParentId);
         }
-        _pendingDeleteId = null;
-        _pendingDeleteTable = null;
-        _pendingDeleteParent = null;
+        if (parentSection) {
+            navigate(`${urlBase}/${parentSection.slug}`);
+        } else {
+            navigate(urlBase);
+        }
+        pendingDeleteSectionId = null;
+        pendingDeleteTable = null;
+        pendingDeleteParentId = null;
     } else {
-        document.getElementById('delete-confirm-error').textContent = res.error || 'Delete failed';
-        document.getElementById('delete-confirm-error').classList.remove('hidden');
+        const deleteErrorElement = document.getElementById('delete-confirm-error');
+        deleteErrorElement.textContent = apiResponse.error || 'Delete failed';
+        deleteErrorElement.classList.remove('hidden');
     }
 });
 
 /* ─── Admin ─── */
+
+// Opens the admin panel (admins only) and wires up its tabs.
 async function loadAdmin() {
     if (!currentUser || !currentUser.is_admin) {
         showPage('home');
@@ -2567,595 +3556,748 @@ async function loadAdmin() {
         return;
     }
     loadAdminUsers();
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            btn.classList.add('active');
-            document.getElementById(`tab-${btn.dataset.tab}`)?.classList.remove('hidden');
-            if (btn.dataset.tab === 'images')    loadAdminImages();
-            if (btn.dataset.tab === 'documents') loadAdminDocuments();
-            if (btn.dataset.tab === 'sounds')    loadAdminSounds();
+    document.querySelectorAll('.tab-btn').forEach(tabButton => {
+        tabButton.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(otherButton => otherButton.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tabContent => tabContent.classList.add('hidden'));
+            tabButton.classList.add('active');
+            const selectedTabContent = document.getElementById(`tab-${tabButton.dataset.tab}`);
+            if (selectedTabContent) {
+                selectedTabContent.classList.remove('hidden');
+            }
+            if (tabButton.dataset.tab === 'images') {
+                loadAdminImages();
+            }
+            if (tabButton.dataset.tab === 'documents') {
+                loadAdminDocuments();
+            }
+            if (tabButton.dataset.tab === 'sounds') {
+                loadAdminSounds();
+            }
         });
     });
 }
 
+// Builds the session-token header used by admin API calls.
+function buildAuthorizationHeader() {
+    const sessionToken = localStorage.getItem('gftv-token');
+    return { Authorization: `Bearer ${sessionToken}` };
+}
+
+// Builds a green/red/grey "Yes" or "No" badge for the users table.
+function buildYesNoBadgeHtml(isYes, noBadgeClass) {
+    if (isYes) {
+        return '<span class="badge badge-green">Yes</span>';
+    }
+    return `<span class="badge ${noBadgeClass}">No</span>`;
+}
+
+// Fills the admin "Users" table, with Approve / Make Editor buttons where useful.
 async function loadAdminUsers() {
-    const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch('/api/admin/users', {
-        headers: { Authorization: `Bearer ${token}` }
+    const apiResponse = await apiFetch('/api/admin/users', {
+        headers: buildAuthorizationHeader()
     });
-    const listEl = document.getElementById('admin-users-list');
-    if (!res.ok || !listEl) return;
-    const users = res.users || [];
-    listEl.innerHTML = `<table class="users-table">
-    <thead><tr><th>Display Name</th><th>Username</th><th>Email</th><th>Approved</th><th>Admin</th><th>Editor</th><th>Actions</th></tr></thead>
-    <tbody>${users.map(u => `<tr>
-      <td>${u.display_name}</td><td>@${u.username}</td><td>${u.email}</td>
-      <td><span class="badge ${u.is_approved ? 'badge-green' : 'badge-red'}">${u.is_approved ? 'Yes' : 'No'}</span></td>
-      <td><span class="badge ${u.is_admin ? 'badge-green' : 'badge-grey'}">${u.is_admin ? 'Yes' : 'No'}</span></td>
-      <td><span class="badge ${u.is_editor ? 'badge-green' : 'badge-grey'}">${u.is_editor ? 'Yes' : 'No'}</span></td>
+    const usersListElement = document.getElementById('admin-users-list');
+    if (!apiResponse.ok || !usersListElement) {
+        return;
+    }
+    const users = apiResponse.users || [];
+    const userRowsHtml = users.map(user => {
+        let approveButtonHtml = '';
+        if (!user.is_approved) {
+            approveButtonHtml = `<button class="btn btn-sm btn-primary" onclick="approveUser('${user.id}')">Approve</button>`;
+        }
+        let makeEditorButtonHtml = '';
+        if (!user.is_editor) {
+            makeEditorButtonHtml = `<button class="btn btn-sm btn-ghost" onclick="makeEditor('${user.id}')">Make Editor</button>`;
+        }
+        return `<tr>
+      <td>${escapeHtmlCharacters(String(user.display_name || ''))}</td><td>@${escapeHtmlCharacters(String(user.username || ''))}</td><td>${escapeHtmlCharacters(String(user.email || ''))}</td>
+      <td>${buildYesNoBadgeHtml(user.is_approved, 'badge-red')}</td>
+      <td>${buildYesNoBadgeHtml(user.is_admin, 'badge-grey')}</td>
+      <td>${buildYesNoBadgeHtml(user.is_editor, 'badge-grey')}</td>
       <td>
-        ${!u.is_approved ? `<button class="btn btn-sm btn-primary" onclick="approveUser('${u.id}')">Approve</button>` : ''}
-        ${!u.is_editor ? `<button class="btn btn-sm btn-ghost" onclick="makeEditor('${u.id}')">Make Editor</button>` : ''}
+        ${approveButtonHtml}
+        ${makeEditorButtonHtml}
       </td>
-    </tr>`).join('')}</tbody></table>`;
+    </tr>`;
+    }).join('');
+    usersListElement.innerHTML = `<table class="users-table">
+    <thead><tr><th>Display Name</th><th>Username</th><th>Email</th><th>Approved</th><th>Admin</th><th>Editor</th><th>Actions</th></tr></thead>
+    <tbody>${userRowsHtml}</tbody></table>`;
 }
 
-let adminImagesLoaded = false;
+// A short grey status message used while admin lists load.
+function buildAdminStatusMessageHtml(messageText) {
+    return `<p style="color:var(--text-muted);font-size:0.9rem">${messageText}</p>`;
+}
+
+let isAdminImagesLoaded = false;
+
+// Fills the admin "Images" table. Pass true to reload even if already loaded.
 async function loadAdminImages(force = false) {
-    if (adminImagesLoaded && !force) return;
-    const listEl = document.getElementById('admin-images-list');
-    if (!listEl) return;
-    listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Loading images…</p>';
-    const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch('/api/policy/images', {
-        headers: { Authorization: `Bearer ${token}` }
+    if (isAdminImagesLoaded && !force) {
+        return;
+    }
+    const imagesListElement = document.getElementById('admin-images-list');
+    if (!imagesListElement) {
+        return;
+    }
+    imagesListElement.innerHTML = buildAdminStatusMessageHtml('Loading images…');
+    const apiResponse = await apiFetch('/api/policy/images', {
+        headers: buildAuthorizationHeader()
     });
-    adminImagesLoaded = true;
-    if (!res.ok) {
-        listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Failed to load images.</p>';
+    isAdminImagesLoaded = true;
+    if (!apiResponse.ok) {
+        imagesListElement.innerHTML = buildAdminStatusMessageHtml('Failed to load images.');
         return;
     }
-    const images = res.images || [];
+    const images = apiResponse.images || [];
     if (!images.length) {
-        listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">No images uploaded yet.</p>';
+        imagesListElement.innerHTML = buildAdminStatusMessageHtml('No images uploaded yet.');
         return;
     }
-    listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
+    imagesListElement.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
     <thead><tr><th></th><th>Filename</th><th>Description</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
-    <tbody>${images.map(adminImgRowHtml).join('')}</tbody></table></div>`;
+    <tbody>${images.map(buildAdminImageRowHtml).join('')}</tbody></table></div>`;
 }
 
-window.copyImageUrl = function(url) {
+window.copyImageUrl = function (url) {
     navigator.clipboard.writeText(url).then(() => showToast('URL copied to clipboard', 'success'));
 };
 
-window.openAsBlob = async function(url, filename) {
+// Downloads a file and opens it in a new tab from a local "blob:" address.
+// Falls back to opening the original address if the download fails.
+window.openAsBlob = async function (url, filename) {
     try {
-        const res = await fetch(url);
-        const blob = await res.blob();
-        const blobUrl = URL.createObjectURL(blob);
+        const fileResponse = await fetch(url);
+        const fileBlob = await fileResponse.blob();
+        const blobUrl = URL.createObjectURL(fileBlob);
         window.open(blobUrl, '_blank');
-    } catch {
+    } catch (downloadError) {
         window.open(url, '_blank');
     }
 };
 
-window.downloadAsBlob = async function(url, filename) {
+// Starts a browser download of a file by clicking a temporary <a download> link.
+function clickTemporaryDownloadLink(url, filename) {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+// Downloads a file under the given file name. Going through a blob makes the
+// browser save the file instead of opening it, even for files on another site.
+window.downloadAsBlob = async function (url, filename) {
     try {
-        const res = await fetch(url);
-        const blob = await res.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const fileResponse = await fetch(url);
+        const fileBlob = await fileResponse.blob();
+        const blobUrl = URL.createObjectURL(fileBlob);
+        clickTemporaryDownloadLink(blobUrl, filename);
         setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-    } catch {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+    } catch (downloadError) {
+        clickTemporaryDownloadLink(url, filename);
     }
 };
 
+// Loads every <audio data-blob-src="..."> inside "container" through a blob
+// address, falling back to the original address if that fails.
 function initBlobMedia(container) {
-    container.querySelectorAll('audio[data-blob-src]').forEach(async el => {
+    container.querySelectorAll('audio[data-blob-src]').forEach(async audioElement => {
         try {
-            const url = el.dataset.blobSrc;
-            const res = await fetch(url);
-            const blob = await res.blob();
-            el.src = URL.createObjectURL(blob);
-        } catch {
-            el.src = el.dataset.blobSrc;
+            const audioUrl = audioElement.dataset.blobSrc;
+            const audioResponse = await fetch(audioUrl);
+            const audioBlob = await audioResponse.blob();
+            audioElement.src = URL.createObjectURL(audioBlob);
+        } catch (downloadError) {
+            audioElement.src = audioElement.dataset.blobSrc;
+        }
+    });
+}
+
+// Reads the file name shown in the same table row as "button".
+function getFilenameFromRow(button, fallbackText) {
+    const tableRow = button.closest('tr');
+    if (tableRow) {
+        const filenameCell = tableRow.querySelector('.admin-img-filename');
+        if (filenameCell && filenameCell.textContent) {
+            return filenameCell.textContent;
+        }
+    }
+    return fallbackText;
+}
+
+/**
+ * Sets up a "Delete" button + confirmation dialog for an admin media table
+ * (images, documents or sounds).
+ *
+ * window[globalFunctionName](id, button) is called by the row's Delete
+ * button: it remembers the item and opens the confirmation dialog. When the
+ * dialog's confirm button is pressed, the item is deleted through the API
+ * and its table row is removed.
+ */
+function setupAdminDeleteConfirmation(options) {
+    let pendingItemId = null;
+    let pendingDeleteButton = null;
+
+    window[options.globalFunctionName] = function (itemId, deleteButton) {
+        const filename = getFilenameFromRow(deleteButton, options.fallbackName);
+        document.getElementById(options.filenameElementId).textContent = filename;
+        pendingItemId = itemId;
+        pendingDeleteButton = deleteButton;
+        openModal(options.modalId);
+    };
+
+    addListenerIfPresent(options.confirmButtonId, 'click', async () => {
+        if (!pendingItemId) {
+            return;
+        }
+        const itemId = pendingItemId;
+        const deleteButton = pendingDeleteButton;
+        pendingItemId = null;
+        pendingDeleteButton = null;
+        closeModal(options.modalId);
+        deleteButton.disabled = true;
+        const requestOptions = { method: 'DELETE' };
+        if (options.sendAuthorization) {
+            requestOptions.headers = buildAuthorizationHeader();
+        }
+        const apiResponse = await apiFetch(`${options.deleteEndpoint}?id=${itemId}`, requestOptions);
+        if (apiResponse.ok) {
+            const tableRow = document.querySelector(`tr[${options.rowIdAttribute}="${itemId}"]`);
+            if (tableRow) {
+                tableRow.remove();
+            }
+            showToast(options.successMessage, 'success');
+        } else {
+            deleteButton.disabled = false;
+            showToast(apiResponse.error || 'Failed to delete', 'error');
         }
     });
 }
 
 /* ─── Delete Image Modal ─── */
-{
-    let pendingDeleteId  = null;
-    let pendingDeleteBtn = null;
+setupAdminDeleteConfirmation({
+    globalFunctionName: 'deleteAdminImage',
+    fallbackName: 'this image',
+    filenameElementId: 'delete-image-filename',
+    modalId: 'delete-image-modal',
+    confirmButtonId: 'delete-image-confirm',
+    deleteEndpoint: '/api/policy/manage-image',
+    sendAuthorization: true,
+    rowIdAttribute: 'data-img-id',
+    successMessage: 'Image deleted',
+});
 
-    window.deleteAdminImage = function(id, btn) {
-        const row = btn.closest('tr');
-        const filename = row?.querySelector('.admin-img-filename')?.textContent || 'this image';
-        document.getElementById('delete-image-filename').textContent = filename;
-        pendingDeleteId  = id;
-        pendingDeleteBtn = btn;
-        openModal('delete-image-modal');
-    };
+// The grey dash shown when an image has no description.
+const EMPTY_DESCRIPTION_HTML = '<em style="color:var(--text-muted);font-style:normal">—</em>';
 
-    document.getElementById('delete-image-confirm')?.addEventListener('click', async () => {
-        if (!pendingDeleteId) return;
-        const id  = pendingDeleteId;
-        const btn = pendingDeleteBtn;
-        pendingDeleteId  = null;
-        pendingDeleteBtn = null;
-        closeModal('delete-image-modal');
-        btn.disabled = true;
-        const token = localStorage.getItem('gftv-token');
-        const res = await apiFetch(`/api/policy/manage-image?id=${id}`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) {
-            document.querySelector(`tr[data-img-id="${id}"]`)?.remove();
-            showToast('Image deleted', 'success');
-        } else {
-            btn.disabled = false;
-            showToast(res.error || 'Failed to delete', 'error');
+/**
+ * Turns an image's description cell into a text box. Pressing Enter or
+ * clicking away saves the new description; pressing Escape cancels.
+ */
+window.editImageDescription = function (descriptionElement) {
+    if (descriptionElement.querySelector('input')) {
+        return;
+    }
+    const imageId = descriptionElement.dataset.id;
+    const currentDescription = descriptionElement.dataset.desc || '';
+    descriptionElement.innerHTML = `<input class="admin-img-desc-input" type="text" value="${currentDescription.replace(/"/g, '&quot;')}" placeholder="Add description…">`;
+    const descriptionInput = descriptionElement.querySelector('input');
+    descriptionInput.focus();
+    descriptionInput.select();
+    let isCancelled = false;
+
+    async function saveDescription() {
+        if (isCancelled) {
+            return;
         }
-    });
-}
-
-window.editImageDesc = function(el) {
-    if (el.querySelector('input')) return;
-    const id = el.dataset.id;
-    const current = el.dataset.desc || '';
-    el.innerHTML = `<input class="admin-img-desc-input" type="text" value="${current.replace(/"/g, '&quot;')}" placeholder="Add description…">`;
-    const input = el.querySelector('input');
-    input.focus();
-    input.select();
-    let cancelled = false;
-
-    async function save() {
-        if (cancelled) return;
-        const val = input.value.trim();
-        el.dataset.desc = val;
-        el.innerHTML = val || '<em style="color:var(--text-muted);font-style:normal">—</em>';
-        const token = localStorage.getItem('gftv-token');
-        const res = await apiFetch(`/api/policy/manage-image?id=${id}`, {
+        const newDescription = descriptionInput.value.trim();
+        descriptionElement.dataset.desc = newDescription;
+        descriptionElement.innerHTML = newDescription || EMPTY_DESCRIPTION_HTML;
+        const apiResponse = await apiFetch(`/api/policy/manage-image?id=${imageId}`, {
             method: 'PATCH',
-            body: JSON.stringify({ description: val || null }),
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+            body: JSON.stringify({ description: newDescription || null }),
+            headers: buildAuthorizedJsonHeaders()
         });
-        if (!res.ok) showToast('Failed to save description', 'error');
+        if (!apiResponse.ok) {
+            showToast('Failed to save description', 'error');
+        }
     }
 
-    input.addEventListener('blur', save);
-    input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-        if (e.key === 'Escape') {
-            cancelled = true;
-            el.innerHTML = el.dataset.desc || '<em style="color:var(--text-muted);font-style:normal">—</em>';
+    descriptionInput.addEventListener('blur', saveDescription);
+    descriptionInput.addEventListener('keydown', keyboardEvent => {
+        if (keyboardEvent.key === 'Enter') {
+            keyboardEvent.preventDefault();
+            descriptionInput.blur();
+        }
+        if (keyboardEvent.key === 'Escape') {
+            isCancelled = true;
+            descriptionElement.innerHTML = descriptionElement.dataset.desc || EMPTY_DESCRIPTION_HTML;
         }
     });
 };
 
-/* ─── Admin Documents ─── */
-function adminDocRowHtml(d) {
-    const kb   = Math.round(d.file_size / 1024);
-    const ext  = d.filename.split('.').pop().toUpperCase();
-    const date = new Date(d.uploaded_at).toLocaleDateString();
-    return `<tr data-doc-id="${d.id}">
-      <td class="admin-img-filename">${d.filename}</td>
-      <td style="color:var(--text-muted);font-size:0.8rem">${ext}</td>
-      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${kb} KB</td>
-      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${date}</td>
+/* ─── Admin Documents and Sounds ───
+   Both tables have the same columns, so they share one row builder. */
+
+// Builds one table row for an uploaded document or sound.
+// "rowIdAttribute" is data-doc-id or data-snd-id; "deleteFunctionName" is the
+// global delete function the row's Delete button calls.
+function buildAdminFileRowHtml(fileRecord, rowIdAttribute, deleteFunctionName) {
+    const sizeInKilobytes = bytesToKilobytes(fileRecord.file_size);
+    const fileExtension = getUpperCaseExtension(fileRecord.filename);
+    const uploadDate = new Date(fileRecord.uploaded_at).toLocaleDateString();
+    return `<tr ${rowIdAttribute}="${fileRecord.id}">
+      <td class="admin-img-filename">${fileRecord.filename}</td>
+      <td style="color:var(--text-muted);font-size:0.8rem">${fileExtension}</td>
+      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${sizeInKilobytes} KB</td>
+      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${uploadDate}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${d.public_url}')">Copy URL</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAdminDocument('${d.id}', this)">Delete</button>
+        <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${fileRecord.public_url}')">Copy URL</button>
+        <button class="btn btn-sm btn-danger" onclick="${deleteFunctionName}('${fileRecord.id}', this)">Delete</button>
       </td>
     </tr>`;
 }
 
-let adminDocsLoaded = false;
-async function loadAdminDocuments(force = false) {
-    if (adminDocsLoaded && !force) return;
-    const listEl = document.getElementById('admin-documents-list');
-    if (!listEl) return;
-    listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Loading documents…</p>';
-    const res = await apiFetch('/api/policy/documents');
-    adminDocsLoaded = true;
-    if (!res.ok) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Failed to load documents.</p>'; return; }
-    const docs = res.documents || [];
-    if (!docs.length) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">No documents uploaded yet.</p>'; return; }
-    listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
+function buildAdminDocumentRowHtml(documentRecord) {
+    return buildAdminFileRowHtml(documentRecord, 'data-doc-id', 'deleteAdminDocument');
+}
+
+function buildAdminSoundRowHtml(soundRecord) {
+    return buildAdminFileRowHtml(soundRecord, 'data-snd-id', 'deleteAdminSound');
+}
+
+/**
+ * Loads a list of uploaded files from the API and shows them as a table in
+ * the admin panel. Used for both the Documents and Sounds tabs.
+ */
+async function renderAdminFileTable(options) {
+    const listElement = document.getElementById(options.listElementId);
+    if (!listElement) {
+        return false;
+    }
+    listElement.innerHTML = buildAdminStatusMessageHtml(options.loadingMessage);
+    const apiResponse = await apiFetch(options.listEndpoint);
+    if (!apiResponse.ok) {
+        listElement.innerHTML = buildAdminStatusMessageHtml(options.failureMessage);
+        return true;
+    }
+    const fileRecords = apiResponse[options.responseListName] || [];
+    if (!fileRecords.length) {
+        listElement.innerHTML = buildAdminStatusMessageHtml(options.emptyMessage);
+        return true;
+    }
+    listElement.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
     <thead><tr><th>Filename</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
-    <tbody>${docs.map(adminDocRowHtml).join('')}</tbody></table></div>`;
+    <tbody>${fileRecords.map(options.buildRowHtml).join('')}</tbody></table></div>`;
+    return true;
+}
+
+let isAdminDocumentsLoaded = false;
+
+// Fills the admin "Documents" table. Pass true to reload even if already loaded.
+async function loadAdminDocuments(force = false) {
+    if (isAdminDocumentsLoaded && !force) {
+        return;
+    }
+    const listWasFound = await renderAdminFileTable({
+        listElementId: 'admin-documents-list',
+        listEndpoint: '/api/policy/documents',
+        responseListName: 'documents',
+        loadingMessage: 'Loading documents…',
+        failureMessage: 'Failed to load documents.',
+        emptyMessage: 'No documents uploaded yet.',
+        buildRowHtml: buildAdminDocumentRowHtml,
+    });
+    if (listWasFound) {
+        isAdminDocumentsLoaded = true;
+    }
 }
 
 /* ─── Delete Document Modal ─── */
-{
-    let pendingDocId  = null;
-    let pendingDocBtn = null;
+setupAdminDeleteConfirmation({
+    globalFunctionName: 'deleteAdminDocument',
+    fallbackName: 'this document',
+    filenameElementId: 'delete-document-filename',
+    modalId: 'delete-document-modal',
+    confirmButtonId: 'delete-document-confirm',
+    deleteEndpoint: '/api/policy/manage-document',
+    sendAuthorization: false,
+    rowIdAttribute: 'data-doc-id',
+    successMessage: 'Document deleted',
+});
 
-    window.deleteAdminDocument = function(id, btn) {
-        const row = btn.closest('tr');
-        const filename = row?.querySelector('.admin-img-filename')?.textContent || 'this document';
-        document.getElementById('delete-document-filename').textContent = filename;
-        pendingDocId  = id;
-        pendingDocBtn = btn;
-        openModal('delete-document-modal');
-    };
+/**
+ * Connects an admin "Upload" button to its hidden file input. The chosen
+ * file is uploaded straight away and a row for it is added to the top of
+ * the table (or the whole table is reloaded if it is not shown yet).
+ */
+function setupAdminFileUpload(options) {
+    const fileInput = document.getElementById(options.fileInputId);
+    const uploadButton = document.getElementById(options.uploadButtonId);
 
-    document.getElementById('delete-document-confirm')?.addEventListener('click', async () => {
-        if (!pendingDocId) return;
-        const id  = pendingDocId;
-        const btn = pendingDocBtn;
-        pendingDocId  = null;
-        pendingDocBtn = null;
-        closeModal('delete-document-modal');
-        btn.disabled = true;
-        const res = await apiFetch(`/api/policy/manage-document?id=${id}`, { method: 'DELETE' });
-        if (res.ok) { document.querySelector(`tr[data-doc-id="${id}"]`)?.remove(); showToast('Document deleted', 'success'); }
-        else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
+    if (uploadButton) {
+        uploadButton.addEventListener('click', () => {
+            if (fileInput) {
+                fileInput.click();
+            }
+        });
+    }
+
+    if (!fileInput) {
+        return;
+    }
+    fileInput.addEventListener('change', async changeEvent => {
+        const file = getFirstFile(changeEvent.target.files);
+        changeEvent.target.value = '';
+        if (!file) {
+            return;
+        }
+        uploadButton.disabled = true;
+        uploadButton.textContent = 'Uploading…';
+        try {
+            const base64Data = await fileToBase64(file);
+            const apiResponse = await apiFetch(options.uploadEndpoint, {
+                method: 'POST',
+                headers: buildAuthorizedJsonHeaders(),
+                body: JSON.stringify({ filename: file.name, mime_type: file.type, data: base64Data }),
+            });
+            if (!apiResponse.ok) {
+                showToast(apiResponse.error || 'Upload failed', 'error');
+                return;
+            }
+            showToast(options.successMessage, 'success');
+            const listElement = document.getElementById(options.listElementId);
+            let tableBody = null;
+            if (listElement) {
+                tableBody = listElement.querySelector('tbody');
+            }
+            const uploadedRecord = apiResponse[options.responseRecordName];
+            if (tableBody && uploadedRecord) {
+                tableBody.insertAdjacentHTML('afterbegin', options.buildRowHtml(uploadedRecord));
+            } else {
+                options.reloadList();
+            }
+        } finally {
+            uploadButton.disabled = false;
+            uploadButton.textContent = options.buttonLabel;
+        }
     });
 }
 
 /* ─── Admin Document Upload ─── */
-{
-    const fileInput = document.getElementById('admin-doc-file-input');
-    const uploadBtn = document.getElementById('admin-doc-upload-btn');
-
-    uploadBtn?.addEventListener('click', () => fileInput?.click());
-
-    fileInput?.addEventListener('change', async e => {
-        const file = e.target.files?.[0];
-        e.target.value = '';
-        if (!file) return;
-        uploadBtn.disabled = true;
-        uploadBtn.textContent = 'Uploading…';
-        try {
-            const base64 = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-            const token = localStorage.getItem('gftv-token');
-            const res = await apiFetch('/api/policy/upload-document', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ filename: file.name, mime_type: file.type, data: base64 }),
-            });
-            if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
-            showToast('Document uploaded', 'success');
-            const listEl = document.getElementById('admin-documents-list');
-            const tbody = listEl?.querySelector('tbody');
-            if (tbody && res.document) {
-                tbody.insertAdjacentHTML('afterbegin', adminDocRowHtml(res.document));
-            } else {
-                adminDocsLoaded = false;
-                loadAdminDocuments();
-            }
-        } finally {
-            uploadBtn.disabled = false;
-            uploadBtn.textContent = 'Upload Document';
-        }
-    });
-}
+setupAdminFileUpload({
+    fileInputId: 'admin-doc-file-input',
+    uploadButtonId: 'admin-doc-upload-btn',
+    uploadEndpoint: '/api/policy/upload-document',
+    successMessage: 'Document uploaded',
+    listElementId: 'admin-documents-list',
+    responseRecordName: 'document',
+    buildRowHtml: buildAdminDocumentRowHtml,
+    buttonLabel: 'Upload Document',
+    reloadList: () => {
+        isAdminDocumentsLoaded = false;
+        loadAdminDocuments();
+    },
+});
 
 /* ─── Admin Sounds ─── */
-function adminSndRowHtml(s) {
-    const kb   = Math.round(s.file_size / 1024);
-    const ext  = s.filename.split('.').pop().toUpperCase();
-    const date = new Date(s.uploaded_at).toLocaleDateString();
-    return `<tr data-snd-id="${s.id}">
-      <td class="admin-img-filename">${s.filename}</td>
-      <td style="color:var(--text-muted);font-size:0.8rem">${ext}</td>
-      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${kb} KB</td>
-      <td style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap">${date}</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${s.public_url}')">Copy URL</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAdminSound('${s.id}', this)">Delete</button>
-      </td>
-    </tr>`;
-}
+let isAdminSoundsLoaded = false;
 
-let adminSoundsLoaded = false;
+// Fills the admin "Sounds" table. Pass true to reload even if already loaded.
 async function loadAdminSounds(force = false) {
-    if (adminSoundsLoaded && !force) return;
-    const listEl = document.getElementById('admin-sounds-list');
-    if (!listEl) return;
-    listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Loading audio files…</p>';
-    const res = await apiFetch('/api/policy/sounds');
-    adminSoundsLoaded = true;
-    if (!res.ok) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">Failed to load sounds.</p>'; return; }
-    const sounds = res.sounds || [];
-    if (!sounds.length) { listEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem">No audio files uploaded yet.</p>'; return; }
-    listEl.innerHTML = `<div class="admin-images-wrap"><table class="admin-images-table">
-    <thead><tr><th>Filename</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
-    <tbody>${sounds.map(adminSndRowHtml).join('')}</tbody></table></div>`;
+    if (isAdminSoundsLoaded && !force) {
+        return;
+    }
+    const listWasFound = await renderAdminFileTable({
+        listElementId: 'admin-sounds-list',
+        listEndpoint: '/api/policy/sounds',
+        responseListName: 'sounds',
+        loadingMessage: 'Loading audio files…',
+        failureMessage: 'Failed to load sounds.',
+        emptyMessage: 'No audio files uploaded yet.',
+        buildRowHtml: buildAdminSoundRowHtml,
+    });
+    if (listWasFound) {
+        isAdminSoundsLoaded = true;
+    }
 }
 
 /* ─── Delete Sound Modal ─── */
-{
-    let pendingSndId  = null;
-    let pendingSndBtn = null;
-
-    window.deleteAdminSound = function(id, btn) {
-        const row = btn.closest('tr');
-        const filename = row?.querySelector('.admin-img-filename')?.textContent || 'this audio file';
-        document.getElementById('delete-sound-filename').textContent = filename;
-        pendingSndId  = id;
-        pendingSndBtn = btn;
-        openModal('delete-sound-modal');
-    };
-
-    document.getElementById('delete-sound-confirm')?.addEventListener('click', async () => {
-        if (!pendingSndId) return;
-        const id  = pendingSndId;
-        const btn = pendingSndBtn;
-        pendingSndId  = null;
-        pendingSndBtn = null;
-        closeModal('delete-sound-modal');
-        btn.disabled = true;
-        const res = await apiFetch(`/api/policy/manage-sound?id=${id}`, { method: 'DELETE' });
-        if (res.ok) { document.querySelector(`tr[data-snd-id="${id}"]`)?.remove(); showToast('Audio deleted', 'success'); }
-        else { btn.disabled = false; showToast(res.error || 'Failed to delete', 'error'); }
-    });
-}
+setupAdminDeleteConfirmation({
+    globalFunctionName: 'deleteAdminSound',
+    fallbackName: 'this audio file',
+    filenameElementId: 'delete-sound-filename',
+    modalId: 'delete-sound-modal',
+    confirmButtonId: 'delete-sound-confirm',
+    deleteEndpoint: '/api/policy/manage-sound',
+    sendAuthorization: false,
+    rowIdAttribute: 'data-snd-id',
+    successMessage: 'Audio deleted',
+});
 
 /* ─── Admin Sound Upload ─── */
-{
-    const fileInput = document.getElementById('admin-snd-file-input');
-    const uploadBtn = document.getElementById('admin-snd-upload-btn');
-
-    uploadBtn?.addEventListener('click', () => fileInput?.click());
-
-    fileInput?.addEventListener('change', async e => {
-        const file = e.target.files?.[0];
-        e.target.value = '';
-        if (!file) return;
-        uploadBtn.disabled = true;
-        uploadBtn.textContent = 'Uploading…';
-        try {
-            const base64 = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-            const token = localStorage.getItem('gftv-token');
-            const res = await apiFetch('/api/policy/upload-sound', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ filename: file.name, mime_type: file.type, data: base64 }),
-            });
-            if (!res.ok) { showToast(res.error || 'Upload failed', 'error'); return; }
-            showToast('Sound uploaded', 'success');
-            const listEl = document.getElementById('admin-sounds-list');
-            const tbody = listEl?.querySelector('tbody');
-            if (tbody && res.sound) {
-                tbody.insertAdjacentHTML('afterbegin', adminSndRowHtml(res.sound));
-            } else {
-                adminSoundsLoaded = false;
-                loadAdminSounds();
-            }
-        } finally {
-            uploadBtn.disabled = false;
-            uploadBtn.textContent = 'Upload Sound';
-        }
-    });
-}
+setupAdminFileUpload({
+    fileInputId: 'admin-snd-file-input',
+    uploadButtonId: 'admin-snd-upload-btn',
+    uploadEndpoint: '/api/policy/upload-sound',
+    successMessage: 'Sound uploaded',
+    listElementId: 'admin-sounds-list',
+    responseRecordName: 'sound',
+    buildRowHtml: buildAdminSoundRowHtml,
+    buttonLabel: 'Upload Sound',
+    reloadList: () => {
+        isAdminSoundsLoaded = false;
+        loadAdminSounds();
+    },
+});
 
 /* ─── Admin Image Upload ─── */
-function adminImgRowHtml(img) {
-    const kb  = Math.round(img.file_size / 1024);
-    const dim = img.width ? `${img.width}×${img.height}` : '';
-    const date = new Date(img.uploaded_at).toLocaleDateString();
-    const desc = (img.description || '').replace(/"/g, '&quot;');
-    return `<tr data-img-id="${img.id}">
-      <td><img class="admin-img-thumb" src="${img.public_url}" alt="" loading="lazy"></td>
-      <td class="admin-img-filename">${img.filename}</td>
-      <td><span class="admin-img-desc" data-id="${img.id}" data-desc="${desc}" onclick="editImageDesc(this)">${img.description || '<em style="color:var(--text-muted);font-style:normal">—</em>'}</span></td>
-      <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${dim ? dim + '<br>' : ''}${kb} KB</td>
-      <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${date}</td>
+
+// Builds one row of the admin "Images" table.
+function buildAdminImageRowHtml(imageRecord) {
+    const sizeInKilobytes = bytesToKilobytes(imageRecord.file_size);
+    let dimensionsHtml = '';
+    if (imageRecord.width) {
+        dimensionsHtml = `${imageRecord.width}×${imageRecord.height}<br>`;
+    }
+    const uploadDate = new Date(imageRecord.uploaded_at).toLocaleDateString();
+    const escapedDescription = (imageRecord.description || '').replace(/"/g, '&quot;');
+    const descriptionHtml = imageRecord.description || EMPTY_DESCRIPTION_HTML;
+    return `<tr data-img-id="${imageRecord.id}">
+      <td><img class="admin-img-thumb" src="${imageRecord.public_url}" alt="" loading="lazy"></td>
+      <td class="admin-img-filename">${imageRecord.filename}</td>
+      <td><span class="admin-img-desc" data-id="${imageRecord.id}" data-desc="${escapedDescription}" onclick="editImageDescription(this)">${descriptionHtml}</span></td>
+      <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${dimensionsHtml}${sizeInKilobytes} KB</td>
+      <td style="color:var(--text-muted);white-space:nowrap;font-size:0.8rem">${uploadDate}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${img.public_url}')">Copy URL</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAdminImage('${img.id}', this)">Delete</button>
+        <button class="btn btn-sm btn-ghost" onclick="copyImageUrl('${imageRecord.public_url}')">Copy URL</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAdminImage('${imageRecord.id}', this)">Delete</button>
       </td>
     </tr>`;
 }
 
-{
-    let adminStagedCompressed = null;
-    let adminStagedFile = null;
+/**
+ * Admin image upload. Choosing a file shows a "staging" strip with a
+ * compressed preview and an Upload button; the file is only sent to the
+ * server when that Upload button is pressed.
+ */
+function setupAdminImageUpload() {
+    const fileInput = document.getElementById('admin-img-file-input');
+    const uploadButton = document.getElementById('admin-img-upload-btn');
+    const stagingElement = document.getElementById('admin-img-staging');
 
-    const fileInput  = document.getElementById('admin-img-file-input');
-    const uploadBtn  = document.getElementById('admin-img-upload-btn');
-    const stagingEl  = document.getElementById('admin-img-staging');
+    // Hides the staging strip and forgets the chosen file
+    function clearStaging() {
+        stagingElement.className = 'admin-img-staging hidden';
+        stagingElement.innerHTML = '';
+    }
 
-    uploadBtn?.addEventListener('click', () => fileInput?.click());
+    if (uploadButton) {
+        uploadButton.addEventListener('click', () => {
+            if (fileInput) {
+                fileInput.click();
+            }
+        });
+    }
 
-    fileInput?.addEventListener('change', async e => {
-        const file = e.target.files?.[0];
-        e.target.value = '';
-        if (!file) return;
+    if (!fileInput) {
+        return;
+    }
+    fileInput.addEventListener('change', async changeEvent => {
+        const file = getFirstFile(changeEvent.target.files);
+        changeEvent.target.value = '';
+        if (!file) {
+            return;
+        }
 
-        adminStagedCompressed = null;
-        adminStagedFile = file;
-        stagingEl.className = 'admin-img-staging';
-        stagingEl.innerHTML = `
+        stagingElement.className = 'admin-img-staging';
+        stagingElement.innerHTML = `
             <div class="admin-img-staging-thumb"></div>
             <div class="admin-img-staging-info">
-                <span class="admin-img-staging-name">${file.name}</span>
+                <span class="admin-img-staging-name">${escapeHtmlCharacters(file.name)}</span>
                 <span class="admin-img-staging-meta">Compressing…</span>
             </div>
             <button class="btn btn-sm btn-primary" id="admin-img-staging-go" disabled>Upload</button>
             <button class="btn btn-sm btn-ghost" id="admin-img-staging-cancel">Cancel</button>`;
 
-        document.getElementById('admin-img-staging-cancel').addEventListener('click', () => {
-            stagingEl.className = 'admin-img-staging hidden';
-            stagingEl.innerHTML = '';
-            adminStagedCompressed = null;
-            adminStagedFile = null;
-        });
+        document.getElementById('admin-img-staging-cancel').addEventListener('click', clearStaging);
 
         try {
-            const c = await compressImage(file);
-            adminStagedCompressed = c;
-            const thumb = stagingEl.querySelector('.admin-img-staging-thumb');
-            thumb.innerHTML = `<img src="data:${c.mime};base64,${c.base64}" alt="">`;
-            const savings = file.size > 0 ? Math.round((1 - c.size / file.size) * 100) : 0;
-            stagingEl.querySelector('.admin-img-staging-meta').textContent =
-                `${c.width}×${c.height} · ${Math.round(c.size / 1024)} KB` +
-                (savings > 5 ? ` (${savings}% smaller)` : '');
-            const goBtn = document.getElementById('admin-img-staging-go');
-            goBtn.disabled = false;
-            goBtn.addEventListener('click', async () => {
-                goBtn.disabled = true;
-                goBtn.textContent = 'Uploading…';
-                const ext = c.mime === 'image/webp' ? 'webp' : c.mime === 'image/png' ? 'png'
-                          : c.mime === 'image/gif'  ? 'gif'  : 'jpg';
+            const compressedImage = await compressImage(file);
+            const thumbnailContainer = stagingElement.querySelector('.admin-img-staging-thumb');
+            thumbnailContainer.innerHTML = `<img src="data:${compressedImage.mimeType};base64,${compressedImage.base64}" alt="">`;
+            let percentageSaved = 0;
+            if (file.size > 0) {
+                percentageSaved = Math.round((1 - compressedImage.size / file.size) * 100);
+            }
+            let compressionInfoText = `${compressedImage.width}×${compressedImage.height} · ${bytesToKilobytes(compressedImage.size)} KB`;
+            if (percentageSaved > 5) {
+                compressionInfoText += ` (${percentageSaved}% smaller)`;
+            }
+            stagingElement.querySelector('.admin-img-staging-meta').textContent = compressionInfoText;
+
+            const confirmUploadButton = document.getElementById('admin-img-staging-go');
+            confirmUploadButton.disabled = false;
+            confirmUploadButton.addEventListener('click', async () => {
+                confirmUploadButton.disabled = true;
+                confirmUploadButton.textContent = 'Uploading…';
+                const fileExtension = getExtensionForImageMimeType(compressedImage.mimeType);
                 const baseName = file.name.replace(/\.[^.]+$/, '');
-                const token = localStorage.getItem('gftv-token');
-                const res = await apiFetch('/api/policy/upload-image', {
+                const apiResponse = await apiFetch('/api/policy/upload-image', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    headers: buildAuthorizedJsonHeaders(),
                     body: JSON.stringify({
-                        filename:  `${baseName}.${ext}`,
-                        mime_type: c.mime,
-                        data:      c.base64,
-                        width:     c.width,
-                        height:    c.height,
+                        filename:  `${baseName}.${fileExtension}`,
+                        mime_type: compressedImage.mimeType,
+                        data:      compressedImage.base64,
+                        width:     compressedImage.width,
+                        height:    compressedImage.height,
                     }),
                 });
-                if (!res.ok) {
-                    showToast(res.error || 'Upload failed', 'error');
-                    goBtn.disabled = false;
-                    goBtn.textContent = 'Upload';
+                if (!apiResponse.ok) {
+                    showToast(apiResponse.error || 'Upload failed', 'error');
+                    confirmUploadButton.disabled = false;
+                    confirmUploadButton.textContent = 'Upload';
                     return;
                 }
                 showToast('Image uploaded', 'success');
-                stagingEl.className = 'admin-img-staging hidden';
-                stagingEl.innerHTML = '';
-                adminStagedCompressed = null;
-                adminStagedFile = null;
-                libraryLoaded = false; // invalidate image picker library cache
+                clearStaging();
+                isImageLibraryLoaded = false; // invalidate image picker library cache
 
                 // Prepend row to admin table, or rebuild if table doesn't exist yet
-                const listEl = document.getElementById('admin-images-list');
-                const tbody = listEl?.querySelector('tbody');
-                if (tbody && res.image) {
-                    tbody.insertAdjacentHTML('afterbegin', adminImgRowHtml(res.image));
+                const imagesListElement = document.getElementById('admin-images-list');
+                let tableBody = null;
+                if (imagesListElement) {
+                    tableBody = imagesListElement.querySelector('tbody');
+                }
+                if (tableBody && apiResponse.image) {
+                    tableBody.insertAdjacentHTML('afterbegin', buildAdminImageRowHtml(apiResponse.image));
                 } else {
-                    adminImagesLoaded = false;
+                    isAdminImagesLoaded = false;
                     loadAdminImages();
                 }
             });
-        } catch {
-            stagingEl.querySelector('.admin-img-staging-meta').textContent = 'Could not process image.';
+        } catch (compressionError) {
+            stagingElement.querySelector('.admin-img-staging-meta').textContent = 'Could not process image.';
         }
     });
 }
+setupAdminImageUpload();
 
-window.approveUser = async function (id) {
-    const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch('/api/admin/users', {
+// Changes one role flag on a user (for example is_approved or is_editor),
+// then reloads the admin panel.
+async function updateUserFlag(userId, flagName, successMessage) {
+    const requestBody = { id: userId };
+    requestBody[flagName] = true;
+    const apiResponse = await apiFetch('/api/admin/users', {
         method: 'PUT',
-        body: JSON.stringify({
-            id,
-            is_approved: true
-        }),
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        }
+        body: JSON.stringify(requestBody),
+        headers: buildAuthorizedJsonHeaders()
     });
-    if (res.ok) {
-        showToast('User approved', 'success');
+    if (apiResponse.ok) {
+        showToast(successMessage, 'success');
         loadAdmin();
-    } else showToast(res.error || 'Failed', 'error');
-};
-window.makeEditor = async function (id) {
-    const token = localStorage.getItem('gftv-token');
-    const res = await apiFetch('/api/admin/users', {
-        method: 'PUT',
-        body: JSON.stringify({
-            id,
-            is_editor: true
-        }),
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        }
-    });
-    if (res.ok) {
-        showToast('Editor role granted', 'success');
-        loadAdmin();
-    } else showToast(res.error || 'Failed', 'error');
-};
-/* ─── Modals ─── */
-function openModal(id) {
-    const el = document.getElementById(id);
-    if (el) {
-        el.hidden = false;
-        el.removeAttribute('hidden');
+    } else {
+        showToast(apiResponse.error || 'Failed', 'error');
     }
 }
 
-function closeModal(id) {
-    const el = document.getElementById(id);
-    if (el) el.hidden = true;
-    if (id === 'auth-modal') showLoginStep();
+window.approveUser = async function (userId) {
+    await updateUserFlag(userId, 'is_approved', 'User approved');
+};
+
+window.makeEditor = async function (userId) {
+    await updateUserFlag(userId, 'is_editor', 'Editor role granted');
+};
+
+/* ─── Modals ─── */
+function openModal(modalId) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        modalElement.hidden = false;
+        modalElement.removeAttribute('hidden');
+    }
 }
-document.querySelectorAll('.modal-close, [data-close]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const target = btn.dataset.close || btn.closest('.modal-overlay')?.id;
-        if (target) closeModal(target);
+
+function closeModal(modalId) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        modalElement.hidden = true;
+    }
+    // The sign-in dialog always reopens on its first step
+    if (modalId === 'auth-modal') {
+        showLoginStep();
+    }
+}
+
+// Close buttons: either name their modal in data-close, or close the modal they sit in
+document.querySelectorAll('.modal-close, [data-close]').forEach(closeButton => {
+    closeButton.addEventListener('click', () => {
+        let targetModalId = closeButton.dataset.close;
+        if (!targetModalId) {
+            const parentOverlay = closeButton.closest('.modal-overlay');
+            if (parentOverlay) {
+                targetModalId = parentOverlay.id;
+            }
+        }
+        if (targetModalId) {
+            closeModal(targetModalId);
+        }
     });
 });
-document.querySelectorAll('.modal-overlay').forEach(overlay =>
-    overlay.addEventListener('click', e => {
-        if (e.target === overlay) closeModal(overlay.id);
-    }));
+
+// Clicking the dark area around a modal closes it
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', clickEvent => {
+        if (clickEvent.target === overlay) {
+            closeModal(overlay.id);
+        }
+    });
+});
 
 /* ─── Image click → open as blob in new tab (hides storage URL) ─── */
-document.addEventListener('click', async e => {
-    const el = e.target.closest('.section-img, .section-img-figure img');
-    if (!el) return;
+document.addEventListener('click', async clickEvent => {
+    const clickedImage = clickEvent.target.closest('.section-img, .section-img-figure img');
+    if (!clickedImage) {
+        return;
+    }
     try {
-        const res    = await fetch(el.src);
-        const blob   = await res.blob();
-        const blobUrl = URL.createObjectURL(blob);
+        const imageResponse = await fetch(clickedImage.src);
+        const imageBlob = await imageResponse.blob();
+        const blobUrl = URL.createObjectURL(imageBlob);
         window.open(blobUrl, '_blank');
         setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
-    } catch {
-        window.open(el.src, '_blank');
+    } catch (downloadError) {
+        window.open(clickedImage.src, '_blank');
     }
 });
 
 /* ─── Toast ─── */
-function showToast(msg, type = '') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const icon = type === 'success' ?
-        '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2"/><polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2"/>' :
-        '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/><line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>';
-    toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none">${icon}</svg>${msg}`;
-    container.appendChild(toast);
+
+// SVG drawings used inside toast messages
+const TOAST_SUCCESS_ICON = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2"/><polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2"/>';
+const TOAST_ERROR_ICON = '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/><line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>';
+
+// Shows a short pop-up message in the corner for three seconds.
+// "toastType" is 'success', 'error', 'info' or '' and only changes the styling.
+function showToast(message, toastType = '') {
+    const toastContainer = document.getElementById('toast-container');
+    const toastElement = document.createElement('div');
+    toastElement.className = `toast ${toastType}`;
+    let iconSvg = TOAST_ERROR_ICON;
+    if (toastType === 'success') {
+        iconSvg = TOAST_SUCCESS_ICON;
+    }
+    toastElement.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none">${iconSvg}</svg>${message}`;
+    toastContainer.appendChild(toastElement);
     setTimeout(() => {
-        toast.classList.add('out');
-        setTimeout(() => toast.remove(), 300);
+        toastElement.classList.add('out');
+        setTimeout(() => toastElement.remove(), 300);
     }, 3000);
 }
 
@@ -3164,116 +4306,144 @@ function showToast(msg, type = '') {
    scroll away with the page. The sidebar is fixed, so it hangs from wherever
    the header currently ends rather than from a hardcoded 60px. */
 (function trackChromeBottom() {
-    const header = document.getElementById('site-header');
-    if (!header) return;
-    let ticking = false;
-    function update() {
-        ticking = false;
-        const bottom = Math.max(0, Math.round(header.getBoundingClientRect().bottom));
-        document.documentElement.style.setProperty('--chrome-bottom', bottom + 'px');
+    const siteHeader = document.getElementById('site-header');
+    if (!siteHeader) {
+        return;
     }
-    function request() {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(update);
+    // True while an update is already queued for the next animation frame
+    let isUpdateQueued = false;
+
+    function updateChromeBottom() {
+        isUpdateQueued = false;
+        const headerBottom = Math.max(0, Math.round(siteHeader.getBoundingClientRect().bottom));
+        document.documentElement.style.setProperty('--chrome-bottom', headerBottom + 'px');
     }
-    window.addEventListener('scroll', request, { passive: true });
-    window.addEventListener('resize', request);
+
+    // Many scroll events can fire per frame; only measure once per frame
+    function requestChromeUpdate() {
+        if (isUpdateQueued) {
+            return;
+        }
+        isUpdateQueued = true;
+        requestAnimationFrame(updateChromeBottom);
+    }
+
+    window.addEventListener('scroll', requestChromeUpdate, { passive: true });
+    window.addEventListener('resize', requestChromeUpdate);
     if ('ResizeObserver' in window) {
-        const ro = new ResizeObserver(request);
-        ro.observe(document.body);
+        const bodyResizeObserver = new ResizeObserver(requestChromeUpdate);
+        bodyResizeObserver.observe(document.body);
     }
-    update();
+    updateChromeBottom();
 })();
 
 /* ─── Service worker and the update notice ───
    A new worker never activates on its own. It downloads, installs, and waits;
    the only thing that promotes it is a person pressing Reload. See
    update-bar-spec.md. */
-const SW_URL = '/sw.js';
-const SW_STRINGS = {
+const SERVICE_WORKER_URL = '/sw.js';
+const UPDATE_NOTICE_TEXT = {
     label:  'Update',
     ready:  'A new version of GFTV PolicySpot is ready.',
     reload: 'Reload',
     later:  'Not now',
 };
 
-let swRegistration = null;
-let swWaiting = null;
-let swReloading = false;
-let swDismissed = false; // this page view only, never stored
+let serviceWorkerRegistration = null;
+let waitingServiceWorker = null;
+let isReloadingForUpdate = false;
+let isUpdateNoticeDismissed = false; // this page view only, never stored
 
+/**
+ * Shows the "A new version is ready" bar when a new service worker is
+ * waiting, or removes the bar when there is none or the reader chose "Not now".
+ */
 function renderUpdateNotice() {
-    const existing = document.querySelector('.update-notice');
+    const existingNotice = document.querySelector('.update-notice');
 
-    if (!swWaiting || swDismissed) {
-        existing?.remove();
+    if (!waitingServiceWorker || isUpdateNoticeDismissed) {
+        if (existingNotice) {
+            existingNotice.remove();
+        }
         return;
     }
 
-    const bar = existing ?? document.createElement('div');
-    bar.className = 'update-notice';
-    bar.setAttribute('role', 'status');
-    bar.setAttribute('aria-label', SW_STRINGS.label);
-    bar.textContent = '';
+    let noticeBar = existingNotice;
+    if (!noticeBar) {
+        noticeBar = document.createElement('div');
+    }
+    noticeBar.className = 'update-notice';
+    noticeBar.setAttribute('role', 'status');
+    noticeBar.setAttribute('aria-label', UPDATE_NOTICE_TEXT.label);
+    noticeBar.textContent = '';
 
-    const inner = document.createElement('div');
-    inner.className = 'update-notice-inner';
+    const noticeInner = document.createElement('div');
+    noticeInner.className = 'update-notice-inner';
 
-    const text = document.createElement('p');
-    text.textContent = SW_STRINGS.ready;
+    const noticeText = document.createElement('p');
+    noticeText.textContent = UPDATE_NOTICE_TEXT.ready;
 
-    const reload = document.createElement('button');
-    reload.type = 'button';
-    reload.className = 'btn btn-primary btn-sm';
-    reload.setAttribute('data-sw-update', '');
-    reload.textContent = SW_STRINGS.reload;
-    reload.addEventListener('click', () => {
+    const reloadButton = document.createElement('button');
+    reloadButton.type = 'button';
+    reloadButton.className = 'btn btn-primary btn-sm';
+    reloadButton.setAttribute('data-sw-update', '');
+    reloadButton.textContent = UPDATE_NOTICE_TEXT.reload;
+    reloadButton.addEventListener('click', () => {
         // The only place anything asks for skipWaiting. The reload happens on
         // controllerchange, not here.
-        swWaiting?.postMessage('skip-waiting');
+        if (waitingServiceWorker) {
+            waitingServiceWorker.postMessage('skip-waiting');
+        }
     });
 
-    const later = document.createElement('button');
-    later.type = 'button';
-    later.className = 'btn btn-ghost btn-sm';
-    later.setAttribute('data-sw-later', '');
-    later.textContent = SW_STRINGS.later;
-    later.addEventListener('click', () => {
-        swDismissed = true;
+    const laterButton = document.createElement('button');
+    laterButton.type = 'button';
+    laterButton.className = 'btn btn-ghost btn-sm';
+    laterButton.setAttribute('data-sw-later', '');
+    laterButton.textContent = UPDATE_NOTICE_TEXT.later;
+    laterButton.addEventListener('click', () => {
+        isUpdateNoticeDismissed = true;
         renderUpdateNotice();
     });
 
-    inner.append(text, reload, later);
-    bar.append(inner);
+    noticeInner.append(noticeText, reloadButton, laterButton);
+    noticeBar.append(noticeInner);
 
-    if (!existing) {
+    if (!existingNotice) {
         // Under the permanent official bar, above the header.
         const officialBar = document.getElementById('officialBar');
-        if (officialBar) officialBar.after(bar);
-        else document.body.prepend(bar);
+        if (officialBar) {
+            officialBar.after(noticeBar);
+        } else {
+            document.body.prepend(noticeBar);
+        }
     }
 }
 
-function watchForSwUpdate() {
-    if (!swRegistration) return;
+// Watches the service worker registration for a new version being installed.
+function watchForServiceWorkerUpdate() {
+    if (!serviceWorkerRegistration) {
+        return;
+    }
 
     // A worker already waiting when the page opened. This is the ordinary
     // case on the second page view after a deploy.
-    if (swRegistration.waiting && navigator.serviceWorker.controller) {
-        swWaiting = swRegistration.waiting;
+    if (serviceWorkerRegistration.waiting && navigator.serviceWorker.controller) {
+        waitingServiceWorker = serviceWorkerRegistration.waiting;
         renderUpdateNotice();
     }
 
-    swRegistration.addEventListener('updatefound', () => {
-        const installing = swRegistration.installing;
-        if (!installing) return;
-        installing.addEventListener('statechange', () => {
+    serviceWorkerRegistration.addEventListener('updatefound', () => {
+        const installingWorker = serviceWorkerRegistration.installing;
+        if (!installingWorker) {
+            return;
+        }
+        installingWorker.addEventListener('statechange', () => {
             // `installed` with a controller present means an update.
             // `installed` with no controller is a first install, which has
             // nothing to prompt about.
-            if (installing.state === 'installed' && navigator.serviceWorker.controller) {
-                swWaiting = swRegistration.waiting ?? installing;
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                waitingServiceWorker = serviceWorkerRegistration.waiting || installingWorker;
                 renderUpdateNotice();
             }
         });
@@ -3281,25 +4451,29 @@ function watchForSwUpdate() {
 }
 
 function registerServiceWorker() {
-    if (!('serviceWorker' in navigator)) return;
+    if (!('serviceWorker' in navigator)) {
+        return;
+    }
 
     navigator.serviceWorker
-        .register(SW_URL)
-        .then(reg => {
-            swRegistration = reg;
-            watchForSwUpdate();
+        .register(SERVICE_WORKER_URL)
+        .then(registration => {
+            serviceWorkerRegistration = registration;
+            watchForServiceWorkerUpdate();
         })
-        .catch(cause => {
+        .catch(registrationError => {
             // A refused registration is not a reason to break the page.
-            console.warn('service worker registration failed:', cause);
+            console.warn('service worker registration failed:', registrationError);
         });
 
     // The swap, once somebody has accepted it. The controller has changed by
     // this point, so the reload is served by the new worker. The flag guards
     // against a second controllerchange starting a reload loop.
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (swReloading) return;
-        swReloading = true;
+        if (isReloadingForUpdate) {
+            return;
+        }
+        isReloadingForUpdate = true;
         window.location.reload();
     });
 }
@@ -3307,24 +4481,36 @@ function registerServiceWorker() {
 // Registration on `load`, not immediately: installing fetches everything the
 // worker precaches, and starting that while the page is still fetching its
 // own assets makes a first visit slower for no gain.
-if (document.readyState === 'complete') registerServiceWorker();
-else window.addEventListener('load', registerServiceWorker, { once: true });
+if (document.readyState === 'complete') {
+    registerServiceWorker();
+} else {
+    window.addEventListener('load', registerServiceWorker, { once: true });
+}
 
 /* ─── API Helper ─── */
+
+/**
+ * Calls one of the site's API endpoints and returns the parsed JSON reply.
+ * The saved session token is sent automatically unless the caller already
+ * set an Authorization header. Network failures never throw; they return
+ * { ok: false, error: 'Network error' } instead.
+ */
 async function apiFetch(url, options = {}) {
-    const token = localStorage.getItem('gftv-token');
-    const headers = {
+    const sessionToken = localStorage.getItem('gftv-token');
+    const requestHeaders = {
         'Content-Type': 'application/json',
         ...options.headers
     };
-    if (token && !headers['Authorization']) headers['Authorization'] = `Bearer ${token}`;
+    if (sessionToken && !requestHeaders['Authorization']) {
+        requestHeaders['Authorization'] = `Bearer ${sessionToken}`;
+    }
     try {
-        const res = await fetch(url, {
+        const httpResponse = await fetch(API_BASE_URL + url, {
             ...options,
-            headers
+            headers: requestHeaders
         });
-        return await res.json();
-    } catch (e) {
+        return await httpResponse.json();
+    } catch (networkError) {
         return {
             ok: false,
             error: 'Network error'
@@ -3332,26 +4518,39 @@ async function apiFetch(url, options = {}) {
     }
 }
 
-/* ─── Event Listeners ─── */
 /* ─── Search ─── */
-async function prefetchSections(docKey) {
-    if (docSectionsCache[docKey]) return;
+
+// Downloads a document's section list into the cache if it is not there yet,
+// so the search can look inside every document.
+async function prefetchSections(documentKey) {
+    if (documentSectionsCache[documentKey]) {
+        return;
+    }
     try {
-        const res = await apiFetch(DOCS[docKey].apiSections);
-        if (res.ok) docSectionsCache[docKey] = res.sections || [];
-    } catch (e) { /* silent */ }
+        const apiResponse = await apiFetch(DOCUMENT_CONFIG[documentKey].apiSections);
+        if (apiResponse.ok) {
+            documentSectionsCache[documentKey] = apiResponse.sections || [];
+        }
+    } catch (fetchError) {
+        // search simply covers fewer documents
+    }
 }
 
 async function openSearch() {
     openModal('search-modal');
-    const input = document.getElementById('search-input');
-    if (input) {
-        input.value = '';
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.value = '';
         renderSearchResults('');
-        input.focus();
+        searchInput.focus();
     }
-    await Promise.all(Object.keys(DOCS).map(prefetchSections));
-    const currentQuery = document.getElementById('search-input')?.value || '';
+    await Promise.all(Object.keys(DOCUMENT_CONFIG).map(prefetchSections));
+    // The reader may have started typing while the documents downloaded
+    let currentQuery = '';
+    const searchInputAfterLoading = document.getElementById('search-input');
+    if (searchInputAfterLoading) {
+        currentQuery = searchInputAfterLoading.value || '';
+    }
     renderSearchResults(currentQuery);
 }
 
@@ -3359,8 +4558,9 @@ function closeSearch() {
     closeModal('search-modal');
 }
 
-function stripMarkdown(md) {
-    return md
+// Removes Markdown symbols so the text can be searched and shown as plain text.
+function stripMarkdown(markdownText) {
+    return markdownText
         .replace(/!\[.*?\]\(.*?\)/g, '')
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
         .replace(/#{1,6}\s/g, '')
@@ -3369,154 +4569,266 @@ function stripMarkdown(md) {
         .trim();
 }
 
-function extractSnippet(text, query, maxLen = 140) {
-    const idx = text.toLowerCase().indexOf(query.toLowerCase());
-    if (idx === -1) return text.slice(0, maxLen) + (text.length > maxLen ? '…' : '');
-    const start = Math.max(0, idx - 40);
-    const end = Math.min(text.length, idx + query.length + 100);
-    return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+/**
+ * Returns a short piece of "text" around the first place "query" appears,
+ * with "…" added where text was cut off. If the query is not found, the
+ * start of the text is returned instead.
+ */
+function extractSnippet(text, query, maximumLength = 140) {
+    const matchIndex = text.toLowerCase().indexOf(query.toLowerCase());
+    if (matchIndex === -1) {
+        let snippet = text.slice(0, maximumLength);
+        if (text.length > maximumLength) {
+            snippet += '…';
+        }
+        return snippet;
+    }
+    const snippetStart = Math.max(0, matchIndex - 40);
+    const snippetEnd = Math.min(text.length, matchIndex + query.length + 100);
+    let snippet = text.slice(snippetStart, snippetEnd);
+    if (snippetStart > 0) {
+        snippet = '…' + snippet;
+    }
+    if (snippetEnd < text.length) {
+        snippet = snippet + '…';
+    }
+    return snippet;
 }
 
+/**
+ * Builds the list of everything the search can find: the main site pages
+ * plus every section of every document that has been loaded.
+ */
 function getSearchIndex() {
-    const items = [
-        { title: 'Home', sub: 'PolicySpot', href: '/', type: 'page', content: '' },
-        ...SITE_PAGES.map(p => ({ title: p.label, sub: 'Page', href: p.href, type: 'page', content: '' })),
+    const searchItems = [
+        { title: 'Home', subtitle: 'PolicySpot', href: '/', type: 'page', content: '' },
     ];
-    for (const [docKey, docSections] of Object.entries(docSectionsCache)) {
-        const doc = DOCS[docKey];
-        docSections.forEach(s => {
-            if (s.type === 'subsection') {
-                const parent = docSections.find(p => p.id === s.parent_id);
-                const parentSlug = parent?.slug || '';
-                items.push({ title: s.title, sub: doc.label, href: `${doc.urlBase}/${parentSlug}#${s.slug || s.id}`, type: 'section', content: s.content || '' });
+    SITE_PAGES.forEach(sitePage => {
+        searchItems.push({ title: sitePage.label, subtitle: 'Page', href: sitePage.href, type: 'page', content: '' });
+    });
+    for (const [documentKey, documentSections] of Object.entries(documentSectionsCache)) {
+        const documentConfig = DOCUMENT_CONFIG[documentKey];
+        documentSections.forEach(section => {
+            if (section.type === 'subsection') {
+                // Subsections live on their parent article's page, under an anchor
+                const parentSection = documentSections.find(candidate => candidate.id === section.parent_id);
+                let parentSlug = '';
+                if (parentSection && parentSection.slug) {
+                    parentSlug = parentSection.slug;
+                }
+                searchItems.push({
+                    title: section.title,
+                    subtitle: documentConfig.label,
+                    href: `${documentConfig.urlBase}/${parentSlug}#${section.slug || section.id}`,
+                    type: 'section',
+                    content: section.content || ''
+                });
             } else {
-                items.push({ title: s.title, sub: doc.label, href: `${doc.urlBase}/${s.slug}`, type: 'section', content: s.content || '' });
+                searchItems.push({
+                    title: section.title,
+                    subtitle: documentConfig.label,
+                    href: `${documentConfig.urlBase}/${section.slug}`,
+                    type: 'section',
+                    content: section.content || ''
+                });
             }
         });
     }
-    return items;
+    return searchItems;
 }
 
 const PAGE_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>`;
 const SECTION_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><line x1="8" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="6" x2="3.01" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="12" x2="3.01" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="18" x2="3.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
 
-function buildResultItem(item, index, query) {
-    const btn = document.createElement('button');
-    btn.className = 'search-result-item';
-    btn.dataset.index = index;
-    let snippet = '';
-    if (query && item.content) {
-        const plain = stripMarkdown(item.content);
-        if (plain.toLowerCase().includes(query.toLowerCase())) {
-            snippet = extractSnippet(plain, query);
+// Builds one clickable search result. A snippet of matching text is shown
+// when the query was found in the item's content.
+function buildResultItem(searchItem, resultIndex, query) {
+    const resultButton = document.createElement('button');
+    resultButton.className = 'search-result-item';
+    resultButton.dataset.index = resultIndex;
+    let snippetHtml = '';
+    if (query && searchItem.content) {
+        const plainText = stripMarkdown(searchItem.content);
+        if (plainText.toLowerCase().includes(query.toLowerCase())) {
+            snippetHtml = `<span class="search-result-snippet">${extractSnippet(plainText, query)}</span>`;
         }
     }
-    btn.innerHTML = `
-        <span class="search-result-icon">${item.type === 'page' ? PAGE_ICON : SECTION_ICON}</span>
+    let iconSvg = SECTION_ICON;
+    if (searchItem.type === 'page') {
+        iconSvg = PAGE_ICON;
+    }
+    resultButton.innerHTML = `
+        <span class="search-result-icon">${iconSvg}</span>
         <span class="search-result-text">
-            <span class="search-result-title">${item.title}</span>
-            <span class="search-result-sub">${item.sub}</span>
-            ${snippet ? `<span class="search-result-snippet">${snippet}</span>` : ''}
+            <span class="search-result-title">${searchItem.title}</span>
+            <span class="search-result-sub">${searchItem.subtitle}</span>
+            ${snippetHtml}
         </span>`;
-    btn.addEventListener('click', () => { closeSearch(); navigate(item.href); });
-    return btn;
+    resultButton.addEventListener('click', () => {
+        closeSearch();
+        navigate(searchItem.href);
+    });
+    return resultButton;
 }
 
+/**
+ * Shows the search results for "query": up to 12 items whose title,
+ * document name or content contain the query. With an empty query, the
+ * main site pages are listed instead.
+ */
 function renderSearchResults(query) {
-    const container = document.getElementById('search-results');
-    if (!container) return;
-    const q = query.trim().toLowerCase();
-    const index = getSearchIndex();
-    const results = q
-        ? index.filter(i =>
-            i.title.toLowerCase().includes(q) ||
-            i.sub.toLowerCase().includes(q) ||
-            (i.content && stripMarkdown(i.content).toLowerCase().includes(q))
-          ).slice(0, 12)
-        : index.filter(i => i.type === 'page');
-    container.innerHTML = '';
-    if (q && !results.length) {
-        container.innerHTML = `<div class="search-empty">No results for "<strong>${query}</strong>"</div>`;
+    const resultsContainer = document.getElementById('search-results');
+    if (!resultsContainer) {
         return;
     }
-    results.forEach((item, i) => container.appendChild(buildResultItem(item, i, query.trim())));
+    const normalisedQuery = query.trim().toLowerCase();
+    const searchIndex = getSearchIndex();
+    let results = [];
+    if (normalisedQuery) {
+        results = searchIndex.filter(searchItem => {
+            if (searchItem.title.toLowerCase().includes(normalisedQuery)) {
+                return true;
+            }
+            if (searchItem.subtitle.toLowerCase().includes(normalisedQuery)) {
+                return true;
+            }
+            if (searchItem.content && stripMarkdown(searchItem.content).toLowerCase().includes(normalisedQuery)) {
+                return true;
+            }
+            return false;
+        }).slice(0, 12);
+    } else {
+        results = searchIndex.filter(searchItem => searchItem.type === 'page');
+    }
+    resultsContainer.innerHTML = '';
+    if (normalisedQuery && !results.length) {
+        resultsContainer.innerHTML = `<div class="search-empty">No results for "<strong>${escapeHtmlCharacters(query)}</strong>"</div>`;
+        return;
+    }
+    results.forEach((searchItem, resultIndex) => {
+        resultsContainer.appendChild(buildResultItem(searchItem, resultIndex, query.trim()));
+    });
 }
 
+// Moves the keyboard highlight to the search result at "highlightIndex".
+function highlightSearchResult(resultItems, highlightIndex) {
+    resultItems.forEach((resultItem, itemIndex) => {
+        resultItem.classList.toggle('focused', itemIndex === highlightIndex);
+    });
+    const highlightedItem = resultItems[highlightIndex];
+    if (highlightedItem) {
+        highlightedItem.scrollIntoView({ block: 'nearest' });
+    }
+}
+
+// Where each header link (by its data-page value) goes.
+const NAV_LINK_DESTINATIONS = {
+    home: '/',
+    charter: '/the-charter',
+    news: '/news',
+    prs: '/prs',
+    rules: '/rules',
+    join: '/join-us',
+    about: '/about',
+};
+
+/**
+ * Connects all of the page's fixed buttons and links once the page has
+ * loaded: theme picker, search, sidebar, header navigation, home page cards
+ * and the copy toolbar.
+ */
 function setupEventListeners() {
-    document.getElementById('theme-btn')?.addEventListener('click', () => openModal('theme-modal'));
+    addListenerIfPresent('theme-btn', 'click', () => openModal('theme-modal'));
 
     // Delegated theme pickers, modal stays open so combinations can be tried
-    document.getElementById('theme-grid')?.addEventListener('click', e => {
-        const swatch = e.target.closest('.theme-swatch');
-        if (swatch) applyColorTheme(swatch.dataset.colorTheme);
+    addListenerIfPresent('theme-grid', 'click', clickEvent => {
+        const swatch = clickEvent.target.closest('.theme-swatch');
+        if (swatch) {
+            applyColorTheme(swatch.dataset.colorTheme);
+        }
     });
-    document.getElementById('mode-toggle')?.addEventListener('click', e => {
-        const btn = e.target.closest('.mode-btn');
-        if (btn) applyMode(btn.dataset.mode);
-    });
-
-    document.getElementById('search-btn')?.addEventListener('click', openSearch);
-    document.getElementById('sidebar-search-btn')?.addEventListener('click', () => { closeSidebar(); openSearch(); });
-    document.getElementById('menu-btn')?.addEventListener('click', toggleSidebar);
-    document.getElementById('sidebar-close')?.addEventListener('click', closeSidebar);
-    document.getElementById('sidebar-overlay')?.addEventListener('click', closeSidebar);
-    document.getElementById('login-btn')?.addEventListener('click', () => openModal('auth-modal'));
-
-    document.getElementById('search-input')?.addEventListener('input', e => renderSearchResults(e.target.value));
-    document.getElementById('search-input')?.addEventListener('keydown', e => {
-        const items = document.querySelectorAll('.search-result-item');
-        const focused = document.querySelector('.search-result-item.focused');
-        let idx = focused ? parseInt(focused.dataset.index) : -1;
-        if (e.key === 'Escape') { closeSearch(); return; }
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            idx = Math.min(idx + 1, items.length - 1);
-            items.forEach((item, i) => item.classList.toggle('focused', i === idx));
-            items[idx]?.scrollIntoView({ block: 'nearest' });
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            idx = Math.max(idx - 1, 0);
-            items.forEach((item, i) => item.classList.toggle('focused', i === idx));
-            items[idx]?.scrollIntoView({ block: 'nearest' });
-        } else if (e.key === 'Enter') {
-            document.querySelector('.search-result-item.focused')?.click();
+    addListenerIfPresent('mode-toggle', 'click', clickEvent => {
+        const modeButton = clickEvent.target.closest('.mode-btn');
+        if (modeButton) {
+            applyMode(modeButton.dataset.mode);
         }
     });
 
-    document.querySelectorAll('.nav-link').forEach(l => {
-        l.addEventListener('click', e => {
-            e.preventDefault();
-            const p = l.dataset.page;
-            if (p === 'home') navigate('/');
-            else if (p === 'charter') navigate('/the-charter');
-            else if (p === 'news') navigate('/news');
-            else if (p === 'prs') navigate('/prs');
-            else if (p === 'rules') navigate('/rules');
-            else if (p === 'join') navigate('/join-us');
-            else if (p === 'about') navigate('/about');
+    addListenerIfPresent('search-btn', 'click', openSearch);
+    addListenerIfPresent('sidebar-search-btn', 'click', () => {
+        closeSidebar();
+        openSearch();
+    });
+    addListenerIfPresent('menu-btn', 'click', toggleSidebar);
+    addListenerIfPresent('sidebar-close', 'click', closeSidebar);
+    addListenerIfPresent('sidebar-overlay', 'click', closeSidebar);
+    addListenerIfPresent('login-btn', 'click', () => openModal('auth-modal'));
+
+    addListenerIfPresent('search-input', 'input', inputEvent => renderSearchResults(inputEvent.target.value));
+
+    // Arrow keys move through the results, Enter opens one, Escape closes the search
+    addListenerIfPresent('search-input', 'keydown', keyboardEvent => {
+        const resultItems = document.querySelectorAll('.search-result-item');
+        const focusedItem = document.querySelector('.search-result-item.focused');
+        let highlightIndex = -1;
+        if (focusedItem) {
+            highlightIndex = parseInt(focusedItem.dataset.index);
+        }
+        if (keyboardEvent.key === 'Escape') {
+            closeSearch();
+            return;
+        }
+        if (keyboardEvent.key === 'ArrowDown') {
+            keyboardEvent.preventDefault();
+            highlightIndex = Math.min(highlightIndex + 1, resultItems.length - 1);
+            highlightSearchResult(resultItems, highlightIndex);
+        } else if (keyboardEvent.key === 'ArrowUp') {
+            keyboardEvent.preventDefault();
+            highlightIndex = Math.max(highlightIndex - 1, 0);
+            highlightSearchResult(resultItems, highlightIndex);
+        } else if (keyboardEvent.key === 'Enter') {
+            const highlightedItem = document.querySelector('.search-result-item.focused');
+            if (highlightedItem) {
+                highlightedItem.click();
+            }
+        }
+    });
+
+    document.querySelectorAll('.nav-link').forEach(navLink => {
+        navLink.addEventListener('click', clickEvent => {
+            clickEvent.preventDefault();
+            const destinationPath = NAV_LINK_DESTINATIONS[navLink.dataset.page];
+            if (destinationPath) {
+                navigate(destinationPath);
+            }
         });
     });
 
     // Hero / static links with data-navlink
-    document.querySelectorAll('[data-navlink]').forEach(el => {
-        el.addEventListener('click', e => {
-            const href = el.getAttribute('href');
-            if (href && href.startsWith('/')) {
-                e.preventDefault();
-                navigate(href);
+    document.querySelectorAll('[data-navlink]').forEach(navigationLink => {
+        navigationLink.addEventListener('click', clickEvent => {
+            const linkHref = navigationLink.getAttribute('href');
+            if (linkHref && linkHref.startsWith('/')) {
+                clickEvent.preventDefault();
+                navigate(linkHref);
             }
         });
     });
 
     // Home page document cards
-    document.querySelectorAll('.home-doc-card').forEach(card => {
-        const fn = () => navigate(card.dataset.href);
-        card.addEventListener('click', fn);
-        card.addEventListener('keydown', e => e.key === 'Enter' && fn());
+    document.querySelectorAll('.home-doc-card').forEach(documentCard => {
+        const openCard = () => navigate(documentCard.dataset.href);
+        documentCard.addEventListener('click', openCard);
+        documentCard.addEventListener('keydown', keyboardEvent => {
+            if (keyboardEvent.key === 'Enter') {
+                openCard();
+            }
+        });
     });
 
     setupCopyDropdown();
 }
 
 /* ─── PWA ─── */
-// SW is registered and the controllerchange reload listener is set up in index.html.
+// The service worker is registered, and the controllerchange reload listener
+// is set up, in registerServiceWorker() above.

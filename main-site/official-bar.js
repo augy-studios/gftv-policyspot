@@ -6,37 +6,50 @@
 // again. Shared by every page on the site, so it stays out of script.js.
 (function () {
     var STORAGE_KEY = 'gftv-policyspot.officialBar';
-    var DURATION = 220; // matches the CSS transition, with a little slack
+    var ANIMATION_DURATION_IN_MILLISECONDS = 220; // matches the CSS transition, with a little slack
 
-    var toggle = document.getElementById('officialBarToggle');
+    var toggleButton = document.getElementById('officialBarToggle');
     var panel = document.getElementById('officialBarPanel');
-    if (!toggle || !panel) return;
+    if (!toggleButton || !panel) {
+        return;
+    }
 
     var closeTimer = null;
 
-    function remember(open) {
+    // Saves whether the panel is open so it can be restored on the next visit.
+    function rememberOpenState(isOpen) {
         try {
-            if (open) localStorage.setItem(STORAGE_KEY, 'open');
-            else localStorage.removeItem(STORAGE_KEY);
-        } catch (e) {
+            if (isOpen) {
+                localStorage.setItem(STORAGE_KEY, 'open');
+            } else {
+                localStorage.removeItem(STORAGE_KEY);
+            }
+        } catch (storageError) {
             // storage blocked, the bar still works for this page view
         }
     }
 
-    function setOpen(open, animate) {
+    // Opens or closes the panel, with or without the sliding animation.
+    function setOpen(isOpen, shouldAnimate) {
         if (closeTimer !== null) {
             clearTimeout(closeTimer);
             closeTimer = null;
         }
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (isOpen) {
+            toggleButton.setAttribute('aria-expanded', 'true');
+        } else {
+            toggleButton.setAttribute('aria-expanded', 'false');
+        }
 
-        if (open) {
+        if (isOpen) {
             panel.hidden = false;
-            if (animate) {
+            if (shouldAnimate) {
                 // Two frames so the collapsed row height is painted before
                 // the transition to the open one starts.
                 requestAnimationFrame(function () {
-                    requestAnimationFrame(function () { panel.classList.add('open'); });
+                    requestAnimationFrame(function () {
+                        panel.classList.add('open');
+                    });
                 });
             } else {
                 panel.classList.add('open');
@@ -45,25 +58,29 @@
         }
 
         panel.classList.remove('open');
-        if (animate) {
+        if (shouldAnimate) {
             // `hidden` lands after the row has collapsed, so the panel leaves
             // the accessibility tree rather than merely going invisible.
             closeTimer = setTimeout(function () {
                 closeTimer = null;
                 panel.hidden = true;
-            }, DURATION + 40);
+            }, ANIMATION_DURATION_IN_MILLISECONDS + 40);
         } else {
             panel.hidden = true;
         }
     }
 
-    var remembered = false;
-    try { remembered = localStorage.getItem(STORAGE_KEY) === 'open'; } catch (e) { }
-    setOpen(remembered, false);
+    var wasOpenLastTime = false;
+    try {
+        wasOpenLastTime = localStorage.getItem(STORAGE_KEY) === 'open';
+    } catch (storageError) {
+        // storage blocked, start with the panel closed
+    }
+    setOpen(wasOpenLastTime, false);
 
-    toggle.addEventListener('click', function () {
-        var open = toggle.getAttribute('aria-expanded') !== 'true';
-        setOpen(open, true);
-        remember(open);
+    toggleButton.addEventListener('click', function () {
+        var shouldOpen = toggleButton.getAttribute('aria-expanded') !== 'true';
+        setOpen(shouldOpen, true);
+        rememberOpenState(shouldOpen);
     });
 })();

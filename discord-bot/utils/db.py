@@ -1,3 +1,5 @@
+"""Supabase database helpers for the Discord bot."""
+
 import logging
 from collections import Counter
 
@@ -5,11 +7,12 @@ from supabase import acreate_client, AsyncClient
 
 import config
 
-log = logging.getLogger('policyspot.db')
+logger = logging.getLogger('policyspot.db')
 
 _client: AsyncClient | None = None
 
-DOC_TABLES: dict[str, str] = {
+# Short document name → database table
+DOCUMENT_TABLES: dict[str, str] = {
     'charter': 'gftvpolicy_charter',
     'news':    'gftvpolicy_news',
     'prs':     'gftvpolicy_prs',
@@ -18,7 +21,8 @@ DOC_TABLES: dict[str, str] = {
     'legal':   'gftvpolicy_legal',
 }
 
-DOC_DISPLAY: dict[str, str] = {
+# Short document name → name shown to users
+DOCUMENT_DISPLAY_NAMES: dict[str, str] = {
     'charter': 'Charter',
     'news':    'News Standards',
     'prs':     'Programme Rating System',
@@ -29,83 +33,98 @@ DOC_DISPLAY: dict[str, str] = {
 
 
 async def get_client() -> AsyncClient:
+    """Return the shared Supabase client, creating it the first time."""
     global _client
     if _client is None:
         _client = await acreate_client(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY)
     return _client
 
 
-async def fetch_sections(doc: str) -> list[dict]:
+async def fetch_sections(document: str) -> list[dict]:
+    """Return every published section of a document, in document order."""
     client = await get_client()
-    r = await (
-        client.table(DOC_TABLES[doc])
+    response = await (
+        client.table(DOCUMENT_TABLES[document])
         .select('id,slug,title,type,number,anchor,parent_id,order_index,content,updated_at')
         .eq('is_published', True)
         .order('order_index')
         .execute()
     )
-    return r.data
+    return response.data
 
 
-async def fetch_section_by_slug(doc: str, slug: str) -> dict | None:
+async def fetch_section_by_slug(document: str, slug: str) -> dict | None:
+    """Return one published section by its slug, or None if there is none."""
     client = await get_client()
-    r = await (
-        client.table(DOC_TABLES[doc])
+    response = await (
+        client.table(DOCUMENT_TABLES[document])
         .select('*')
         .eq('is_published', True)
         .eq('slug', slug)
         .maybe_single()
         .execute()
     )
-    return r.data
+    return response.data
 
 
-async def search_sections(query: str, doc: str | None = None) -> list[tuple[str, dict]]:
+async def search_sections(query: str, document: str | None = None) -> list[tuple[str, dict]]:
+    """Find sections whose title or content contains the query (case-insensitive).
+
+    Searches one document, or all of them when "document" is None.
+    Returns a list of (document_name, section) pairs without duplicates."""
     client = await get_client()
-    docs = [doc] if doc else list(DOC_TABLES)
+    if document:
+        documents_to_search = [document]
+    else:
+        documents_to_search = list(DOCUMENT_TABLES)
     results: list[tuple[str, dict]] = []
-    seen: set[str] = set()
+    already_found: set[str] = set()
 
-    for d in docs:
-        table = DOC_TABLES[d]
-        for field in ('title', 'content'):
-            r = await (
-                client.table(table)
+    for document_name in documents_to_search:
+        table_name = DOCUMENT_TABLES[document_name]
+        for field_name in ('title', 'content'):
+            response = await (
+                client.table(table_name)
                 .select('id,slug,title,type,number,content')
                 .eq('is_published', True)
-                .ilike(field, f'%{query}%')
+                .ilike(field_name, f'%{query}%')
                 .execute()
             )
-            for item in r.data:
-                key = f'{d}:{item["id"]}'
-                if key not in seen:
-                    seen.add(key)
-                    results.append((d, item))
+            for section in response.data:
+                unique_key = f'{document_name}:{section["id"]}'
+                if unique_key not in already_found:
+                    already_found.add(unique_key)
+                    results.append((document_name, section))
 
     return results
 
 
-async def fetch_view_counts(doc: str | None = None) -> dict[str, int]:
+async def fetch_view_counts(document: str | None = None) -> dict[str, int]:
+    """Return {section_id: number of recorded visits}, optionally for one document."""
     client = await get_client()
-    query = client.table('gftvpolicy_pagevisits').select('section_id')
-    if doc:
-        query = query.eq('doc', doc)
-    r = await query.execute()
-    return dict(Counter(row['section_id'] for row in r.data))
+    visits_query = client.table('gftvpolicy_pagevisits').select('section_id')
+    if document:
+        visits_query = visits_query.eq('doc', document)
+    response = await visits_query.execute()
+    visit_counter = Counter()
+    for row in response.data:
+        visit_counter[row['section_id']] += 1
+    return dict(visit_counter)
 
 
-async def record_view(section_id: str, doc: str, slug: str) -> None:
+async def record_view(section_id: str, document: str, slug: str) -> None:
+    """Record one visit to a section. Failures are logged and otherwise ignored."""
     try:
         client = await get_client()
         await (
             client.table('gftvpolicy_pagevisits')
             .insert({
                 'section_id': section_id,
-                'doc': doc,
+                'doc': document,
                 'slug': slug,
                 'device_type': 'Others',
             })
             .execute()
         )
-    except Exception as exc:
-        log.warning('Failed to record view for %s/%s: %s', doc, slug, exc)
+    except Exception as error:
+        logger.warning('Failed to record view for %s/%s: %s', document, slug, error)

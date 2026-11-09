@@ -10,21 +10,22 @@ from telegramify_markdown import richify
 
 from config import TELEGRAM_BOT_TOKEN
 
-_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
-_TIMEOUT = 30
+_BOT_API_BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
+_REQUEST_TIMEOUT_SECONDS = 30
 
 
-def _reply_markup(buttons: list | None) -> dict | None:
-    """Convert kb_*()-style rows of Telethon Button.inline(...) objects into
-    the inline_keyboard JSON the raw Bot API expects."""
+def _build_reply_markup(buttons: list | None) -> dict | None:
+    """Convert build_*_keyboard()-style rows of Telethon Button.inline(...)
+    objects into the inline_keyboard JSON the raw Bot API expects."""
     if not buttons:
         return None
-    return {
-        "inline_keyboard": [
-            [{"text": btn.text, "callback_data": btn.data.decode()} for btn in row]
-            for row in buttons
-        ]
-    }
+    keyboard_rows = []
+    for button_row in buttons:
+        json_row = []
+        for button in button_row:
+            json_row.append({"text": button.text, "callback_data": button.data.decode()})
+        keyboard_rows.append(json_row)
+    return {"inline_keyboard": keyboard_rows}
 
 
 async def send_rich_article(chat_id: int, markdown: str, buttons: list | None = None) -> int:
@@ -33,14 +34,14 @@ async def send_rich_article(chat_id: int, markdown: str, buttons: list | None = 
         "chat_id": chat_id,
         "rich_message": richify(markdown).to_dict(),
     }
-    reply_markup = _reply_markup(buttons)
+    reply_markup = _build_reply_markup(buttons)
     if reply_markup:
         payload["reply_markup"] = reply_markup
 
-    async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-        resp = await client.post(f"{_API}/sendRichMessage", json=payload)
-        resp.raise_for_status()
-        return resp.json()["result"]["message_id"]
+    async with httpx.AsyncClient(timeout=_REQUEST_TIMEOUT_SECONDS) as http_client:
+        response = await http_client.post(f"{_BOT_API_BASE_URL}/sendRichMessage", json=payload)
+        response.raise_for_status()
+        return response.json()["result"]["message_id"]
 
 
 async def edit_rich_article(chat_id: int, message_id: int, markdown: str, buttons: list | None = None) -> None:
@@ -50,10 +51,10 @@ async def edit_rich_article(chat_id: int, message_id: int, markdown: str, button
         "message_id": message_id,
         "rich_message": richify(markdown).to_dict(),
     }
-    reply_markup = _reply_markup(buttons)
+    reply_markup = _build_reply_markup(buttons)
     if reply_markup:
         payload["reply_markup"] = reply_markup
 
-    async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-        resp = await client.post(f"{_API}/editMessageText", json=payload)
-        resp.raise_for_status()
+    async with httpx.AsyncClient(timeout=_REQUEST_TIMEOUT_SECONDS) as http_client:
+        response = await http_client.post(f"{_BOT_API_BASE_URL}/editMessageText", json=payload)
+        response.raise_for_status()

@@ -1,23 +1,29 @@
-// api/auth/logout.js
+// api/auth/logout.js - Signs the user out by deleting their session token.
 const {
     getSupabaseClient
 } = require('../../lib/supabase');
 const {
-    ok,
-    err,
+    sendSuccess,
+    sendError,
     handleOptions
 } = require('../../lib/response');
 
-module.exports = async (req, res) => {
-    if (handleOptions(req, res)) return;
-    if (req.method !== 'POST') return err(res, 'Method not allowed', 405);
-    const authHeader = req.headers['authorization'];
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.slice(7);
-        const supabase = getSupabaseClient();
-        await supabase.from('gftvhello_sessions').delete().eq('token', token);
+const BEARER_PREFIX = 'Bearer ';
+
+module.exports = async (request, response) => {
+    if (handleOptions(request, response)) {
+        return;
     }
-    return ok(res, {
+    if (request.method !== 'POST') {
+        return sendError(response, 'Method not allowed', 405);
+    }
+    const authorizationHeader = request.headers['authorization'];
+    if (authorizationHeader && authorizationHeader.startsWith(BEARER_PREFIX)) {
+        const sessionToken = authorizationHeader.slice(BEARER_PREFIX.length);
+        const supabase = getSupabaseClient();
+        await supabase.from('gftvhello_sessions').delete().eq('token', sessionToken);
+    }
+    return sendSuccess(response, {
         message: 'Logged out'
     });
 };

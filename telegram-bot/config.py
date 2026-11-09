@@ -1,3 +1,5 @@
+"""Settings for the bot, read from environment variables (or a .env file)."""
+
 import os
 from dotenv import load_dotenv
 
@@ -10,5 +12,6 @@ TELEGRAM_BOT_TOKEN: str = os.environ["TELEGRAM_BOT_TOKEN"]
 SUPABASE_URL: str = os.environ["SUPABASE_URL"]
 SUPABASE_SERVICE_KEY: str = os.environ["SUPABASE_SERVICE_KEY"]
 
-# Seconds before cached Supabase data is re-fetched
-CACHE_TTL: int = int(os.getenv("CACHE_TTL", "300"))
+# Seconds before cached Supabase data is re-fetched ("time to live").
+# The environment variable keeps its short name so existing .env files still work.
+CACHE_TIME_TO_LIVE_SECONDS: int = int(os.getenv("CACHE_TTL", "300"))

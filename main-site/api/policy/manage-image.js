@@ -2,45 +2,70 @@
 // Note: PATCH (description update) requires a `description TEXT` column in gftvpolicy_images.
 const { getSupabaseClient } = require('../../lib/supabase');
 const { validateSession }   = require('../../lib/auth');
-const { ok, err, handleOptions } = require('../../lib/response');
+const { sendSuccess, sendError, handleOptions } = require('../../lib/response');
 
-module.exports = async (req, res) => {
-    if (handleOptions(req, res)) return;
-    const user = await validateSession(req);
-    if (!user)          return err(res, 'Unauthorized', 401);
-    if (!user.is_admin) return err(res, 'Forbidden', 403);
+module.exports = async (request, response) => {
+    if (handleOptions(request, response)) {
+        return;
+    }
+    const user = await validateSession(request);
+    if (!user) {
+        return sendError(response, 'Unauthorized', 401);
+    }
+    if (!user.is_admin) {
+        return sendError(response, 'Forbidden', 403);
+    }
 
     const supabase = getSupabaseClient();
-    const id = req.query?.id || req.body?.id;
-    if (!id) return err(res, 'Image id required');
+    // The id may be sent either in the URL query string or in the JSON body
+    let imageId = null;
+    if (request.query && request.query.id) {
+        imageId = request.query.id;
+    } else if (request.body && request.body.id) {
+        imageId = request.body.id;
+    }
+    if (!imageId) {
+        return sendError(response, 'Image id required');
+    }
 
-    if (req.method === 'DELETE') {
-        const { data: img, error: fetchErr } = await supabase
+    if (request.method === 'DELETE') {
+        const { data: imageRecord, error: fetchError } = await supabase
             .from('gftvpolicy_images')
             .select('storage_path')
-            .eq('id', id)
+            .eq('id', imageId)
             .single();
-        if (fetchErr || !img) return err(res, 'Image not found', 404);
+        if (fetchError || !imageRecord) {
+            return sendError(response, 'Image not found', 404);
+        }
 
-        await supabase.storage.from('policy-images').remove([img.storage_path]);
+        await supabase.storage.from('policy-images').remove([imageRecord.storage_path]);
 
-        const { error: delErr } = await supabase
+        const { error: deleteError } = await supabase
             .from('gftvpolicy_images')
             .delete()
-            .eq('id', id);
-        if (delErr) return err(res, 'Failed to delete image record');
-        return ok(res, { deleted: true });
+            .eq('id', imageId);
+        if (deleteError) {
+            return sendError(response, 'Failed to delete image record');
+        }
+        return sendSuccess(response, { deleted: true });
     }
 
-    if (req.method === 'PATCH') {
-        const { description } = req.body || {};
-        const { error: updErr } = await supabase
+    if (request.method === 'PATCH') {
+        const { description } = request.body || {};
+        // A missing description (null or undefined) clears the stored value
+        let newDescription = description;
+        if (description === undefined || description === null) {
+            newDescription = null;
+        }
+        const { error: updateError } = await supabase
             .from('gftvpolicy_images')
-            .update({ description: description ?? null })
-            .eq('id', id);
-        if (updErr) return err(res, 'Failed to update description');
-        return ok(res, { updated: true });
+            .update({ description: newDescription })
+            .eq('id', imageId);
+        if (updateError) {
+            return sendError(response, 'Failed to update description');
+        }
+        return sendSuccess(response, { updated: true });
     }
 
-    return err(res, 'Method not allowed', 405);
+    return sendError(response, 'Method not allowed', 405);
 };

@@ -1,10 +1,13 @@
+"""GFTV PolicySpot Discord bot: start-up, slash-command syncing and
+restoring the interactive messages that were open before a restart."""
+
 import logging
 
 import discord
 from discord.ext import commands
 
 import config
-import utils.db as db
+import utils.db as database
 import utils.view_store as view_store
 
 logging.basicConfig(
@@ -12,7 +15,7 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)s %(name)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
-log = logging.getLogger('policyspot')
+logger = logging.getLogger('policyspot')
 
 
 class PolicySpotBot(commands.Bot):
@@ -21,6 +24,7 @@ class PolicySpotBot(commands.Bot):
         super().__init__(command_prefix=commands.when_mentioned, intents=intents)
 
     async def setup_hook(self) -> None:
+        """Runs once before the bot connects: load commands, restore views, sync commands."""
         await view_store.init_db()
         await self.load_extension('cogs.policy')
         await self.load_extension('cogs.help_cog')
@@ -29,57 +33,60 @@ class PolicySpotBot(commands.Bot):
             guild = discord.Object(id=config.GUILD_ID)
             self.tree.copy_global_to(guild=guild)
             await self.tree.sync(guild=guild)
-            log.info('Slash commands synced to guild %s', config.GUILD_ID)
+            logger.info('Slash commands synced to guild %s', config.GUILD_ID)
         await self.tree.sync()
-        log.info('Slash commands synced globally (may take up to 1 hour)')
+        logger.info('Slash commands synced globally (may take up to 1 hour)')
 
     async def _restore_views(self) -> None:
+        """Re-attach the buttons and menus of interactive messages sent before
+        the last restart, using the states saved in view_store. Saved states
+        whose sections no longer exist are deleted."""
         from cogs.policy import PolicyBrowser, SearchResultsView, SectionContentView
 
-        entries = await view_store.load_all()
-        restored = 0
-        stale: list[int] = []
+        saved_views = await view_store.load_all()
+        restored_count = 0
+        stale_message_ids: list[int] = []
 
-        for message_id, view_type, state in entries:
+        for message_id, view_type, state in saved_views:
             try:
                 view: discord.ui.View | None = None
 
                 if view_type == 'PolicyBrowser':
-                    sections = await db.fetch_sections(state['doc'])
+                    sections = await database.fetch_sections(state['doc'])
                     if sections:
                         view = PolicyBrowser.from_state(state, sections)
 
                 elif view_type == 'SectionContentView':
-                    section = await db.fetch_section_by_slug(state['doc'], state['slug'])
+                    section = await database.fetch_section_by_slug(state['doc'], state['slug'])
                     if section:
                         view = SectionContentView.from_state(state, section)
 
                 elif view_type == 'SearchResultsView':
                     results: list[tuple[str, dict]] = []
-                    for doc, slug in state['results']:
-                        sec = await db.fetch_section_by_slug(doc, slug)
-                        if sec:
-                            results.append((doc, sec))
+                    for document_name, slug in state['results']:
+                        found_section = await database.fetch_section_by_slug(document_name, slug)
+                        if found_section:
+                            results.append((document_name, found_section))
                     if results:
                         view = SearchResultsView.from_state(state, results)
 
                 if view is not None:
                     self.add_view(view, message_id=message_id)
-                    restored += 1
+                    restored_count += 1
                 else:
-                    stale.append(message_id)
+                    stale_message_ids.append(message_id)
             except Exception:
-                log.exception('Failed to restore view for message %s', message_id)
-                stale.append(message_id)
+                logger.exception('Failed to restore view for message %s', message_id)
+                stale_message_ids.append(message_id)
 
-        for message_id in stale:
+        for message_id in stale_message_ids:
             await view_store.delete(message_id)
 
-        log.info('Restored %d persistent view(s); pruned %d stale.', restored, len(stale))
+        logger.info('Restored %d persistent view(s); pruned %d stale.', restored_count, len(stale_message_ids))
 
     async def on_ready(self) -> None:
         assert self.user is not None
-        log.info('Logged in as %s (ID: %s)', self.user, self.user.id)
+        logger.info('Logged in as %s (ID: %s)', self.user, self.user.id)
         guild_count = len(self.guilds)
         await self.change_presence(
             status=discord.Status.online,

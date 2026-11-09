@@ -1,32 +1,53 @@
+// api/policy/manage-sound.js - Delete an uploaded sound from storage and from the catalogue table (admin only)
 const { getSupabaseClient } = require('../../lib/supabase');
 const { validateSession }   = require('../../lib/auth');
-const { ok, err, handleOptions } = require('../../lib/response');
+const { sendSuccess, sendError, handleOptions } = require('../../lib/response');
 
-module.exports = async (req, res) => {
-    if (handleOptions(req, res)) return;
-    if (req.method !== 'DELETE') return err(res, 'Method not allowed', 405);
+module.exports = async (request, response) => {
+    if (handleOptions(request, response)) {
+        return;
+    }
+    if (request.method !== 'DELETE') {
+        return sendError(response, 'Method not allowed', 405);
+    }
 
-    const user = await validateSession(req);
-    if (!user)          return err(res, 'Unauthorized', 401);
-    if (!user.is_admin) return err(res, 'Forbidden', 403);
+    const user = await validateSession(request);
+    if (!user) {
+        return sendError(response, 'Unauthorized', 401);
+    }
+    if (!user.is_admin) {
+        return sendError(response, 'Forbidden', 403);
+    }
 
     const supabase = getSupabaseClient();
-    const id = req.query?.id || req.body?.id;
-    if (!id) return err(res, 'Sound id required');
+    // The id may be sent either in the URL query string or in the JSON body
+    let soundId = null;
+    if (request.query && request.query.id) {
+        soundId = request.query.id;
+    } else if (request.body && request.body.id) {
+        soundId = request.body.id;
+    }
+    if (!soundId) {
+        return sendError(response, 'Sound id required');
+    }
 
-    const { data: snd, error: fetchErr } = await supabase
+    const { data: soundRecord, error: fetchError } = await supabase
         .from('gftvpolicy_sounds')
         .select('storage_path')
-        .eq('id', id)
+        .eq('id', soundId)
         .single();
-    if (fetchErr || !snd) return err(res, 'Sound not found', 404);
+    if (fetchError || !soundRecord) {
+        return sendError(response, 'Sound not found', 404);
+    }
 
-    await supabase.storage.from('policy-sounds').remove([snd.storage_path]);
+    await supabase.storage.from('policy-sounds').remove([soundRecord.storage_path]);
 
-    const { error: delErr } = await supabase
+    const { error: deleteError } = await supabase
         .from('gftvpolicy_sounds')
         .delete()
-        .eq('id', id);
-    if (delErr) return err(res, 'Failed to delete sound record');
-    return ok(res, { deleted: true });
+        .eq('id', soundId);
+    if (deleteError) {
+        return sendError(response, 'Failed to delete sound record');
+    }
+    return sendSuccess(response, { deleted: true });
 };

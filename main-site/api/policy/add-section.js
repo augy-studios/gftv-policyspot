@@ -1,8 +1,9 @@
 // api/policy/add-section.js - Create a new section or subsection (admin only)
 const { getSupabaseClient } = require('../../lib/supabase');
 const { validateSession } = require('../../lib/auth');
-const { ok, err, handleOptions } = require('../../lib/response');
+const { sendSuccess, sendError, handleOptions } = require('../../lib/response');
 
+// Maps the short document name used by the website to its database table.
 const TABLE_MAP = {
     charter: 'gftvpolicy_charter',
     news:    'gftvpolicy_news',
@@ -12,41 +13,66 @@ const TABLE_MAP = {
     legal:   'gftvpolicy_legal',
 };
 
-module.exports = async (req, res) => {
-    if (handleOptions(req, res)) return;
-    if (req.method !== 'POST') return err(res, 'Method not allowed', 405);
-    const user = await validateSession(req);
-    if (!user) return err(res, 'Unauthorized', 401);
-    if (!user.is_admin) return err(res, 'Forbidden', 403);
+module.exports = async (request, response) => {
+    if (handleOptions(request, response)) {
+        return;
+    }
+    if (request.method !== 'POST') {
+        return sendError(response, 'Method not allowed', 405);
+    }
+    const user = await validateSession(request);
+    if (!user) {
+        return sendError(response, 'Unauthorized', 401);
+    }
+    if (!user.is_admin) {
+        return sendError(response, 'Forbidden', 403);
+    }
 
-    const { table, title, slug, content, type, parent_id, number, anchor } = req.body || {};
-    if (!table || !title || !slug || !type) return err(res, 'table, title, slug, and type are required');
+    const {
+        table,
+        title,
+        slug,
+        content,
+        type,
+        parent_id: parentId,
+        number,
+        anchor
+    } = request.body || {};
+    if (!table || !title || !slug || !type) {
+        return sendError(response, 'table, title, slug, and type are required');
+    }
 
     const tableName = TABLE_MAP[table];
-    if (!tableName) return err(res, 'Invalid table');
-    if (!/^[a-z0-9-]+$/.test(slug)) return err(res, 'Slug must be lowercase alphanumeric with hyphens only');
+    if (!tableName) {
+        return sendError(response, 'Invalid table');
+    }
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+        return sendError(response, 'Slug must be lowercase alphanumeric with hyphens only');
+    }
 
     const supabase = getSupabaseClient();
 
-    const { data: existing } = await supabase
+    const { data: existingSection } = await supabase
         .from(tableName)
         .select('id')
         .eq('slug', slug.trim())
         .maybeSingle();
-    if (existing) return err(res, 'Slug already in use', 409);
+    if (existingSection) {
+        return sendError(response, 'Slug already in use', 409);
+    }
 
     // Get the highest order_index among siblings to append at the end
-    let siblingsRes;
-    if (type === 'subsection' && parent_id) {
-        siblingsRes = await supabase
+    let siblingsResult;
+    if (type === 'subsection' && parentId) {
+        siblingsResult = await supabase
             .from(tableName)
             .select('order_index')
-            .eq('parent_id', parent_id)
+            .eq('parent_id', parentId)
             .eq('type', 'subsection')
             .order('order_index', { ascending: false })
             .limit(1);
     } else {
-        siblingsRes = await supabase
+        siblingsResult = await supabase
             .from(tableName)
             .select('order_index')
             .is('parent_id', null)
@@ -54,27 +80,30 @@ module.exports = async (req, res) => {
             .order('order_index', { ascending: false })
             .limit(1);
     }
-    const nextOrder = siblingsRes.data && siblingsRes.data.length > 0
-        ? siblingsRes.data[0].order_index + 1
-        : 0;
+    let nextOrderIndex = 0;
+    if (siblingsResult.data && siblingsResult.data.length > 0) {
+        nextOrderIndex = siblingsResult.data[0].order_index + 1;
+    }
 
-    const { data, error } = await supabase
+    const { data: createdSection, error } = await supabase
         .from(tableName)
         .insert({
             slug: slug.trim(),
             title: title.trim(),
             content: content || '',
-            type,
-            parent_id: parent_id || null,
+            type: type,
+            parent_id: parentId || null,
             number: number || null,
             anchor: anchor || null,
-            order_index: nextOrder,
+            order_index: nextOrderIndex,
             is_published: true,
             updated_at: new Date().toISOString(),
         })
         .select('*')
         .single();
 
-    if (error) return err(res, 'Failed to create section: ' + error.message);
-    return ok(res, { section: data });
+    if (error) {
+        return sendError(response, 'Failed to create section: ' + error.message);
+    }
+    return sendSuccess(response, { section: createdSection });
 };

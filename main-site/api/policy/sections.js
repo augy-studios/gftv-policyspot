@@ -1,27 +1,33 @@
-// api/policy/sections.js - List all policy sections
+// api/policy/sections.js - List all Charter policy sections
 const {
     getSupabaseClient
 } = require('../../lib/supabase');
 const {
-    ok,
-    err,
+    sendSuccess,
+    sendError,
     handleOptions
 } = require('../../lib/response');
 
-module.exports = async (req, res) => {
-    if (handleOptions(req, res)) return;
-    if (req.method !== 'GET') return err(res, 'Method not allowed', 405);
+module.exports = async (request, response) => {
+    if (handleOptions(request, response)) {
+        return;
+    }
+    if (request.method !== 'GET') {
+        return sendError(response, 'Method not allowed', 405);
+    }
     const supabase = getSupabaseClient();
     const {
-        data,
+        data: sections,
         error
     } = await supabase
         .from('gftvpolicy_charter')
         .select('id, slug, anchor, number, title, type, parent_id, order_index, is_published, content, updated_at')
         .eq('is_published', true)
         .order('order_index');
-    if (error) return err(res, 'Failed to load sections');
-    return ok(res, {
-        sections: data
+    if (error) {
+        return sendError(response, 'Failed to load sections');
+    }
+    return sendSuccess(response, {
+        sections: sections
     });
 };
